@@ -1,0 +1,313 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug PG_decoders_test",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            "args": [
+                "--use_env",
+                "--nproc_per_node=1",
+                "--master_port=2345",
+                "omni_test_PG_decoders.py",
+                "--root_path=./data",
+                "--output_dir=exp_out/trail_debug_16",
+                "--resume=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_16/best_model_294_0.4725.pth",
+                "--batch_size=1",
+                "--img_size=224",
+                "--cfg=configs/swin_tiny_patch4_window7_224_lite-PG.yaml",
+                "--prompt",
+                "--is_saveout",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "2345",
+                "WORLD_SIZE": "1",
+                "RANK": "0",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Debug PG Training",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/omni_train_PG_decoders.py",
+            "args": [
+                "--output_dir=exp_out/debug_16",
+                "--prompt",
+                "--base_lr=0.00001",
+                "--batch_size=1",
+                "--max_epochs=800",
+                "--root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "2345",
+                "WORLD_SIZE": "1",
+                "RANK": "0",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Model.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/model.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "${workspaceFolder}/baseline"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}",
+            "stopOnEntry": true
+        },
+        {
+            "name": "Train UUSIC Model",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            "args": [
+                "--use_env",
+                "--nproc_per_node=1",
+                "--master_port=2345",
+                "omni_train_debug.py",
+                "--output_dir=exp_out/debug_2",
+                "--max_epochs=300",
+                "--prompt",
+                "--base_lr=0.00001",
+                "--resume=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trial_uusic_9/latest.pth"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Test UUSIC Model",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            "args": [
+                "--use_env",
+                "--nproc_per_node=1",
+                "--master_port=12345",
+                "omni_test.py",
+                "--output_dir=exp_out/trial_1",
+                "--prompt",
+                "--base_lr=0.003"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Train UUSIC Model (Single GPU Debug)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/omni_train.py",
+            "args": [
+                "--use_env",
+                "--output_dir=exp_out/trial_1",
+                "--prompt",
+                "--base_lr=0.003",
+                "--batch_size=8",
+                "--max_epochs=50"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Test UUSIC Model (Single GPU Debug)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/omni_test.py",
+            "args": [
+                "--use_env",
+                "--output_dir=exp_out/trial_1",
+                "--prompt",
+                "--base_lr=0.003",
+                "--batch_size=16"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Generate Dataset TXT Files",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/datasets/generate_txt.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/baseline"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Run GPU Occupier",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/train_vgg.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Train with Custom Config",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/omni_train.py",
+            "args": [
+                "--cfg=configs/swin_tiny_patch4_window7_224_lite.yaml",
+                "--output_dir=exp_out/custom_trial",
+                "--prompt",
+                "--base_lr=0.001",
+                "--batch_size=16",
+                "--max_epochs=100",
+                "--img_size=224"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Test with Inference Save",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/baseline/omni_test.py",
+            "args": [
+                "--output_dir=exp_out/trial_1",
+                "--prompt",
+                "--base_lr=0.003",
+                "--is_saveout",
+                "--test_save_dir=predictions"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        },
+        {
+            "name": "Train UUSIC Model 2 optimizers",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            "args": [
+                "--use_env",
+                "--nproc_per_node=1",
+                "--master_port=12345",
+                "omni_train.py",
+                "--output_dir=exp_out/debug_5",
+                "--prompt",
+                "--seg_lr=0.0001",
+                "--cls_lr=0.00001",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/baseline",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "7",
+                "PYTHONPATH": "${workspaceFolder}/baseline",
+                "MASTER_ADDR": "localhost",
+                "MASTER_PORT": "12345",
+                "RANK": "0",
+                "WORLD_SIZE": "1",
+                "LOCAL_RANK": "0",
+                "NODE_RANK": "0"
+            },
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}"
+        }
+
+    ]
+}

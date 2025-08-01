@@ -1,0 +1,7 @@
+baseline/data/
+baseline/data_demo
+baseline/exp_out
+baseline/pretrained_ckpt
+baseline/__pycache__
+baseline/.ipynb_checkpoints
+baseline/data.zip
