@@ -33,7 +33,8 @@ torchrun \
     omni_train_PG_decoders.py \
     --output_dir=exp_out/trail_debug_19 \
     --prompt \
-    --base_lr=0.001 \
-    --batch_size=1 \
-    --max_epochs=200 \
-    --root_path=/cpfs01/project
+    --base_lr=0.00001 \
+    --batch_size=128 \
+    --max_epochs=800 \
+    --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_19/latest_199.pth \
+    --root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/

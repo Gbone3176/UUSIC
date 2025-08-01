@@ -303,7 +303,7 @@ def omni_train(args, model, snapshot_path):
             # 根据权重决定是否跳过某些批次（权重采样的替代方案）
             skip_prob = max(0.0, 1.0 - weight)
             
-            for i_batch, sampled_batch in tqdm(enumerate(dataloader), desc=f"Seg-{dataset_name}"):
+            for i_batch, sampled_batch in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Seg-{dataset_name}"):
                 # 根据权重随机跳过某些批次
                 if random.random() < skip_prob:
                     continue
@@ -363,7 +363,7 @@ def omni_train(args, model, snapshot_path):
             # 根据权重决定是否跳过某些批次
             skip_prob = max(0.0, 1.0 - weight)
             
-            for i_batch, sampled_batch in tqdm(enumerate(dataloader), desc=f"Cls-{dataset_name}"):
+            for i_batch, sampled_batch in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Cls-{dataset_name}"):
                 # 根据权重随机跳过某些批次
                 if random.random() < skip_prob:
                     continue
@@ -742,13 +742,3 @@ def load_encoder_weights_and_freeze(model, resume_path):
         logging.error(f"Error loading encoder weights: {e}")
         logging.info("Starting training from scratch")
         return 0
-
-# ========== 修改的模型加载和权重冻结部分 ==========
-# 仅加载encoder权重并冻结
-resume_epoch = load_encoder_weights_and_freeze(model, args.resume)
-
-# 创建优化器（只优化可训练的参数）
-trainable_params = [p for p in model.parameters() if p.requires_grad]
-optimizer = optim.AdamW(trainable_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
-
-logging.info(f"Optimizer created with {len(trainable_params)} trainable parameter groups")
