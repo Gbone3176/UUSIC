@@ -5,3 +5,5 @@ baseline/pretrained_ckpt
 baseline/__pycache__
 baseline/.ipynb_checkpoints
 baseline/data.zip
+.vscode
+.ipynb_checkpoints
