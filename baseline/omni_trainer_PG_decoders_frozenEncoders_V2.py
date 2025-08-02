@@ -13,7 +13,7 @@ from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torch.utils.tensorboard import SummaryWriter
-
+from torch.optim.lr_scheduler import CosineAnnealingLR, LambdaLR
 
 from utils import DiceLoss
 from datasets.dataset_aug_norm import USdatasetCls, USdatasetSeg
@@ -21,16 +21,38 @@ from datasets.dataset_aug_norm import RandomGenerator_Cls, RandomGenerator_Seg, 
 from datasets.omni_dataset_decoders import WeightedRandomSamplerDDP
 from datasets.omni_dataset_decoders import USdatasetOmni_cls_decoders, USdatasetOmni_seg_decoders
 from sklearn.metrics import roc_auc_score
-from utils import omni_seg_test
 
+from utils import omni_seg_test_decoders
 
-def get_lr_schedule(progress, base_lr):
-    if progress >= 0.5:
-        return base_lr * (progress ** 0.5)  # 更温和的衰减
-    elif progress >= 0.2:
-        return base_lr * (0.5 ** 0.5) * (progress / 0.5)  # 线性衰减
-    else:
-        return base_lr * (0.2 ** 0.5)  # 保持最小学习率
+# Warmup + CosineAnnealingLR调度器
+import math
+class WarmupCosineLRScheduler:
+    def __init__(self, optimizer, base_lr, max_iters, warmup_iters=0):
+        self.optimizer = optimizer
+        self.base_lr = base_lr
+        self.max_iters = max_iters
+        self.warmup_iters = warmup_iters
+        self.last_iter = 0
+        self.set_lr(0.0 if warmup_iters > 0 else base_lr)
+
+    def step(self):
+        self.last_iter += 1
+        if self.last_iter <= self.warmup_iters and self.warmup_iters > 0:
+            lr = self.base_lr * self.last_iter / float(self.warmup_iters)
+        else:
+            t = min(self.last_iter - self.warmup_iters, self.max_iters - self.warmup_iters)
+            T = max(1, self.max_iters - self.warmup_iters)
+            lr = 0.5 * self.base_lr * (1 + math.cos(math.pi * t / T))
+        self.set_lr(lr)
+        return lr
+
+    def set_lr(self, lr):
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = lr
+        self.current_lr = lr
+
+    def get_lr(self):
+        return self.current_lr
 
 def validate_dataset_config(model):
     """
@@ -138,13 +160,14 @@ def omni_train(args, model, snapshot_path):
     
     # 为每个分割数据集创建单独的DataLoader
     seg_dataloaders = {}
+    # 改进的权重配置 - 基于数据平衡的考虑
     seg_dataset_weights = {
-        'private_Breast': 0.25,
-        'private_Breast_luminal': 0.25,
-        'private_Cardiac': 4,
-        'private_Fetal_Head': 4,
-        'private_Kidney': 2,
-        'private_Thyroid': 4
+        'private_Breast': 1.0,          # 基准权重
+        'private_Breast_luminal': 1.2,  # 略微增加
+        'private_Cardiac': 1.8,         # 较大增加（通常数据较少）
+        'private_Fetal_Head': 1.8,      # 较大增加（通常数据较少）
+        'private_Kidney': 1.5,          # 中等增加
+        'private_Thyroid': 2.0          # 最大增加（通常数据最少）
     }
     
     logging.info("Creating segmentation DataLoaders for each dataset...")
@@ -189,11 +212,12 @@ def omni_train(args, model, snapshot_path):
     
     # 为每个分类数据集创建单独的DataLoader
     cls_dataloaders = {}
+    # 改进的权重配置 - 基于数据平衡和任务难度的考虑
     cls_dataset_weights = {
-        'private_Appendix': 4,
-        'private_Breast': 4,
-        'private_Breast_luminal': 1,
-        'private_Liver': 2
+        'private_Appendix': 1.8,        # 增加权重（通常数据较少）
+        'private_Breast': 1.0,          # 基准权重
+        'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
+        'private_Liver': 1.6            # 适度增加
     }
     
     logging.info("Creating classification DataLoaders for each dataset...")  
@@ -267,18 +291,23 @@ def omni_train(args, model, snapshot_path):
 
     logging.info(f"Optimizer created with {len(trainable_params)} trainable parameter groups")
 
+
     writer = SummaryWriter(snapshot_path + '/log')
     global_iter_num = 0
     seg_iter_num = 0
     cls_iter_num = 0
     max_epoch = args.max_epochs
-    
+
     # 计算总迭代次数
     total_seg_iterations = sum(len(info['loader']) for info in seg_dataloaders.values())
     total_cls_iterations = sum(len(info['loader']) for info in cls_dataloaders.values())
     total_iterations = total_seg_iterations + total_cls_iterations
     max_iterations = args.max_epochs * total_iterations
-    
+
+    # warmup_batch可通过args.warmup_batch指定，默认5
+    warmup_batch = getattr(args, 'warmup_batch', 5)
+    lr_scheduler = WarmupCosineLRScheduler(optimizer, base_lr, max_iterations, warmup_iters=warmup_batch)
+
     logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
         batch_size, total_seg_iterations, total_cls_iterations, total_iterations, max_iterations))
     best_performance = 0.0
@@ -291,6 +320,11 @@ def omni_train(args, model, snapshot_path):
     else:
         iterator = tqdm(range(resume_epoch, max_epoch), ncols=70, disable=False)
 
+    ## 添加早停机制
+    patience = 10
+    no_improve_count = 0
+    best_performance = 0.0
+
     for epoch_num in iterator:
         logging.info("\n epoch: {}".format(epoch_num))
         
@@ -300,21 +334,39 @@ def omni_train(args, model, snapshot_path):
         for dataset_name, info in cls_dataloaders.items():
             info['sampler'].set_epoch(epoch_num)
 
-        # ========== 分割任务训练 - 按数据集逐个训练 ==========
+        # ========== 分割任务训练 - 加权采样 ==========
         logging.info("Training segmentation tasks...")
+        
+        # 创建加权采样池
+        seg_batch_pool = []
         for dataset_name, dataset_info in seg_dataloaders.items():
             dataloader = dataset_info['loader']
             weight = dataset_info['weight']
             
-            logging.info(f"Training segmentation on {dataset_name} with weight {weight}")
+            # 根据权重决定每个数据集的采样次数
+            sample_count = int(len(dataloader) * weight)
+            sample_count = max(1, sample_count)  # 确保至少采样一次
             
-            # 根据权重决定是否跳过某些批次（权重采样的替代方案）
-            skip_prob = max(0.0, 1.0 - weight)
+            # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
             
-            for i_batch, sampled_batch in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Seg-{dataset_name}"):
-                # 根据权重随机跳过某些批次
-                if random.random() < skip_prob:
-                    continue
+            # 将批次添加到采样池，重复次数根据权重决定
+            batch_list = list(enumerate(dataloader))
+            if weight <= 1.0:
+                # 权重<=1时，随机采样子集
+                sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
+            else:
+                # 权重>1时，重复采样
+                sampled_batches = random.choices(batch_list, k=sample_count)
+            
+            for i_batch, sampled_batch in sampled_batches:
+                seg_batch_pool.append((dataset_name, i_batch, sampled_batch))
+        
+        # 随机打乱采样池
+        random.shuffle(seg_batch_pool)
+        logging.info(f"Total segmentation batches after weighted sampling: {len(seg_batch_pool)}")
+        
+        # 训练加权采样后的批次
+        for dataset_name, i_batch, sampled_batch in tqdm(seg_batch_pool, total=len(seg_batch_pool), desc="Seg-Training"):
                    
                 image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
                 image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
@@ -332,21 +384,17 @@ def omni_train(args, model, snapshot_path):
 
                 loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
                 loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
-                loss = 0.28 * loss_ce + 0.72 * loss_dice
+
+                ce_weight, dice_weight = get_dynamic_loss_weights(epoch_num, max_epoch)
+                loss = ce_weight * loss_ce + dice_weight * loss_dice
 
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
                 
-                # 修改学习率衰减策略：当进度超过70%时保持恒定
-                progress = 1.0 - global_iter_num / max_iterations
-                if progress >= 0.3:
-                    lr_ = base_lr * (progress ** 0.9)
-                else:
-                    lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
-                    
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = lr_
+
+                # 分割和分类公用同一个学习率调度器
+                lr_ = lr_scheduler.step()
 
                 seg_iter_num = seg_iter_num + 1
                 global_iter_num = global_iter_num + 1
@@ -359,22 +407,40 @@ def omni_train(args, model, snapshot_path):
                     logging.info('Dataset: %s, global iteration %d and seg iteration %d : loss : %f' %
                                  (dataset_name, global_iter_num, seg_iter_num, loss.item()))
 
-        # ========== 分类任务训练 - 按数据集逐个训练 ==========
+        # ========== 分类任务训练 - 加权采样 ==========
         logging.info("Training classification tasks...")
+        
+        # 创建加权采样池
+        cls_batch_pool = []
         for dataset_name, dataset_info in cls_dataloaders.items():
             dataloader = dataset_info['loader']
             weight = dataset_info['weight']
             num_classes = dataset_info['num_classes']
             
-            logging.info(f"Training classification on {dataset_name} with {num_classes} classes and weight {weight}")
+            # 根据权重决定每个数据集的采样次数
+            sample_count = int(len(dataloader) * weight)
+            sample_count = max(1, sample_count)  # 确保至少采样一次
             
-            # 根据权重决定是否跳过某些批次
-            skip_prob = max(0.0, 1.0 - weight)
+            # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
             
-            for i_batch, sampled_batch in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Cls-{dataset_name}"):
-                # 根据权重随机跳过某些批次
-                if random.random() < skip_prob:
-                    continue
+            # 将批次添加到采样池，重复次数根据权重决定
+            batch_list = list(enumerate(dataloader))
+            if weight <= 1.0:
+                # 权重<=1时，随机采样子集
+                sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
+            else:
+                # 权重>1时，重复采样
+                sampled_batches = random.choices(batch_list, k=sample_count)
+            
+            for i_batch, sampled_batch in sampled_batches:
+                cls_batch_pool.append((dataset_name, num_classes, i_batch, sampled_batch))
+        
+        # 随机打乱采样池
+        random.shuffle(cls_batch_pool)
+        logging.info(f"Total classification batches after weighted sampling: {len(cls_batch_pool)}")
+        
+        # 训练加权采样后的批次
+        for dataset_name, num_classes, i_batch, sampled_batch in tqdm(cls_batch_pool, total=len(cls_batch_pool), desc="Cls-Training"):
                     
                 image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
                 image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
@@ -403,13 +469,8 @@ def omni_train(args, model, snapshot_path):
                 loss.backward()
                 optimizer.step()
 
-                progress = 1.0 - global_iter_num / max_iterations
-                if progress >= 0.3:
-                    lr_ = base_lr * (progress ** 0.9)
-                else:
-                    lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = lr_
+
+                # lr_ = lr_scheduler.step()
 
                 cls_iter_num = cls_iter_num + 1
                 global_iter_num = global_iter_num + 1
@@ -483,7 +544,7 @@ def omni_train(args, model, snapshot_path):
                             type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float()
                             nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float()
         
-                            metric_i = omni_seg_test(image, label, model,
+                            metric_i = omni_seg_test_decoders(image, label, model,
                                                     classes=num_classes,
                                                     prompt=args.prompt,
                                                     type_prompt=type_prompt,
@@ -492,7 +553,7 @@ def omni_train(args, model, snapshot_path):
                                                     task_prompt=task_prompt,
                                                     dataset_name=dataset_name)
                         else:
-                            metric_i = omni_seg_test(image, label, model,
+                            metric_i = omni_seg_test_decoders(image, label, model,
                                                     classes=num_classes, dataset_name=dataset_name)
 
                         # 实际上这里的metric_i是多类别分割的结果，这个任务只有二类分割，只对一个标签做处理
@@ -649,6 +710,16 @@ def omni_train(args, model, snapshot_path):
                         epoch_num, periodic_save_path))
                 model.train()
 
+        if TotalAvgPerformance > best_performance:
+            best_performance = TotalAvgPerformance
+            no_improve_count = 0
+        else:
+            no_improve_count += 1
+        
+        if no_improve_count >= patience:
+            logging.info(f"Early stopping triggered after {no_improve_count} epochs without improvement")
+            break
+
     writer.close()
     return "Training Finished!"
 
@@ -685,7 +756,7 @@ def load_encoder_weights_and_freeze(model, resume_path):
         # 筛选出encoder相关的权重
         encoder_dict = {}
         # 更精确的encoder/decoder区分
-        encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop']
+        encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop','norm']
         decoder_keywords = ['seg_decoders', 'cls_decoders', 'seg_heads', 'cls_heads', 
                        'seg_skip_connections', 'cls_skip_connections', 'norm_task_seg', 'norm_task_cls']
         
@@ -752,3 +823,25 @@ def load_encoder_weights_and_freeze(model, resume_path):
         logging.error(f"Error loading encoder weights: {e}")
         logging.info("Starting training from scratch")
         return 0
+
+def get_dynamic_loss_weights(epoch, total_epochs):
+    """根据训练进度动态调整损失权重"""
+    progress = epoch / total_epochs
+    if progress < 0.3:
+        return 0.5, 0.5  # 早期平衡
+    elif progress < 0.7:
+        return 0.3, 0.7  # 中期偏重dice
+    else:
+        return 0.2, 0.8  # 后期更重dice
+
+def weighted_batch_sampling(dataloaders, weights):
+    """使用加权采样而不是随机跳过"""
+    all_batches = []
+    for dataset_name, info in dataloaders.items():
+        weight = weights.get(dataset_name, 1.0)
+        for batch in info['loader']:
+            all_batches.append((dataset_name, batch, weight))
+    
+    # 按权重采样
+    weights_list = [w for _, _, w in all_batches]
+    return random.choices(all_batches, weights=weights_list, k=len(all_batches))

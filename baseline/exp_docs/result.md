@@ -543,5 +543,10 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 
 - trail_debug_18：调整学习率lr=0.001，各个数据集使用一个单独的decoder，做特异性优化
 
-- trail_debug_19：调整学习率lr=0.001，各个数据集使用一个单独的decoder，做特异性优化。导入之前的encoder的权重并冻结encoder，只训练decoder和task Heads。
+- trail_debug_19：调整学习率lr=0.00001，各个数据集使用一个单独的decoder，做特异性优化。导入之前的encoder的权重并冻结encoder，只训练decoder和task Heads。
 
+- trail_debug_20：
+    - lr：Warmup + Cosine Annealing
+    - 各个数据集使用一个单独的decoder，做特异性优化。
+    - 导入之前的encoder的权重并冻结encoder，只训练decoder和task Heads。- 对分割的两个损失函数的权重进行动态调整
+    - 添加早停
