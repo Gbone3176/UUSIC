@@ -61,12 +61,12 @@ args = parser.parse_args()
 config = get_config(args)
 
 
-def inference(args, model, test_save_path=None):
+def inference(args, model, test_save_path=None, dirname=None):
     import csv
     import time
 
-    if not os.path.exists(f"{args.output_dir}/result.csv"):
-        with open(f"{args.output_dir}/result.csv", 'w', newline='') as csvfile:
+    if not os.path.exists(f"{dirname}/result.csv"):
+        with open(f"{dirname}/result.csv", 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['dataset', 'task', 'metric', 'time'])
 
@@ -297,26 +297,26 @@ if __name__ == "__main__":
         print("self trained swin unet with PG decoders", msg)
     snapshot_name = snapshot.split('/')[-1]
 
-
-    filename = os.path.join(args.output_dir, "test_result.txt")
+    dirname = os.path.join(args.output_dir,snapshot_name[:-4])
+    filename = os.path.join(dirname, "test_result.txt")
 
     # 确保目录存在（如果 `args.output_dir` 不存在则创建）
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(dirname, exist_ok=True)
 
     # 创建文件（如果文件不存在）
     with open(filename, "a") as f:  # "a" 模式（追加模式）不会覆盖已有内容
         pass
 
-    logging.basicConfig(filename=args.output_dir+"/"+"test_result.txt", level=logging.INFO,
+    logging.basicConfig(filename=dirname+"/"+"test_result.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.info(str(args))
     logging.info(snapshot_name)
 
     if args.is_saveout:
-        args.test_save_dir = os.path.join(args.output_dir, "predictions")
+        args.test_save_dir = os.path.join(dirname, "predictions")
         test_save_path = args.test_save_dir
         os.makedirs(test_save_path, exist_ok=True)
     else:
         test_save_path = None
-    inference(args, net, test_save_path) 
+    inference(args, net, test_save_path, dirname=dirname)

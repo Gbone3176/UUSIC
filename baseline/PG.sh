@@ -2,12 +2,12 @@ export CUDA_VISIBLE_DEVICES=0
 ######## train PG ########
 # torchrun \
 #     --nproc_per_node=1 \
-#     --master_port=12345 \
+#     --master_port=2345 \
 #     omni_train_PG_decoders.py \
-#     --output_dir=exp_out/trail_debug_18 \
+#     --output_dir=exp_out/debug_18 \
 #     --prompt \
 #     --base_lr=0.001 \
-#     --batch_size=128 \
+#     --batch_size=1 \
 #     --max_epochs=200 \
 #     --root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/ \
     
@@ -17,7 +17,7 @@ torchrun \
     --master_port=2345 \
     omni_test_PG_decoders.py \
     --root_path ./data \
-    --output_dir exp_out/trail_debug_22 \
+    --output_dir exp_out/test_trail_debug_22 \
     --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_22/epoch40_performance_0.274.pth \
     --batch_size 1 \
     --img_size 224 \

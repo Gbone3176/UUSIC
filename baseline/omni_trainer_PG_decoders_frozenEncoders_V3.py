@@ -54,9 +54,9 @@ class WarmupCosineLRScheduler:
     def get_lr(self):
         return self.current_lr
 
-def load_encoder_weights_and_freeze(model, resume_path):
+def load_encoder_weights_and_unfreeze(model, resume_path):
     """
-    仅加载encoder部分的权重并冻结encoder参数
+    加载encoder部分的权重但保持encoder参数可训练
     
     Args:
         model: 要加载权重的模型
@@ -112,29 +112,17 @@ def load_encoder_weights_and_freeze(model, resume_path):
         
         logging.info(f"Successfully loaded {len(encoder_dict)} encoder parameters from pretrained model")
         
-        # 冻结encoder部分的权重
-        frozen_params = 0
+        # 保持所有参数可训练（包括encoder）
         trainable_params = 0
-        frozen_param_names = []
         trainable_param_names = []
         
         for name, param in model.named_parameters():
-            # 检查是否是encoder参数
-            is_encoder = any(enc_key in name for enc_key in encoder_keywords)
-            is_decoder = any(dec_key in name for dec_key in decoder_keywords)
-            
-            if is_encoder and not is_decoder:
-                param.requires_grad = False
-                frozen_params += param.numel()
-                frozen_param_names.append(name)
-            else:
-                param.requires_grad = True
-                trainable_params += param.numel()
-                trainable_param_names.append(name)
+            param.requires_grad = True
+            trainable_params += param.numel()
+            trainable_param_names.append(name)
                 
-        logging.info(f"Frozen {frozen_params:,} encoder parameters")
-        logging.info(f"Trainable {trainable_params:,} decoder parameters")
-        logging.info(f"Frozen parameter ratio: {frozen_params/(frozen_params+trainable_params)*100:.2f}%")
+        logging.info(f"All {trainable_params:,} parameters are now trainable (including encoder)")
+        logging.info("Encoder parameters are no longer frozen and will be updated during training")
         
         # 获取恢复的epoch（如果有的话）
         if 'epoch' in checkpoint:
@@ -142,7 +130,7 @@ def load_encoder_weights_and_freeze(model, resume_path):
             logging.info(f"Resuming from epoch {resume_epoch}")
         else:
             resume_epoch = 0
-            logging.info("Starting fresh training with pretrained encoder")
+            logging.info("Starting fresh training with pretrained encoder (unfrozen)")
             
         # 注意：不加载optimizer状态，因为我们改变了可训练参数的结构
         logging.info("Note: Optimizer state not loaded due to changed trainable parameter structure")
@@ -407,15 +395,14 @@ def omni_train(args, model, snapshot_path):
     #     optimizer.load_state_dict(torch.load(args.resume, map_location='cpu')['optimizer'])
     #     resume_epoch = torch.load(args.resume, map_location='cpu')['epoch']
 
-    # ========== 修改的模型加载和权重冻结部分 ==========
-    # 仅加载encoder权重并冻结
-    resume_epoch = load_encoder_weights_and_freeze(model, args.resume)
+    # ========== 修改的模型加载和权重解冻部分 ==========
+    # 加载encoder权重但保持可训练
+    resume_epoch = load_encoder_weights_and_unfreeze(model, args.resume)
 
-    # 创建优化器（只优化可训练的参数）
-    trainable_params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = optim.AdamW(trainable_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
+    # 创建优化器（现在所有参数都是可训练的）
+    optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
 
-    logging.info(f"Optimizer created with {len(trainable_params)} trainable parameter groups")
+    logging.info(f"Optimizer created with all parameters trainable (including encoder)")
 
 
     writer = SummaryWriter(snapshot_path + '/log')

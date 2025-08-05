@@ -556,8 +556,10 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
     - 不使用早停
     - 扩充数据，同种任务和器官的数据用同一个decoder
 
-- trail_debug_22：在20的基础上
-    - 使用[官方](https://github.com/Zehui-Lin/PerceptGuide/releases/tag/v1.0.0)的权重进行初始化，并冻结encoder
+- trail_debug_22：在21的基础上
     - 不使用早停
-    - 扩充数据，同种任务和器官的数据用同一个decoder
     - lr 1e-5
+
+- trail_debug_22：在21的基础上
+    - 解冻encoder
+    - 调整 celoss 和 diceloss 的权重

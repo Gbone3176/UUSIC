@@ -1,0 +1,9 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+baseline/data/
+baseline/data_demo
+baseline/exp_out
+baseline/pretrained_ckpt
+baseline/__pycache__
+baseline/.ipynb_checkpoints
+baseline/data.zip
+.ipynb_checkpoints
