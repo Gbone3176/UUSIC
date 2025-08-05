@@ -545,8 +545,19 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 
 - trail_debug_19：调整学习率lr=0.00001，各个数据集使用一个单独的decoder，做特异性优化。导入之前的encoder的权重并冻结encoder，只训练decoder和task Heads。
 
-- trail_debug_20：
+- trail_debug_20：**不work**
     - lr：Warmup + Cosine Annealing
     - 各个数据集使用一个单独的decoder，做特异性优化。
-    - 导入之前的encoder的权重并冻结encoder，只训练decoder和task Heads。- 对分割的两个损失函数的权重进行动态调整
+    - 导入他给的预训练权重，将encoder的权重冻结，只训练decoder和task Heads。- 对分割的两个损失函数的权重进行动态调整
     - 添加早停
+
+- trail_debug_21：在20的基础上
+    - 使用[官方](https://github.com/Zehui-Lin/PerceptGuide/releases/tag/v1.0.0)的权重进行初始化，并冻结encoder
+    - 不使用早停
+    - 扩充数据，同种任务和器官的数据用同一个decoder
+
+- trail_debug_22：在20的基础上
+    - 使用[官方](https://github.com/Zehui-Lin/PerceptGuide/releases/tag/v1.0.0)的权重进行初始化，并冻结encoder
+    - 不使用早停
+    - 扩充数据，同种任务和器官的数据用同一个decoder
+    - lr 1e-5

@@ -55,6 +55,28 @@ nature_prompt_dict = {
     "private_Kidney": "organ",
     "private_Thyroid": "tumor",
 }
+# nature_prompt_dict = {
+#     "BUS-BRA": "tumor",
+#     "BUSIS": "tumor",
+#     "CAMUS": "organ",
+#     "DDTI": "tumor",
+#     "Fetal_HC": "organ",
+#     "KidneyUS": "organ",
+#     # "UDIAT": "organ",
+#     "Appendix": "organ",
+#     "Fatty-Liver": "organ",
+#     "BUSI": "tumor",
+#     "private_Appendix": "organ",
+#     "private_Breast": "tumor",
+#     "private_Breast_luminal": "tumor",
+#     "private_Liver": "organ",
+#     "private_Cardiac": "organ",
+#     "private_Fetal_Head": "organ",
+#     "private_Kidney": "organ",
+#     "private_Thyroid": "tumor",
+# }
+
+
 # type prompt
 available_type_prompt_list = [
     "BUS-BRA",

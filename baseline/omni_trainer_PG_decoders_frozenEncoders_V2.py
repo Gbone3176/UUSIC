@@ -54,47 +54,115 @@ class WarmupCosineLRScheduler:
     def get_lr(self):
         return self.current_lr
 
-def validate_dataset_config(model):
+def load_encoder_weights_and_freeze(model, resume_path):
     """
-    验证模型和训练器中的数据集配置是否一致
+    仅加载encoder部分的权重并冻结encoder参数
+    
+    Args:
+        model: 要加载权重的模型
+        resume_path: 预训练模型路径
+        
+    Returns:
+        resume_epoch: 恢复的epoch数
     """
-    # 训练器中的数据集配置
-    trainer_seg_datasets = [
-        'private_Breast',
-        'private_Breast_luminal', 
-        'private_Cardiac',
-        'private_Fetal_Head',
-        'private_Kidney',
-        'private_Thyroid'
-    ]
+    if resume_path is None:
+        logging.info("No resume path provided, starting training from scratch")
+        return 0
+        
+    logging.info(f"Loading encoder weights from: {resume_path}")
     
-    trainer_cls_datasets = {
-        'private_Appendix': 2,
-        'private_Breast': 2,
-        'private_Breast_luminal': 4,
-        'private_Liver': 2
-    }
-    
-    # 从模型中获取数据集配置
-    model_seg_datasets = model.swin.seg_datasets
-    model_cls_datasets = model.swin.cls_datasets
-    
-    # 验证分割数据集
-    if set(trainer_seg_datasets) != set(model_seg_datasets):
-        return False, f"Segmentation datasets mismatch: trainer={trainer_seg_datasets}, model={model_seg_datasets}"
-    
-    # 验证分类数据集
-    if set(trainer_cls_datasets.keys()) != set(model_cls_datasets):
-        return False, f"Classification datasets mismatch: trainer={list(trainer_cls_datasets.keys())}, model={model_cls_datasets}"
-    
-    # 验证分类数据集的分类头是否存在
-    for dataset_name, num_classes in trainer_cls_datasets.items():
-        head_key = f"{dataset_name}_{num_classes}cls"
-        if head_key not in model.swin.cls_heads:
-            return False, f"Missing classification head: {head_key}"
-    
-    return True, "All dataset configurations are consistent"
+    try:
+        checkpoint = torch.load(resume_path, map_location='cpu')
+        
+        # 提取预训练权重
+        if 'model' in checkpoint:
+            pretrained_dict = checkpoint['model']
+        else:
+            pretrained_dict = checkpoint
+            
+        # 获取当前模型的状态字典
+        model_dict = model.state_dict()
+        
+        # 筛选出encoder相关的权重
+        encoder_dict = {}
+        # 更精确的encoder/decoder区分
+        encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop','norm']
+        decoder_keywords = ['seg_decoders', 'cls_decoders', 'seg_heads', 'cls_heads', 
+                       'seg_skip_connections', 'cls_skip_connections', 'norm_task_seg', 'norm_task_cls']
+        
+        for k, v in pretrained_dict.items():
+            # 检查是否是encoder相关的参数
+            is_encoder = any(enc_key in k for enc_key in encoder_keywords)
+            is_decoder = any(dec_key in k for dec_key in decoder_keywords)
+            
+            # 只加载encoder部分，排除decoder部分
+            if is_encoder and not is_decoder:
+                if k in model_dict and model_dict[k].shape == v.shape:
+                    encoder_dict[k] = v
+                    logging.info(f"Loading encoder weight: {k}, shape: {v.shape}")
+                else:
+                    if k not in model_dict:
+                        logging.warning(f"Encoder weight not found in current model: {k}")
+                    else:
+                        logging.warning(f"Shape mismatch for {k}: pretrained {v.shape} vs model {model_dict[k].shape}")
+        
+        # 更新模型字典
+        model_dict.update(encoder_dict)
+        model.load_state_dict(model_dict)
+        
+        logging.info(f"Successfully loaded {len(encoder_dict)} encoder parameters from pretrained model")
+        
+        # 冻结encoder部分的权重
+        frozen_params = 0
+        trainable_params = 0
+        frozen_param_names = []
+        trainable_param_names = []
+        
+        for name, param in model.named_parameters():
+            # 检查是否是encoder参数
+            is_encoder = any(enc_key in name for enc_key in encoder_keywords)
+            is_decoder = any(dec_key in name for dec_key in decoder_keywords)
+            
+            if is_encoder and not is_decoder:
+                param.requires_grad = False
+                frozen_params += param.numel()
+                frozen_param_names.append(name)
+            else:
+                param.requires_grad = True
+                trainable_params += param.numel()
+                trainable_param_names.append(name)
+                
+        logging.info(f"Frozen {frozen_params:,} encoder parameters")
+        logging.info(f"Trainable {trainable_params:,} decoder parameters")
+        logging.info(f"Frozen parameter ratio: {frozen_params/(frozen_params+trainable_params)*100:.2f}%")
+        
+        # 获取恢复的epoch（如果有的话）
+        if 'epoch' in checkpoint:
+            resume_epoch = checkpoint['epoch']
+            logging.info(f"Resuming from epoch {resume_epoch}")
+        else:
+            resume_epoch = 0
+            logging.info("Starting fresh training with pretrained encoder")
+            
+        # 注意：不加载optimizer状态，因为我们改变了可训练参数的结构
+        logging.info("Note: Optimizer state not loaded due to changed trainable parameter structure")
+        
+        return resume_epoch
+        
+    except Exception as e:
+        logging.error(f"Error loading encoder weights: {e}")
+        logging.info("Starting training from scratch")
+        return 0
 
+def get_dynamic_loss_weights(epoch, total_epochs):
+    """根据训练进度动态调整损失权重"""
+    progress = epoch / total_epochs
+    if progress < 0.3:
+        return 0.5, 0.5  # 早期平衡
+    elif progress < 0.7:
+        return 0.3, 0.7  # 中期偏重dice
+    else:
+        return 0.2, 0.8  # 后期更重dice
 
 def omni_train(args, model, snapshot_path):
 
@@ -139,9 +207,50 @@ def omni_train(args, model, snapshot_path):
     # seg_dataset_weights = {
     #     'private_Breast': 0.25,
     # }
-    
+    seg_data_map = {
+        "BUS-BRA": "private_Breast_luminal",
+        "BUSI": "private_Breast_luminal",
+        "BUSIS": "private_Breast_luminal",
+        "CAMUS": "private_Cardiac",
+        "DDTI": "private_Thyroid",
+        "Fetal_HC": "private_Fetal_Head",
+        "KidneyUS": "private_Kidney",
+        "private_Breast": "private_Breast",
+        "private_Breast_luminal": "private_Breast_luminal",
+        "private_Cardiac": "private_Cardiac",
+        "private_Fetal_Head": "private_Fetal_Head",
+        "private_Kidney": "private_Kidney",
+        "private_Thyroid": "private_Thyroid"
+    }
+
+    cls_data_map = {
+        "Appendix": "private_Appendix",
+        "BUS-BRA": "private_Breast_luminal",
+        "BUSI": "private_Breast_luminal",
+        "Fatty-Liver": "private_Liver",
+        "private_Appendix": "private_Appendix",
+        "private_Breast": "private_Breast",
+        "private_Breast_luminal": "private_Breast_luminal",
+        "private_Liver": "private_Liver"
+    }
+
     # ######### for train #########
+    # seg_datasets = [
+    #     'private_Breast',
+    #     'private_Breast_luminal', 
+    #     'private_Cardiac',
+    #     'private_Fetal_Head',
+    #     'private_Kidney',
+    #     'private_Thyroid'
+    # ]
     seg_datasets = [
+        'BUS-BRA',
+        'BUSI',
+        'BUSIS',
+        'CAMUS',
+        'DDTI',
+        'Fetal_HC',
+        'KidneyUS',
         'private_Breast',
         'private_Breast_luminal', 
         'private_Cardiac',
@@ -152,6 +261,10 @@ def omni_train(args, model, snapshot_path):
     
     # 定义分类任务的数据集列表和其分类数
     cls_datasets = {
+        'Appendix':2,
+        'BUS-BRA':2,
+        'BUSI':2,
+        'Fatty-Liver':2,
         'private_Appendix': 2,
         'private_Breast': 2,
         'private_Breast_luminal': 4,  # 4分类
@@ -162,6 +275,14 @@ def omni_train(args, model, snapshot_path):
     seg_dataloaders = {}
     # 改进的权重配置 - 基于数据平衡的考虑
     seg_dataset_weights = {
+        'BUS-BRA': 1.0,
+        'BUSI': 1.0,
+        'BUSIS': 1.0,
+        'CAMUS': 1.0,
+        'DDTI': 0.5,
+        'Fetal_HC': 1.0,
+        'KidneyUS': 1.0,
+
         'private_Breast': 1.0,          # 基准权重
         'private_Breast_luminal': 1.2,  # 略微增加
         'private_Cardiac': 1.8,         # 较大增加（通常数据较少）
@@ -214,6 +335,11 @@ def omni_train(args, model, snapshot_path):
     cls_dataloaders = {}
     # 改进的权重配置 - 基于数据平衡和任务难度的考虑
     cls_dataset_weights = {
+        'Appendix': 1.0,
+        'BUS-BRA': 1.0,
+        'BUSI': 1.0,
+        'Fatty-Liver': 1.0,
+
         'private_Appendix': 1.8,        # 增加权重（通常数据较少）
         'private_Breast': 1.0,          # 基准权重
         'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
@@ -321,7 +447,7 @@ def omni_train(args, model, snapshot_path):
         iterator = tqdm(range(resume_epoch, max_epoch), ncols=70, disable=False)
 
     ## 添加早停机制
-    patience = 10
+    patience = 50
     no_improve_count = 0
     best_performance = 0.0
 
@@ -378,9 +504,9 @@ def omni_train(args, model, snapshot_path):
                     nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device) 
                     
                     x_seg = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
-                                          use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=2)
+                                          use_dataset_specific=True, dataset_name=seg_data_map[dataset_name], task_type='seg', num_classes=2)
                 else:
-                    x_seg = model(image_batch, use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=2)
+                    x_seg = model(image_batch, use_dataset_specific=True, dataset_name=seg_data_map[dataset_name], task_type='seg', num_classes=2)
 
                 loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
                 loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
@@ -453,9 +579,9 @@ def omni_train(args, model, snapshot_path):
                     
                     # 直接调用对应数据集和分类数的decoder
                     x_cls = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
-                                  use_dataset_specific=True, dataset_name=dataset_name, task_type='cls', num_classes=num_classes)
+                                  use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
                 else:
-                    x_cls = model(image_batch, use_dataset_specific=True, dataset_name=dataset_name, task_type='cls', num_classes=num_classes)
+                    x_cls = model(image_batch, use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
 
                 # 计算分类损失
                 if num_classes == 2:
@@ -716,132 +842,9 @@ def omni_train(args, model, snapshot_path):
         else:
             no_improve_count += 1
         
-        if no_improve_count >= patience:
-            logging.info(f"Early stopping triggered after {no_improve_count} epochs without improvement")
-            break
+        # if no_improve_count >= patience:
+        #     logging.info(f"Early stopping triggered after {no_improve_count} epochs without improvement")
+        #     break
 
     writer.close()
     return "Training Finished!"
-
-
-def load_encoder_weights_and_freeze(model, resume_path):
-    """
-    仅加载encoder部分的权重并冻结encoder参数
-    
-    Args:
-        model: 要加载权重的模型
-        resume_path: 预训练模型路径
-        
-    Returns:
-        resume_epoch: 恢复的epoch数
-    """
-    if resume_path is None:
-        logging.info("No resume path provided, starting training from scratch")
-        return 0
-        
-    logging.info(f"Loading encoder weights from: {resume_path}")
-    
-    try:
-        checkpoint = torch.load(resume_path, map_location='cpu')
-        
-        # 提取预训练权重
-        if 'model' in checkpoint:
-            pretrained_dict = checkpoint['model']
-        else:
-            pretrained_dict = checkpoint
-            
-        # 获取当前模型的状态字典
-        model_dict = model.state_dict()
-        
-        # 筛选出encoder相关的权重
-        encoder_dict = {}
-        # 更精确的encoder/decoder区分
-        encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop','norm']
-        decoder_keywords = ['seg_decoders', 'cls_decoders', 'seg_heads', 'cls_heads', 
-                       'seg_skip_connections', 'cls_skip_connections', 'norm_task_seg', 'norm_task_cls']
-        
-        for k, v in pretrained_dict.items():
-            # 检查是否是encoder相关的参数
-            is_encoder = any(enc_key in k for enc_key in encoder_keywords)
-            is_decoder = any(dec_key in k for dec_key in decoder_keywords)
-            
-            # 只加载encoder部分，排除decoder部分
-            if is_encoder and not is_decoder:
-                if k in model_dict and model_dict[k].shape == v.shape:
-                    encoder_dict[k] = v
-                    logging.info(f"Loading encoder weight: {k}, shape: {v.shape}")
-                else:
-                    if k not in model_dict:
-                        logging.warning(f"Encoder weight not found in current model: {k}")
-                    else:
-                        logging.warning(f"Shape mismatch for {k}: pretrained {v.shape} vs model {model_dict[k].shape}")
-        
-        # 更新模型字典
-        model_dict.update(encoder_dict)
-        model.load_state_dict(model_dict)
-        
-        logging.info(f"Successfully loaded {len(encoder_dict)} encoder parameters from pretrained model")
-        
-        # 冻结encoder部分的权重
-        frozen_params = 0
-        trainable_params = 0
-        frozen_param_names = []
-        trainable_param_names = []
-        
-        for name, param in model.named_parameters():
-            # 检查是否是encoder参数
-            is_encoder = any(enc_key in name for enc_key in encoder_keywords)
-            is_decoder = any(dec_key in name for dec_key in decoder_keywords)
-            
-            if is_encoder and not is_decoder:
-                param.requires_grad = False
-                frozen_params += param.numel()
-                frozen_param_names.append(name)
-            else:
-                param.requires_grad = True
-                trainable_params += param.numel()
-                trainable_param_names.append(name)
-                
-        logging.info(f"Frozen {frozen_params:,} encoder parameters")
-        logging.info(f"Trainable {trainable_params:,} decoder parameters")
-        logging.info(f"Frozen parameter ratio: {frozen_params/(frozen_params+trainable_params)*100:.2f}%")
-        
-        # 获取恢复的epoch（如果有的话）
-        if 'epoch' in checkpoint:
-            resume_epoch = checkpoint['epoch']
-            logging.info(f"Resuming from epoch {resume_epoch}")
-        else:
-            resume_epoch = 0
-            logging.info("Starting fresh training with pretrained encoder")
-            
-        # 注意：不加载optimizer状态，因为我们改变了可训练参数的结构
-        logging.info("Note: Optimizer state not loaded due to changed trainable parameter structure")
-        
-        return resume_epoch
-        
-    except Exception as e:
-        logging.error(f"Error loading encoder weights: {e}")
-        logging.info("Starting training from scratch")
-        return 0
-
-def get_dynamic_loss_weights(epoch, total_epochs):
-    """根据训练进度动态调整损失权重"""
-    progress = epoch / total_epochs
-    if progress < 0.3:
-        return 0.5, 0.5  # 早期平衡
-    elif progress < 0.7:
-        return 0.3, 0.7  # 中期偏重dice
-    else:
-        return 0.2, 0.8  # 后期更重dice
-
-def weighted_batch_sampling(dataloaders, weights):
-    """使用加权采样而不是随机跳过"""
-    all_batches = []
-    for dataset_name, info in dataloaders.items():
-        weight = weights.get(dataset_name, 1.0)
-        for batch in info['loader']:
-            all_batches.append((dataset_name, batch, weight))
-    
-    # 按权重采样
-    weights_list = [w for _, _, w in all_batches]
-    return random.choices(all_batches, weights=weights_list, k=len(all_batches))
