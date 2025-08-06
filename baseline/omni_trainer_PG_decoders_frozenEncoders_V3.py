@@ -56,7 +56,7 @@ class WarmupCosineLRScheduler:
 
 def load_encoder_weights_and_unfreeze(model, resume_path):
     """
-    加载encoder部分的权重但保持encoder参数可训练
+    仅加载encoder部分的权重并冻结encoder参数
     
     Args:
         model: 要加载权重的模型
@@ -112,17 +112,30 @@ def load_encoder_weights_and_unfreeze(model, resume_path):
         
         logging.info(f"Successfully loaded {len(encoder_dict)} encoder parameters from pretrained model")
         
-        # 保持所有参数可训练（包括encoder）
+        # 冻结encoder部分的权重
+        frozen_params = 0
         trainable_params = 0
+        frozen_param_names = []
         trainable_param_names = []
         
         for name, param in model.named_parameters():
-            param.requires_grad = True
-            trainable_params += param.numel()
-            trainable_param_names.append(name)
+            # 检查是否是encoder参数
+            is_encoder = any(enc_key in name for enc_key in encoder_keywords)
+            is_decoder = any(dec_key in name for dec_key in decoder_keywords)
+            
+            if is_encoder and not is_decoder:
+                param.requires_grad = True
+                # param.requires_grad = False
+                frozen_params += param.numel()
+                frozen_param_names.append(name)
+            else:
+                param.requires_grad = True
+                trainable_params += param.numel()
+                trainable_param_names.append(name)
                 
-        logging.info(f"All {trainable_params:,} parameters are now trainable (including encoder)")
-        logging.info("Encoder parameters are no longer frozen and will be updated during training")
+        logging.info(f"Frozen {frozen_params:,} encoder parameters")
+        logging.info(f"Trainable {trainable_params:,} decoder parameters")
+        logging.info(f"Frozen parameter ratio: {frozen_params/(frozen_params+trainable_params)*100:.2f}%")
         
         # 获取恢复的epoch（如果有的话）
         if 'epoch' in checkpoint:
@@ -130,7 +143,7 @@ def load_encoder_weights_and_unfreeze(model, resume_path):
             logging.info(f"Resuming from epoch {resume_epoch}")
         else:
             resume_epoch = 0
-            logging.info("Starting fresh training with pretrained encoder (unfrozen)")
+            logging.info("Starting fresh training with pretrained encoder")
             
         # 注意：不加载optimizer状态，因为我们改变了可训练参数的结构
         logging.info("Note: Optimizer state not loaded due to changed trainable parameter structure")
@@ -232,31 +245,31 @@ def omni_train(args, model, snapshot_path):
     #     'private_Thyroid'
     # ]
     seg_datasets = [
-        # 'BUS-BRA',
-        # 'BUSI',
-        # 'BUSIS',
-        # 'CAMUS',
-        # 'DDTI',
-        # 'Fetal_HC',
-        # 'KidneyUS',
+        'BUS-BRA',
+        'BUSI',
+        'BUSIS',
+        'CAMUS',
+        'DDTI',
+        'Fetal_HC',
+        'KidneyUS',
         'private_Breast',
-        # 'private_Breast_luminal', 
-        # 'private_Cardiac',
-        # 'private_Fetal_Head',
-        # 'private_Kidney',
-        # 'private_Thyroid'
+        'private_Breast_luminal', 
+        'private_Cardiac',
+        'private_Fetal_Head',
+        'private_Kidney',
+        'private_Thyroid'
     ]
     
     # 定义分类任务的数据集列表和其分类数
     cls_datasets = {
-        # 'Appendix':2,
-        # 'BUS-BRA':2,
-        # 'BUSI':2,
-        # 'Fatty-Liver':2,
+        'Appendix':2,
+        'BUS-BRA':2,
+        'BUSI':2,
+        'Fatty-Liver':2,
         'private_Appendix': 2,
-        # 'private_Breast': 2,
-        # 'private_Breast_luminal': 4,  # 4分类
-        # 'private_Liver': 2           
+        'private_Breast': 2,
+        'private_Breast_luminal': 4,  # 4分类
+        'private_Liver': 2           
     }
     
     # 为每个分割数据集创建单独的DataLoader
@@ -395,14 +408,15 @@ def omni_train(args, model, snapshot_path):
     #     optimizer.load_state_dict(torch.load(args.resume, map_location='cpu')['optimizer'])
     #     resume_epoch = torch.load(args.resume, map_location='cpu')['epoch']
 
-    # ========== 修改的模型加载和权重解冻部分 ==========
-    # 加载encoder权重但保持可训练
+    # ========== 修改的模型加载和权重冻结部分 ==========
+    # 仅加载encoder权重并冻结
     resume_epoch = load_encoder_weights_and_unfreeze(model, args.resume)
 
-    # 创建优化器（现在所有参数都是可训练的）
-    optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
+    # 创建优化器（只优化可训练的参数）
+    trainable_params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = optim.AdamW(trainable_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
 
-    logging.info(f"Optimizer created with all parameters trainable (including encoder)")
+    logging.info(f"Optimizer created with {len(trainable_params)} trainable parameter groups")
 
 
     writer = SummaryWriter(snapshot_path + '/log')
@@ -731,24 +745,10 @@ def omni_train(args, model, snapshot_path):
                             with torch.no_grad():
                                 logits = model(image.cuda(), use_dataset_specific=True, dataset_name=dataset_name, task_type='cls', num_classes=num_classes)
 
-
-                        # if num_classes == 4:
-                        #     logits = output[2]
-                        # else:
-                        #     logits = output[1]
-
                         output_prob = torch.softmax(logits, dim=1).data.cpu().numpy()
 
                         label_list.append(label.numpy())
                         prediction_prob_list.append(output_prob)
-
-                    # label_list = np.expand_dims(np.concatenate(
-                    #     (np.array(label_list[:-1]).flatten(), np.array(label_list[-1]).flatten())), axis=1).astype('uint8')
-                    # label_list_OneHot = np.eye(num_classes)[label_list].squeeze(1)
-                    # performance = roc_auc_score(label_list_OneHot, np.concatenate(
-                    #     (np.array(prediction_prob_list[:-1]).reshape(-1, 2), prediction_prob_list[-1])), multi_class='ovo')
-                    
-
 
                     label_list = np.expand_dims(np.concatenate(
                         (np.array(label_list[:-1]).flatten(), np.array(label_list[-1]).flatten())), axis=1).astype('uint8')
@@ -799,6 +799,7 @@ def omni_train(args, model, snapshot_path):
                     if TotalAvgPerformance > best_performance:
                         best_epoch = epoch_num
                         best_performance = TotalAvgPerformance
+                        no_improve_count = 0
                         logging.info('New best validation TotalAvgPerformance: %f' % (TotalAvgPerformance))
                         
                         # 更新best_model.pth软链接指向当前最佳模型
@@ -806,7 +807,10 @@ def omni_train(args, model, snapshot_path):
                         if os.path.exists(best_model_link) or os.path.islink(best_model_link):
                             os.remove(best_model_link)
                         os.system('ln -s ' + os.path.abspath(save_model_path) + ' ' + best_model_link)
-                    
+                    else:
+                        no_improve_count += 1
+
+
                     # 打印当前保存的所有最佳模型
                     logging.info("Current top {} models:".format(len(best_models)))
                     for i, (epoch, perf, path) in enumerate(best_models):
@@ -824,12 +828,6 @@ def omni_train(args, model, snapshot_path):
                         epoch_num, periodic_save_path))
                 model.train()
 
-        if TotalAvgPerformance > best_performance:
-            best_performance = TotalAvgPerformance
-            no_improve_count = 0
-        else:
-            no_improve_count += 1
-        
         # if no_improve_count >= patience:
         #     logging.info(f"Early stopping triggered after {no_improve_count} epochs without improvement")
         #     break

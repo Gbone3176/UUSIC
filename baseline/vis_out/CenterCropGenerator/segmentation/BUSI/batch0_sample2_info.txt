@@ -1,0 +1,4 @@
+Dataset: BUSI
+Image shape: torch.Size([224, 224, 3])
+Mask shape: torch.Size([224, 224])
+Unique mask values: [0, 1]

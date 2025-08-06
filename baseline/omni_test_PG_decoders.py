@@ -145,13 +145,13 @@ def inference(args, model, test_save_path=None, dirname=None):
         logging.info('Testing performance in best val model: mean_dice : %f' % (performance))
         
         if int(os.environ["LOCAL_RANK"]) == 0:  
-            with open(f"{args.output_dir}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{dirname}/result.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
-                    writer.writerow([dataset_name, 'omni_seg_decoders_prompt@'+args.output_dir, performance,
+                    writer.writerow([dataset_name, 'omni_seg_decoders_prompt@'+dirname, performance,
                                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
                 else:
-                    writer.writerow([dataset_name, 'omni_seg_decoders@'+args.output_dir, performance,
+                    writer.writerow([dataset_name, 'omni_seg_decoders@'+dirname, performance,
                                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
 
     # 定义分类测试数据集
@@ -226,13 +226,13 @@ def inference(args, model, test_save_path=None, dirname=None):
         logging.info('Testing performance in best val model: acc : %f' % (performance))
 
         if int(os.environ["LOCAL_RANK"]) == 0:
-            with open(f"{args.output_dir}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{dirname}/result.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
-                    writer.writerow([dataset_name, 'omni_cls_decoders_prompt@'+args.output_dir, performance,
+                    writer.writerow([dataset_name, 'omni_cls_decoders_prompt@'+dirname, performance,
                                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
                 else:
-                    writer.writerow([dataset_name, 'omni_cls_decoders@'+args.output_dir, performance,
+                    writer.writerow([dataset_name, 'omni_cls_decoders@'+dirname, performance,
                                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
                 
 

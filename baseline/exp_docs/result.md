@@ -563,3 +563,6 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 - trail_debug_22：在21的基础上
     - 解冻encoder
     - 调整 celoss 和 diceloss 的权重
+
+- trail_debug_23：在22的基础上
+    - 单独在甲状腺数据集上训练

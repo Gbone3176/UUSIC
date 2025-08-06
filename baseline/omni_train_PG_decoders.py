@@ -6,7 +6,7 @@ import torch
 import logging
 import torch.backends.cudnn as cudnn
 from networks.omni_vision_transformer_PG_02 import OmniVisionTransformer as ViT_omni
-from omni_trainer_PG_decoders_frozenEncoders_V2 import omni_train
+from omni_trainer_PG_decoders_frozenEncoders_V3 import omni_train
 from config_PG import get_config
 
 parser = argparse.ArgumentParser()

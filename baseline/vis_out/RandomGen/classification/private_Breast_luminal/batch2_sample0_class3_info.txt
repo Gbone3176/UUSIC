@@ -1,0 +1,4 @@
+Dataset: private_Breast_luminal
+Num classes: 4
+Label: 3
+Image shape: torch.Size([224, 224, 3])

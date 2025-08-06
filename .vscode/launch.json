@@ -9,9 +9,9 @@
             "args": [
                 "--use_env",
                 "--nproc_per_node=1",
-                "--master_port=2345",
+                "--master_port=12345",
                 "omni_train_PG_decoders.py",
-                "--output_dir=exp_out/debug_22",
+                "--output_dir=exp_out/debug_23",
                 "--prompt",
                 "--base_lr=0.001",
                 "--batch_size=1",
