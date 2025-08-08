@@ -114,9 +114,9 @@ def omni_seg_test(image, label, net, classes, ClassStartIndex=1, test_save_path=
     net.eval()
     with torch.no_grad():
         if prompt:
-            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt), use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=classes)[0]
+            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt))[0]
         else:
-            seg_out = net(input, use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=2)[0]
+            seg_out = net(input)[0]
         out_label_back_transform = torch.cat(
             [seg_out[:, 0:1], seg_out[:, ClassStartIndex:ClassStartIndex+classes-1]], axis=1)
         out = torch.argmax(torch.softmax(out_label_back_transform, dim=1), dim=1)
@@ -153,13 +153,13 @@ def omni_seg_test_decoders(image, label, net, classes, ClassStartIndex=1, test_s
     net.eval()
     with torch.no_grad():
         if prompt:
-            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt), use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=classes)[0]
+            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt), use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=classes)
         else:
-            seg_out = net(input, use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=2)[0]
+            seg_out = net(input, use_dataset_specific=True, dataset_name=dataset_name, task_type='seg', num_classes=2)
         # out_label_back_transform = torch.cat(
         #     [seg_out[:, 0:1], seg_out[:, ClassStartIndex:ClassStartIndex+classes-1]], axis=1)
-        out = torch.argmax(torch.softmax(seg_out, dim=0), dim=0)
-        prediction = out.unsqueeze(0).cpu().detach().numpy()
+        out = torch.argmax(torch.softmax(seg_out, dim=1), dim=1)
+        prediction = out.cpu().detach().numpy()
 
     metric_list = []
     for i in range(1, classes):

@@ -1211,18 +1211,46 @@ class OmniVisionTransformer(nn.Module):
             print("---start load pretrained model of swin encoder---")
             model_dict = self.swin.state_dict()
             full_dict = copy.deepcopy(pretrained_dict)
+            
+            # 原有的编码器权重直接加载（不变）
+            encoder_loaded_count = 0
+            decoder_loaded_count = 0
+            
+            # 为所有数据集特定的decoder映射权重
             for k, v in pretrained_dict.items():
                 if "layers." in k:
                     current_layer_num = 3 - int(k[7:8])
-                    current_k = "layers_up." + str(current_layer_num) + k[8:]
-                    full_dict.update({current_k: v})
+                    
+                    # 为每个分割数据集的decoder映射权重
+                    for dataset_name in self.swin.seg_datasets:
+                        current_k = f"seg_decoders.{dataset_name}.{current_layer_num}" + k[8:]
+                        full_dict.update({current_k: v})
+                        decoder_loaded_count += 1
+                    
+                    # 为每个分类数据集的decoder映射权重
+                    for dataset_name in self.swin.cls_datasets:
+                        current_k = f"cls_decoders.{dataset_name}.{current_layer_num}" + k[8:]
+                        full_dict.update({current_k: v})
+                        decoder_loaded_count += 1
+
+            # 形状兼容性检查
+            removed_count = 0
             for k in list(full_dict.keys()):
                 if k in model_dict:
                     if full_dict[k].shape != model_dict[k].shape:
-                        print("delete:{};shape pretrain:{};shape model:{}".format(k, v.shape, model_dict[k].shape))
+                        print("delete:{};shape pretrain:{};shape model:{}".format(k, full_dict[k].shape, model_dict[k].shape))
                         del full_dict[k]
-
-            self.swin.load_state_dict(full_dict, strict=False)
+                        removed_count += 1
+            
+            # 加载权重
+            missing_keys, unexpected_keys = self.swin.load_state_dict(full_dict, strict=False)
+            
+            print(f"---预训练权重加载完成---")
+            # print(f"解码器权重映射: {decoder_loaded_count} 个参数")
+            # print(f"形状不匹配删除: {removed_count} 个参数")
+            # print(f"缺失的键: {len(missing_keys)} 个")
+            # print(f"意外的键: {len(unexpected_keys)} 个")
+                
         else:
             print("none pretrain")
 

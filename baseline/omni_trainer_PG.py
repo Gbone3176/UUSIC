@@ -54,41 +54,24 @@ def omni_train(args, model, snapshot_path):
     db_train_seg = USdatasetOmni_seg(base_dir=args.root_path, split="train", transform=transforms.Compose(
         [RandomGenerator_Seg(output_size=[args.img_size, args.img_size])]), prompt=args.prompt)
 
-    # weight_base = [1/4, 1/2, 2, 2, 1, 2, 2]
-    weight_base = [
-        0.25,  # for 7960 Thyroid(DDTI+TG3K+TNSCUI+TN3K)
-        3,     # for 105
-        1,     # for 452
-        4,     # for 46
-        4,     # for 84
-        1,     # for 393
-        0.25,   # for 2086
-        0.25,  # for 1312
-        1,     # for 340
-        4,     # for 299 private_Thyroid
-        2,     # for 165
-        4,     # for 53 Private_cardiac
-        0.5,   # for 699
-    ]
-
-    # weight_base = [
-    #     1,     # for 326
-    #     3,     # for 105
-    #     1,     # for 452
-    #     4,     # for 46
-    #     4,     # for 84
-    #     1,     # for 393
-    #     1,     # for 350
-    #     0.25,  # for 1312
-    #     1,     # for 340
-    #     1,     # for 299 Thyroid
-    #     2,     # for 165
-    #     4,     # for 53 Private_cardiac
-    #     0.5,   # for 699
-    # ]
+    seg_datasets_weight = {
+        'private_Breast': (105, 3),         # 对应weight_base[1] = 3
+        'BUS-BRA': (1312, 0.25),            # 对应weight_base[7] = 0.25
+        'BUSI': (452, 1),                   # 对应weight_base[2] = 1
+        'BUSIS': (393, 1),                  # 对应weight_base[5] = 1
+        'CAMUS': (2086, 0.25),              # 对应weight_base[6] = 0.25
+        'DDTI': (7952, 0.25),               # 对应weight_base[0] = 0.25 (Thyroid相关)
+        'Fetal_HC': (699, 0.5),             # 对应weight_base[12] = 0.5
+        'KidneyUS': (340, 1),               # 对应weight_base[8] = 1
+        'private_Breast_luminal': (165, 2), # 对应weight_base[10] = 2
+        'private_Cardiac': (53, 4),         # 对应weight_base[11] = 4
+        'private_Fetal_Head': (84, 4),      # 对应weight_base[4] = 4
+        'private_Kidney': (46, 4),          # 对应weight_base[3] = 4
+        'private_Thyroid': (299, 1)         # 对应weight_base[9] = 4
+    }
     
-    sample_weight_seq = [[weight_base[dataset_index]] *
-                         element for dataset_index, element in enumerate(db_train_seg.subset_len)]
+    sample_weight_seq = [[seg_datasets_weight[seg_subset_name][1]] *
+                         element for (seg_subset_name, element) in db_train_seg.subset_len]
     sample_weight_seq = [element for sublist in sample_weight_seq for element in sublist]
 
     weighted_sampler_seg = WeightedRandomSamplerDDP(
@@ -110,19 +93,19 @@ def omni_train(args, model, snapshot_path):
     db_train_cls = USdatasetOmni_cls(base_dir=args.root_path, split="train", transform=transforms.Compose(
         [RandomGenerator_Cls(output_size=[args.img_size, args.img_size])]), prompt=args.prompt)
 
-    # weight_base = [2, 1/4, 2, 2]
-    weight_base = [
-        4,     # for 105
-        1,     # for 452
-        1,     # for 385
-        0.5,  # for 1312
-        4,     # for 46
-        2,     # for 165
-        4,     # for 72
-        0.5,   # for 981    
-    ]
-    sample_weight_seq = [[weight_base[dataset_index]] *
-                         element for dataset_index, element in enumerate(db_train_cls.subset_len)]
+    cls_datasets_weight = {
+        'Appendix': (981, 1),                # 默认权重1（未在weight_base中明确对应）
+        'BUS-BRA': (1312, 0.25),             # 对应weight_base[7] = 0.25 (大规模数据低权重)
+        'BUSI': (452, 1),                    # 对应weight_base[2] = 1
+        'Fatty-Liver': (385, 1),             # 接近weight_base[6]的350样本，权重=1
+        'private_Appendix': (46, 4),         # 对应weight_base[3] = 4 (小样本高权重)
+        'private_Breast': (105, 3),          # 对应weight_base[1] = 3
+        'private_Breast_luminal': (165, 2),  # 对应weight_base[10] = 2
+        'private_Liver': (72, 4)             # 接近weight_base[4]的84样本，权重=4
+    }
+
+    sample_weight_seq = [[cls_datasets_weight[cls_subset_name][1]] *element 
+                         for (cls_subset_name, element) in db_train_cls.subset_len]
     sample_weight_seq = [element for sublist in sample_weight_seq for element in sublist]
 
     weighted_sampler_cls = WeightedRandomSamplerDDP(
@@ -186,7 +169,7 @@ def omni_train(args, model, snapshot_path):
         weighted_sampler_seg.set_epoch(epoch_num)
         weighted_sampler_cls.set_epoch(epoch_num)
 
-        for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg)):
+        for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
             image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
             image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
             if args.prompt:
@@ -209,10 +192,10 @@ def omni_train(args, model, snapshot_path):
             
             # 修改学习率衰减策略：当进度超过70%时保持恒定
             progress = 1.0 - global_iter_num / max_iterations
-            if progress >= 0.3:
+            if progress >= 0.2:
                 lr_ = base_lr * (progress ** 0.9)
             else:
-                lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
+                lr_ = base_lr * (0.2 ** 0.9)  # 保持在30%进度时的学习率
                 
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr_
@@ -226,8 +209,8 @@ def omni_train(args, model, snapshot_path):
             logging.info('global iteration %d and seg iteration %d : loss : %f' %
                          (global_iter_num, seg_iter_num, loss.item()))
 
-        '''
-        for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls)):
+        
+        for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
             image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
             num_classes_batch = sampled_batch['num_classes']
             image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
@@ -282,7 +265,7 @@ def omni_train(args, model, snapshot_path):
 
             logging.info('global iteration %d and cls iteration %d : loss : %f' %
                          (global_iter_num, cls_iter_num, loss.item()))
-        '''
+        
         
         dist.barrier()
 
@@ -358,7 +341,7 @@ def omni_train(args, model, snapshot_path):
                             count_matrix[i_batch*batch_size+sample_index, 0] = 0
                     metric_i = metric_i[0][0]
                     metric_list += np.array(metric_i).sum()
-                    print(len(metric_i))
+                    # print(len(metric_i))
 
                 metric_list = metric_list / (count_matrix.sum(axis=0) + 1e-6)
                 performance = np.mean(metric_list, axis=0)
@@ -452,8 +435,9 @@ def omni_train(args, model, snapshot_path):
             cls_avg_performance = cls_avg_performance / (len(cls_val_set)+1e-6)
             total_performance += cls_avg_performance
             writer.add_scalar('info/val_metric_cls_Total', cls_avg_performance, epoch_num)
-
+            
             TotalAvgPerformance = total_performance/2
+            # TotalAvgPerformance = total_performance
 
             logging.info('This epoch %d Validation performance: %f' % (epoch_num, TotalAvgPerformance))
             logging.info('But the best epoch is: %d and performance: %f' % (best_epoch, best_performance))

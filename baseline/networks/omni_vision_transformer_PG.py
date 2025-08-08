@@ -1056,15 +1056,21 @@ class OmniVisionTransformer(nn.Module):
             for k, v in pretrained_dict.items():
                 if "layers." in k:
                     current_layer_num = 3 - int(k[7:8])
-                    current_k = "layers_up." + str(current_layer_num) + k[8:]
+                    current_k = "layers_task_seg_up." + str(current_layer_num) + k[8:]
                     full_dict.update({current_k: v})
+
+                    current_k = "layers_task_cls_up." + str(current_layer_num) + k[8:]
+                    full_dict.update({current_k: v})
+                    
             for k in list(full_dict.keys()):
                 if k in model_dict:
                     if full_dict[k].shape != model_dict[k].shape:
                         print("delete:{};shape pretrain:{};shape model:{}".format(k, v.shape, model_dict[k].shape))
                         del full_dict[k]
 
-            self.swin.load_state_dict(full_dict, strict=False)
+            missing_keys, unexpected_keys = self.swin.load_state_dict(full_dict, strict=False)
+            print(f"len of missing_keys: {len(missing_keys)}")
+            print(f"len of unexpected_keys: {len(unexpected_keys)}")
         else:
             print("none pretrain")
 

@@ -71,13 +71,13 @@ def inference(args, model, test_save_path=None):
             writer.writerow(['dataset', 'task', 'metric', 'time'])
 
     seg_test_set = [
-        "BUS-BRA",
-        "BUSIS",
-        "BUSI",
-        "CAMUS",
-        "DDTI",
-        "Fetal_HC",
-        "KidneyUS",
+        # "BUS-BRA",
+        # "BUSIS",
+        # "BUSI",
+        # "CAMUS",
+        # "DDTI",
+        # "Fetal_HC",
+        # "KidneyUS",
         "private_Thyroid",
         "private_Kidney",
         "private_Fetal_Head",
@@ -160,10 +160,10 @@ def inference(args, model, test_save_path=None):
                                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
 
     cls_test_set = [
-        "Appendix",
-        "BUS-BRA",
-        "BUSI",
-        "Fatty-Liver",
+        # "Appendix",
+        # "BUS-BRA",
+        # "BUSI",
+        # "Fatty-Liver",
         "private_Liver",
         "private_Breast_luminal",
         "private_Breast",
@@ -296,6 +296,10 @@ if __name__ == "__main__":
 
     print("self trained swin unet", msg)
     snapshot_name = snapshot.split('/')[-1]
+
+    os.makedirs(args.output_dir, exist_ok=True)
+    with open(args.output_dir+"/"+"test_result.txt", "a") as f:  # "a" 模式（追加模式）不会覆盖已有内容
+        pass
 
     logging.basicConfig(filename=args.output_dir+"/"+"test_result.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')

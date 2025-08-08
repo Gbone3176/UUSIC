@@ -55,6 +55,8 @@ parser.add_argument('--prompt', action='store_true', help='using prompt for trai
 parser.add_argument('--adapter_ft', action='store_true', help='using adapter for fine-tuning')
 parser.add_argument('--skip_missing_datasets', action='store_true', 
                     help='skip datasets that do not exist in the data directory')
+parser.add_argument('--warmup_batch', type=int, default=0,
+                    help='batch number for warmup, default 0 means no warmup')
 
 
 args = parser.parse_args()

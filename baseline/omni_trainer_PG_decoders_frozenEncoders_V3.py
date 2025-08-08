@@ -54,7 +54,7 @@ class WarmupCosineLRScheduler:
     def get_lr(self):
         return self.current_lr
 
-def load_encoder_weights_and_unfreeze(model, resume_path):
+def load_encoder_weights_and_freeze(model, resume_path):
     """
     仅加载encoder部分的权重并冻结encoder参数
     
@@ -283,13 +283,12 @@ def omni_train(args, model, snapshot_path):
         'DDTI': 0.5,
         'Fetal_HC': 1.0,
         'KidneyUS': 1.0,
-
         'private_Breast': 1.0,          # 基准权重
-        'private_Breast_luminal': 1.2,  # 略微增加
+        'private_Breast_luminal': 1.8,  # 略微增加
         'private_Cardiac': 1.8,         # 较大增加（通常数据较少）
         'private_Fetal_Head': 1.8,      # 较大增加（通常数据较少）
         'private_Kidney': 1.5,          # 中等增加
-        'private_Thyroid': 2.0          # 最大增加（通常数据最少）
+        'private_Thyroid': 2.5         # 最大增加（通常数据最少）
     }
     
     logging.info("Creating segmentation DataLoaders for each dataset...")
@@ -301,7 +300,7 @@ def omni_train(args, model, snapshot_path):
                 db_seg = USdatasetOmni_seg_decoders(
                     base_dir=dataset_path,
                     split="train",
-                    transform=transforms.Compose([RandomGenerator_Seg(output_size=[args.img_size, args.img_size])]),
+                    transform=RandomGenerator_Seg(output_size=[args.img_size, args.img_size]),
                     prompt=args.prompt
                 )
                 
@@ -340,7 +339,6 @@ def omni_train(args, model, snapshot_path):
         'BUS-BRA': 1.0,
         'BUSI': 1.0,
         'Fatty-Liver': 1.0,
-
         'private_Appendix': 1.8,        # 增加权重（通常数据较少）
         'private_Breast': 1.0,          # 基准权重
         'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
@@ -355,7 +353,7 @@ def omni_train(args, model, snapshot_path):
                 db_cls = USdatasetOmni_cls_decoders(
                     base_dir=dataset_path,
                     split="train",
-                    transform=transforms.Compose([RandomGenerator_Cls(output_size=[args.img_size, args.img_size])]),
+                    transform=RandomGenerator_Cls(output_size=[args.img_size, args.img_size]),
                     prompt=args.prompt
                 )
                 
@@ -370,7 +368,7 @@ def omni_train(args, model, snapshot_path):
                 dataloader = DataLoader(
                     db_cls,
                     batch_size=batch_size,
-                    num_workers=8,  # 减少每个loader的worker数
+                    num_workers=12,  # 减少每个loader的worker数
                     pin_memory=True,
                     worker_init_fn=worker_init_fn,
                     sampler=sampler
@@ -400,17 +398,10 @@ def omni_train(args, model, snapshot_path):
     cls_ce_loss_2way = CrossEntropyLoss()
     cls_ce_loss_4way = CrossEntropyLoss()
 
-    # optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
-
-    # resume_epoch = 0
-    # if args.resume is not None:
-    #     model.load_state_dict(torch.load(args.resume, map_location='cpu')['model'])
-    #     optimizer.load_state_dict(torch.load(args.resume, map_location='cpu')['optimizer'])
-    #     resume_epoch = torch.load(args.resume, map_location='cpu')['epoch']
 
     # ========== 修改的模型加载和权重冻结部分 ==========
     # 仅加载encoder权重并冻结
-    resume_epoch = load_encoder_weights_and_unfreeze(model, args.resume)
+    resume_epoch = load_encoder_weights_and_freeze(model, args.resume)
 
     # 创建优化器（只优化可训练的参数）
     trainable_params = [p for p in model.parameters() if p.requires_grad]
@@ -432,7 +423,7 @@ def omni_train(args, model, snapshot_path):
     max_iterations = args.max_epochs * total_iterations
 
     # warmup_batch可通过args.warmup_batch指定，默认5
-    warmup_batch = getattr(args, 'warmup_batch', 5)
+    warmup_batch = args.warmup_batch if args.warmup_batch > 0 else 0
     lr_scheduler = WarmupCosineLRScheduler(optimizer, base_lr, max_iterations, warmup_iters=warmup_batch)
 
     logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
@@ -512,8 +503,8 @@ def omni_train(args, model, snapshot_path):
                 loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
                 loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
 
-                # ce_weight, dice_weight = get_dynamic_loss_weights(epoch_num, max_epoch)
-                ce_weight, dice_weight = 0.4, 0.6
+                ce_weight, dice_weight = get_dynamic_loss_weights(epoch_num, max_epoch)
+                # ce_weight, dice_weight = 0.4, 0.6
                 loss = ce_weight * loss_ce + dice_weight * loss_dice
 
                 optimizer.zero_grad()
@@ -659,7 +650,7 @@ def omni_train(args, model, snapshot_path):
                         transform=CenterCropGenerator(output_size=[args.img_size, args.img_size]),
                         prompt=args.prompt
                     )
-                    val_loader = DataLoader(db_val, batch_size=batch_size, shuffle=False, num_workers=16)
+                    val_loader = DataLoader(db_val, batch_size=batch_size, shuffle=False, num_workers=12)
                     logging.info("{} val iterations per epoch".format(len(val_loader)))
 
                     metric_list = 0.0
@@ -724,7 +715,7 @@ def omni_train(args, model, snapshot_path):
                         prompt=args.prompt
                     )
 
-                    val_loader = DataLoader(db_val, batch_size=batch_size, shuffle=False, num_workers=16)
+                    val_loader = DataLoader(db_val, batch_size=batch_size, shuffle=False, num_workers=12)
                     logging.info("{} val iterations per epoch".format(len(val_loader)))
                     model.eval()
 
@@ -768,6 +759,7 @@ def omni_train(args, model, snapshot_path):
                 writer.add_scalar('info/val_metric_cls_Total', cls_avg_performance, epoch_num)
 
                 TotalAvgPerformance = total_performance/2
+                # TotalAvgPerformance = total_performance
 
                 logging.info('This epoch %d Validation performance: %f' % (epoch_num, TotalAvgPerformance))
                 logging.info('But the best epoch is: %d and performance: %f' % (best_epoch, best_performance))

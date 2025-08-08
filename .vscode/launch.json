@@ -9,14 +9,15 @@
             "args": [
                 "--use_env",
                 "--nproc_per_node=1",
-                "--master_port=12345",
+                "--master_port=21345",
                 "omni_train_PG_decoders.py",
-                "--output_dir=exp_out/debug_23",
+                "--output_dir=exp_out/debug_32",
                 "--prompt",
                 "--base_lr=0.001",
-                "--batch_size=1",
+                "--batch_size=8",
                 "--max_epochs=200",
-                "--root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/"
+                "--root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/",
+                "--resume=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_27/best_model_180_0.1087.pth"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/baseline",
@@ -71,13 +72,13 @@
             "name": "Debug PG Training",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/baseline/omni_train_PG_decoders.py",
+            "program": "${workspaceFolder}/baseline/omni_train_PG.py",
             "args": [
-                "--output_dir=exp_out/debug_16",
+                "--output_dir=exp_out/debug_31",
                 "--prompt",
                 "--base_lr=0.00001",
-                "--batch_size=1",
-                "--max_epochs=800",
+                "--batch_size=8",
+                "--max_epochs=80",
                 "--root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/"
             ],
             "console": "integratedTerminal",

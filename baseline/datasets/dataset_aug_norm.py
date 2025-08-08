@@ -90,7 +90,7 @@ class RandomGenerator_Seg(object):
             image = zoom(image, (self.output_size[0] / x, self.output_size[1] / x, 1), order=1)
             label = zoom(label, (self.output_size[0] / x, self.output_size[1] / x), order=0)
 
-        scale = random.uniform(0.8, 1.2)
+        scale = random.uniform(1, 1.2)
         image = zoom(image, (scale, scale, 1), order=1)
         label = zoom(label, (scale, scale), order=0)
 
@@ -163,7 +163,7 @@ class RandomGenerator_Cls(object):
 
         # Apply geometric transformations
         if random.random() > 0.5:
-            image, label = random_rotate(image, label, angle=30)
+            image, label = random_rotate(image, label)
         if random.random() > 0.5:
             image, label = random_horizontal_flip(image, label)
         if random.random() > 0.5:
@@ -179,7 +179,7 @@ class RandomGenerator_Cls(object):
             image = zoom(image, (self.output_size[0] / x, self.output_size[1] / x, 1), order=1)
             label = zoom(label, (self.output_size[0] / x, self.output_size[1] / x), order=0)
 
-        scale = random.uniform(0.8, 1.2)
+        scale = random.uniform(1, 1.2) #只放大不缩小
         image = zoom(image, (scale, scale, 1), order=1)
         label = zoom(label, (scale, scale), order=0)
 

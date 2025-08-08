@@ -566,3 +566,80 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 
 - trail_debug_23：在22的基础上
     - 单独在甲状腺数据集上训练
+
+- trail_debug_24：在22的基础上 **还没开始，先做25，26**
+    - 删除warmup
+
+
+- trail_debug_25：回归原始的PG版本，单编码器单解码器
+    - lr 线性调度
+    - 单独在private_cardiac上训练，测试也是同样
+
+- trail_debug_26：回归原始的PG版本，单编码器单解码器 **还没做**
+    - lr 线性调度
+    - 单独将private_cardiac从数据集中去除，训剩下的，测试同
+
+- trail_debug_27：多解码器的PG版本
+    - 数据集：private_cardiac上训练，测试也是同样
+    - trainer：omni_trainer_PG_decoders_frozenEncoders_V3
+
+- trail_debug_28：多解码器的PG版本
+    - 使用[官方](https://github.com/Zehui-Lin/PerceptGuide/releases/tag/v1.0.0)的权重进行初始化，并冻结encoder
+    - 数据集：所有数据集
+    - trainer：omni_trainer_PG_decoders_frozenEncoders_V3
+
+- trail_debug_29：单编码器单解码器
+    - 数据集：thyroid
+    - trainer：omni_trainer_PG_decoders
+    - lr: 0.00001
+
+- trail_debug_30：单编码器单解码器
+    - 数据集：private_...
+    - trainer：omni_trainer_PG_decoders
+
+- trail_debug_31：单编码器单解码器
+    - 数据集：kidneyUS
+    - trainer：omni_trainer_PG_decoders
+    - lr:0.001
+
+- trail_debug_31_1：单编码器单解码器
+    - 数据集：kidneyUS
+    - trainer：omni_trainer_PG_decoders
+    - 在预处理中不使用缩小，只放大
+    - lr:0.0001
+
+- trail_debug_31_2：单编码器单解码器
+    - 数据集：prvate_Thyroid
+    - trainer：omni_trainer_PG_decoders
+    - lr:0.0001
+
+- trail_debug_32：单编码器单解码器
+    - 数据集：all
+    - trainer：omni_trainer_PG_decoders
+    - lr:1e-5
+
+- trail_debug_33：单编码器多解码器
+    - 数据集：all
+    - trainer：omni_trainer_PG_decoders_V2
+    - lr:1e-5
+    - 不冻结encoder的预训练权重
+
+**trail_debug_33 VS 当前已提交的最佳model**
+
+### **分割任务（`omni_seg_prompt`）结果对比**
+| 数据集               | Multi-Decoder (33号) | Single-Decoder (15号) | 差异 (Single - Multi) |
+|----------------------|----------------------|-----------------------|-----------------------|
+| Thyroid              | 0.4193               | 0.5291                | **+0.1098** ↑         |
+| Kidney               | 0.7605               | 0.8461                | **+0.0856** ↑         |
+| Fetal Head           | 0.8434               | 0.8840                | +0.0406 ↑             |
+| Cardiac              | 0.8082               | 0.8227                | +0.0145 ↑             |
+| Breast luminal       | 0.6898               | 0.7257                | +0.0359 ↑             |
+| Breast               | 0.7772               | 0.8613                | **+0.0841** ↑         |
+
+### **分类任务（`omni_cls_prompt`）结果对比**
+| 数据集               | Multi-Decoder (33号) | Single-Decoder (15号) | 差异 (Multi - Single) |
+|----------------------|----------------------|-----------------------|-----------------------|
+| Liver                | 0.5806               | 0.6774                | -0.0968 ↓             |
+| Breast luminal       | 0.6620               | 0.6620                | 0.0000 ↔              |
+| Breast               | 0.7333               | 0.6000                | **+0.1333** ↑         |
+| Appendix             | 0.9048               | 0.6667                | **+0.2381** ↑         |

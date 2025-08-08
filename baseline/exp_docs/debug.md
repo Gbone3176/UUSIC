@@ -10,6 +10,8 @@
 
 - debug_11:使用预训练权重
 
+- debug_27:检查为什么多分类器的val值异常:seg_out 的维度问题，对于test的时候batch_size=1,所以不影响test，但是影响train的时候的value的计算
+
 
 
 
