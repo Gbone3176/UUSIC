@@ -1,16 +1,16 @@
-export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=0
 ######## train PG ########
 # torchrun \
-#     --nproc_per_node=2 \
-#     --master_port=23451 \
+#     --nproc_per_node=1 \
+#     --master_port=12345 \
 #     omni_train_PG_decoders.py \
-#     --output_dir=exp_out/trail_debug_33 \
+#     --output_dir=exp_out/trail_debug_33-5 \
 #     --prompt \
-#     --base_lr=0.00001 \
-#     --batch_size=128 \
-#     --max_epochs=800 \
+#     --base_lr=0.0001 \
+#     --batch_size=8 \
+#     --max_epochs=500 \
 #     --root_path=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data/ \
-#     # --resume=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/pretrained_ckpt/perceptguide.pth \
+#     --resume=/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_33/best_model_206_0.7551.pth \
     
 # ######## test PG ########
 torchrun \
@@ -18,8 +18,8 @@ torchrun \
     --master_port=2345 \
     omni_test_PG_decoders.py \
     --root_path ./data \
-    --output_dir exp_out/test_trail_debug_33 \
-    --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_33/best_model_206_0.7551.pth \
+    --output_dir exp_out/test_trail_debug_33-5 \
+    --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_33-5/best_model_190_0.8008.pth \
     --batch_size 1 \
     --img_size 224 \
     --cfg configs/swin_tiny_patch4_window7_224_lite-PG.yaml \

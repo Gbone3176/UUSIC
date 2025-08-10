@@ -643,3 +643,135 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 | Breast luminal       | 0.6620               | 0.6620                | 0.0000 ↔              |
 | Breast               | 0.7333               | 0.6000                | **+0.1333** ↑         |
 | Appendix             | 0.9048               | 0.6667                | **+0.2381** ↑         |
+
+
+**32号实验和15号实验**
+
+### 1. 分割任务（omni_seg_prompt）结果对比
+| 数据集        | 32号实验 | 15号实验 | 差异（15号 - 32号） |
+|--------------|---------|---------|-------------------|
+| Thyroid      | 0.4276  | 0.5291  | +0.1015 ↑         |
+| Kidney       | 0.8181  | 0.8461  | +0.0280 ↑         |
+| Fetal Head   | 0.8899  | 0.8840  | -0.0059 ↓         |
+| Cardiac      | 0.8335  | 0.8227  | -0.0108 ↓         |
+| Breast luminal | 0.7090 | 0.7257  | +0.0167 ↑         |
+| Breast       | 0.8413  | 0.8613  | +0.0200 ↑         |
+
+### 2. 分类任务（omni_cls_prompt）结果对比
+| 数据集        | 32号实验 | 15号实验 | 差异（15号 - 32号） |
+|--------------|---------|---------|-------------------|
+| Liver        | 0.6452  | 0.6774  | +0.0322 ↑         |
+| Breast luminal | 0.7042 | 0.6620  | -0.0422 ↓         |
+| Breast       | 0.5778  | 0.6000  | +0.0222 ↑         |
+| Appendix     | 0.7143  | 0.6667  | -0.0476 ↓         |
+
+
+- trail_debug_32-1：单编码器单解码器
+    - 数据集：private_...
+    - trainer：omni_trainer_PG_decoders
+    - lr:1e-5
+    - 使用338ep之后的继续在私有数据就上训练
+
+- trail_debug_33-1：单编码器多解码器
+    - 数据集：private_...
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-5
+    - 使用248ep之后的继续在私有数据就上训练
+
+
+- trail_debug_33-2：单编码器多解码器
+    - 数据集：private_seg_...
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-4
+    - 使用33-1的624ep之后的继续在私有分割数据就上训练
+
+- trail_debug_33-3：单编码器多解码器
+    - 数据集：private_cls_...
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-5
+    - 使用33-2的148ep之后的继续在私有分割数据就上训练
+    - 冻结encoder
+
+- trail_debug_33-4：单编码器多解码器
+    - 数据集：private_appendix
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-5
+    - 使用33-3的120ep之后的继续在私有分割数据就上训练
+    - 冻结encoder
+
+**两次最好实验的测试对比数据**
+
+| Dataset           | Task Type          | Model Version (New) | Metric (New) | Model Version (Old) | Metric (Old) | Delta(↑↓) | Time Difference |
+|-------------------|--------------------|---------------------|--------------|---------------------|--------------|-----------|-----------------|
+| Thyroid           | Segmentation       | decoders_prompt     | 0.5974       | seg_prompt          | 0.5291       | ↑+12.9%   | 20h50m          |
+| Kidney            | Segmentation       | decoders_prompt     | 0.8527       | seg_prompt          | 0.8461       | ↑+0.8%    | 20h50m          |
+| Fetal_Head        | Segmentation       | decoders_prompt     | 0.9234       | seg_prompt          | 0.8840       | ↑+4.5%    | 20h50m          |
+| Cardiac           | Segmentation       | decoders_prompt     | 0.8404       | seg_prompt          | 0.8227       | ↑+2.2%    | 20h50m          |
+| Breast_luminal    | Segmentation       | decoders_prompt     | 0.8016       | seg_prompt          | 0.7257       | ↑+10.5%   | 20h50m          |
+| Breast            | Segmentation       | decoders_prompt     | 0.8336       | seg_prompt          | 0.8613       | ↓-3.2%    | 20h50m          |
+| Liver             | Classification     | decoders_prompt     | 0.5806       | cls_prompt          | 0.6774       | ↓-14.3%   | 20h50m          |
+| Breast_luminal    | Classification     | decoders_prompt     | 0.6056       | cls_prompt          | 0.6620       | ↓-8.5%    | 20h50m          |
+| Breast            | Classification     | decoders_prompt     | 0.7111       | cls_prompt          | 0.6000       | ↑+18.5%   | 20h50m          |
+| Appendix          | Classification     | decoders_prompt     | 0.8095       | cls_prompt          | 0.6667       | ↑+21.4%   | 20h50m          |
+
+在验证集（Val）上的表现：
+
+0.75的：
+{ "Accuracy_Appendix": 0.7333333333333333, "AUC_Appendix": 0.8924501424501425, "T2_Appendix": 0.812891737891738, "Accuracy_Breast": 0.6761363636363636, "AUC_Breast": 0.7585445094217025, "T2_Breast": 0.717340436529033, "Accuracy_Breast_luminal": 0.51953125, "AUC_Breast_luminal": 0.4708990641140125, "T2_Breast_luminal": 0.49521515705700625, "Accuracy_Liver": 0.7024793388429752, "AUC_Liver": 0.8498591549295774, "T2_Liver": 0.7761692468862763, "DSC_Breast": 0.7116012802914872, "NSD_Breast": 0.08546092787282981, "T1_Breast": 0.8130701762093286, "DSC_Breast_luminal": 0.6402694198268937, "NSD_Breast_luminal": 0.04735368884543939, "T1_Breast_luminal": 0.7964578654907272, "DSC_Cardiac": 0.7137848349638579, "NSD_Cardiac": 0.03115526935948386, "T1_Cardiac": 0.841314782802187, "DSC_Fetal_Head": 0.8203609772004293, "NSD_Fetal_Head": 0.05829295126054185, "T1_Fetal_Head": 0.8810340129699437, "DSC_Kidney": 0.8070241883193989, "NSD_Kidney": 0.05673061732876518, "T1_Kidney": 0.8751467854953169, "DSC_Thyroid": 0.4758917710652826, "NSD_Thyroid": 0.042243165678934096, "T1_Thyroid": 0.7168243026931742, "DSC_Breast_all": 0.6693305481643206, "NSD_Breast_all": 0.06287886030104291, "T1_Breast_all": 0.8032258439316389 }
+
+0.72的:
+{ "Accuracy_Appendix": 0.6533333333333333, "AUC_Appendix": 0.7514245014245015, "T2_Appendix": 0.7023789173789174, "Accuracy_Breast": 0.7784090909090909, "AUC_Breast": 0.8610786224821312, "T2_Breast": 0.819743856695611, "Accuracy_Breast_luminal": 0.5625, "AUC_Breast_luminal": 0.4756470130967727, "T2_Breast_luminal": 0.5190735065483864, "Accuracy_Liver": 0.6528925619834711, "AUC_Liver": 0.8473239436619718, "T2_Liver": 0.7501082528227214, "DSC_Breast": 0.6464360328683867, "NSD_Breast": 0.05618100039300724, "T1_Breast": 0.7951275162376897, "DSC_Breast_luminal": 0.4784755261298462, "NSD_Breast_luminal": 0.02389913157674143, "T1_Breast_luminal": 0.7272881972765524, "DSC_Cardiac": 0.6345239392634457, "NSD_Cardiac": 0.02214575606013667, "T1_Cardiac": 0.8061890916016545, "DSC_Fetal_Head": 0.6976647592564753, "NSD_Fetal_Head": 0.02987472421187622, "T1_Fetal_Head": 0.8338950175222996, "DSC_Kidney": 0.6649285437841299, "NSD_Kidney": 0.03510571828722756, "T1_Kidney": 0.8149114127484511, "DSC_Thyroid": 0.3838297283646404, "NSD_Thyroid": 0.02628619574359305, "T1_Thyroid": 0.6787717663105237, "DSC_Breast_all": 0.5469038807270293, "NSD_Breast_all": 0.03705100405744231, "T1_Breast_all": 0.7549264383347936 }
+
+对比分析：
+### 分类任务对比（Accuracy/AUC/T2）
+
+| Metric            | Appendix (0.75) | Appendix (0.72) | Delta   | Breast (0.75) | Breast (0.72) | Delta    |
+|-------------------|-----------------|-----------------|---------|---------------|---------------|----------|
+| Accuracy          | 0.7333          | 0.6533          | ↑+12.2% | 0.6761        | 0.7784        | ↓-13.1%  |
+| AUC               | 0.8925          | 0.7514          | ↑+18.8% | 0.7585        | 0.8611        | ↓-11.9%  |
+| T2-Score          | 0.8129          | 0.7024          | ↑+15.7% | 0.7173        | 0.8197        | ↓-12.5%  |
+| Metric            | Breast_luminal (0.75) | Breast_luminal (0.72) | Delta   | Liver (0.75) | Liver (0.72) | Delta   |
+|-------------------|-----------------------|-----------------------|---------|--------------|--------------|---------|
+| Accuracy          | 0.5195                | 0.5625                | ↓-7.6%  | 0.7025       | 0.6529       | ↑+7.6%  |
+| AUC               | 0.4709                | 0.4756                | ↓-1.0%  | 0.8499       | 0.8473       | ↑+0.3%  |
+| T2-Score          | 0.4952                | 0.5191                | ↓-4.6%  | 0.7762       | 0.7501       | ↑+3.5%  |
+
+### 分割任务对比（DSC/NSD/T1）
+| Metric            | Breast (0.75) | Breast (0.72) | Delta   | Breast_luminal (0.75) | Breast_luminal (0.72) | Delta   |
+|-------------------|---------------|---------------|---------|------------------------|------------------------|---------|
+| DSC               | 0.7116        | 0.6464        | ↑+10.1% | 0.6403                 | 0.4785                 | ↑+33.8% |
+| NSD               | 0.0855        | 0.0562        | ↑+52.1% | 0.0474                 | 0.0239                 | ↑+98.3% |
+| T1-Score          | 0.8131        | 0.7951        | ↑+2.3%  | 0.7965                 | 0.7273                 | ↑+9.5%  |
+| Metric            | Cardiac (0.75) | Cardiac (0.72) | Delta   | Fetal_Head (0.75) | Fetal_Head (0.72) | Delta   |
+|-------------------|----------------|----------------|---------|-------------------|-------------------|---------|
+| DSC               | 0.7138         | 0.6345         | ↑+12.5% | 0.8204            | 0.6977            | ↑+17.6% |
+| NSD               | 0.0312         | 0.0221         | ↑+40.7% | 0.0583            | 0.0299            | ↑+95.0% |
+| T1-Score          | 0.8413         | 0.8062         | ↑+4.4%  | 0.8810            | 0.8339            | ↑+5.6%  |
+| Metric            | Kidney (0.75) | Kidney (0.72) | Delta   | Thyroid (0.75) | Thyroid (0.72) | Delta   |
+|-------------------|---------------|---------------|---------|----------------|----------------|---------|
+| DSC               | 0.8070        | 0.6649        | ↑+21.4% | 0.4759          | 0.3838          | ↑+24.0% |
+| NSD               | 0.0567        | 0.0351        | ↑+61.5% | 0.0422          | 0.0263          | ↑+60.5% |
+| T1-Score          | 0.8751        | 0.8149        | ↑+7.4%  | 0.7168          | 0.6788          | ↑+5.6%  |
+
+
+- trail_debug_33-5：单编码器多解码器
+    - 数据集：private_appendix
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-5
+    - 使用33的206ep(分类效果号)之后的继续在私有分割数据集上微调
+    - 冻结encoder
+
+performance:0.8008
+
+    | Dataset          | Task Category               | Metric Score  |
+|------------------|-----------------------------|---------------|
+| Thyroid          | omni_seg_decoders_prompt    | 0.545958      |
+| Kidney           | omni_seg_decoders_prompt    | 0.831992      |
+| Fetal_Head       | omni_seg_decoders_prompt    | 0.909493      |
+| Cardiac          | omni_seg_decoders_prompt    | 0.840387      |
+| Breast_luminal   | omni_seg_decoders_prompt    | 0.788112      |
+| Breast           | omni_seg_decoders_prompt    | 0.820529      |
+| Liver            | omni_cls_decoders_prompt    | 0.580645      |
+| Breast_luminal   | omni_cls_decoders_prompt    | 0.661972      |
+| Breast           | omni_cls_decoders_prompt    | 0.733333      |
+| Appendix         | omni_cls_decoders_prompt    | 0.904762      |

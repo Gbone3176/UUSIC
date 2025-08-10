@@ -56,104 +56,93 @@ class WarmupCosineLRScheduler:
 
 def load_encoder_weights_and_freeze(model, resume_path):
     """
-    仅加载encoder部分的权重并冻结encoder参数
-    
-    Args:
-        model: 要加载权重的模型
-        resume_path: 预训练模型路径
-        
-    Returns:
-        resume_epoch: 恢复的epoch数
+    加载预训练权重(全部可匹配参数)，仅冻结 encoder 部分
+    返回：恢复的 epoch（如果存在），否则 0
     """
-    if resume_path is None:
-        logging.info("No resume path provided, starting training from scratch")
+    if not resume_path or not os.path.isfile(resume_path):
+        logging.info("No valid resume path, start from scratch.")
         return 0
-        
-    logging.info(f"Loading encoder weights from: {resume_path}")
-    
+
+    logging.info(f"Loading pretrained weights from: {resume_path}")
     try:
-        checkpoint = torch.load(resume_path, map_location='cpu')
-        
-        # 提取预训练权重
-        if 'model' in checkpoint:
-            pretrained_dict = checkpoint['model']
-        else:
-            pretrained_dict = checkpoint
-            
-        # 获取当前模型的状态字典
-        model_dict = model.state_dict()
-        
-        # 筛选出encoder相关的权重
-        encoder_dict = {}
-        # 更精确的encoder/decoder区分
-        encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop','norm']
-        decoder_keywords = ['seg_decoders', 'cls_decoders', 'seg_heads', 'cls_heads', 
-                       'seg_skip_connections', 'cls_skip_connections', 'norm_task_seg', 'norm_task_cls']
-        
-        for k, v in pretrained_dict.items():
-            # 检查是否是encoder相关的参数
-            is_encoder = any(enc_key in k for enc_key in encoder_keywords)
-            is_decoder = any(dec_key in k for dec_key in decoder_keywords)
-            
-            # 只加载encoder部分，排除decoder部分
-            if is_encoder and not is_decoder:
-                if k in model_dict and model_dict[k].shape == v.shape:
-                    encoder_dict[k] = v
-                    logging.info(f"Loading encoder weight: {k}, shape: {v.shape}")
-                else:
-                    if k not in model_dict:
-                        logging.warning(f"Encoder weight not found in current model: {k}")
-                    else:
-                        logging.warning(f"Shape mismatch for {k}: pretrained {v.shape} vs model {model_dict[k].shape}")
-        
-        # 更新模型字典
-        model_dict.update(encoder_dict)
-        model.load_state_dict(model_dict)
-        
-        logging.info(f"Successfully loaded {len(encoder_dict)} encoder parameters from pretrained model")
-        
-        # 冻结encoder部分的权重
-        frozen_params = 0
-        trainable_params = 0
-        frozen_param_names = []
-        trainable_param_names = []
-        
-        for name, param in model.named_parameters():
-            # 检查是否是encoder参数
-            is_encoder = any(enc_key in name for enc_key in encoder_keywords)
-            is_decoder = any(dec_key in name for dec_key in decoder_keywords)
-            
-            if is_encoder and not is_decoder:
-                param.requires_grad = True
-                # param.requires_grad = False
-                frozen_params += param.numel()
-                frozen_param_names.append(name)
-            else:
-                param.requires_grad = True
-                trainable_params += param.numel()
-                trainable_param_names.append(name)
-                
-        logging.info(f"Frozen {frozen_params:,} encoder parameters")
-        logging.info(f"Trainable {trainable_params:,} decoder parameters")
-        logging.info(f"Frozen parameter ratio: {frozen_params/(frozen_params+trainable_params)*100:.2f}%")
-        
-        # 获取恢复的epoch（如果有的话）
-        if 'epoch' in checkpoint:
-            resume_epoch = checkpoint['epoch']
-            logging.info(f"Resuming from epoch {resume_epoch}")
-        else:
-            resume_epoch = 0
-            logging.info("Starting fresh training with pretrained encoder")
-            
-        # 注意：不加载optimizer状态，因为我们改变了可训练参数的结构
-        logging.info("Note: Optimizer state not loaded due to changed trainable parameter structure")
-        
-        return resume_epoch
-        
+        ckpt = torch.load(resume_path, map_location='cpu')
     except Exception as e:
-        logging.error(f"Error loading encoder weights: {e}")
-        logging.info("Starting training from scratch")
+        logging.error(f"Failed to load checkpoint file: {e}")
         return 0
+
+    # 取出 state_dict
+    if isinstance(ckpt, dict) and 'model' in ckpt:
+        state = ckpt['model']
+    else:
+        state = ckpt
+
+    # # 如果是包装成DDP之前再导入，则需要处理可能的 module. 前缀
+    # has_module_prefix = any(k.startswith('module.') for k in state.keys())
+    # if has_module_prefix:
+    #     stripped_state = {k[7:] if k.startswith('module.') else k: v for k, v in state.items()}
+    # else:
+    #     stripped_state = state
+
+    model_state = model.state_dict()
+    loadable = {}
+    skipped = []
+    shape_mismatch = []
+
+    for k, v in state.items():
+        if k in model_state:
+            if model_state[k].shape == v.shape:
+                loadable[k] = v
+            else:
+                shape_mismatch.append((k, tuple(v.shape), tuple(model_state[k].shape)))
+        else:
+            skipped.append(k)
+
+    model_state.update(loadable)
+    missing_before = [k for k in model_state.keys() if k not in loadable and k not in stripped_state]
+
+    # 实际加载
+    result = model.load_state_dict(model_state, strict=False)
+
+    logging.info(f"Loaded params: {len(loadable)} | Skipped(no key): {len(skipped)} | Shape mismatch: {len(shape_mismatch)}")
+    if shape_mismatch:
+        logging.debug(f"Shape mismatch sample: {shape_mismatch[:5]}")
+    if result.missing_keys:
+        logging.debug(f"Remaining missing keys (sample): {result.missing_keys[:10]}")
+    if result.unexpected_keys:
+        logging.debug(f"Unexpected keys (sample): {result.unexpected_keys[:10]}")
+
+    # 定义 encoder 关键词与 decoder / 需排除关键词
+    encoder_keywords = ['patch_embed', 'layers.', 'absolute_pos_embed', 'pos_drop', 'norm']
+    decoder_keywords = [
+        'seg_decoders', 'cls_decoders', 'seg_heads', 'cls_heads',
+        'seg_skip_connections', 'cls_skip_connections',
+        'norm_task_seg', 'norm_task_cls'
+    ]
+
+    frozen, trainable = 0, 0
+    for name, param in model.named_parameters():
+        is_encoder = any(k in name for k in encoder_keywords)
+        is_decoder = any(k in name for k in decoder_keywords)
+        # 仅当判断为 encoder 且不含 decoder 关键词才冻结
+        if is_encoder and not is_decoder:
+            param.requires_grad = False
+            frozen += param.numel()
+        else:
+            param.requires_grad = True
+            trainable += param.numel()
+
+    total = frozen + trainable if (frozen + trainable) > 0 else 1
+    logging.info(f"Frozen encoder params: {frozen:,} | Trainable params: {trainable:,} | Frozen ratio: {frozen/total*100:.2f}%")
+
+    resume_epoch = 0
+    if isinstance(ckpt, dict) and 'epoch' in ckpt:
+        resume_epoch = int(ckpt['epoch'])
+        logging.info(f"Found epoch in checkpoint: {resume_epoch}")
+    else:
+        logging.info("No epoch info in checkpoint (start from 0).")
+
+    logging.info("Optimizer state intentionally NOT loaded (different trainable mask).")
+    return resume_epoch
 
 def get_dynamic_loss_weights(epoch, total_epochs):
     """根据训练进度动态调整损失权重"""
@@ -245,13 +234,13 @@ def omni_train(args, model, snapshot_path):
     #     'private_Thyroid'
     # ]
     seg_datasets = [
-        'BUS-BRA',
-        'BUSI',
-        'BUSIS',
-        'CAMUS',
-        'DDTI',
-        'Fetal_HC',
-        'KidneyUS',
+        # 'BUS-BRA',
+        # 'BUSI',
+        # 'BUSIS',
+        # 'CAMUS',
+        # 'DDTI',
+        # 'Fetal_HC',
+        # 'KidneyUS',
         'private_Breast',
         'private_Breast_luminal', 
         'private_Cardiac',
@@ -262,10 +251,10 @@ def omni_train(args, model, snapshot_path):
     
     # 定义分类任务的数据集列表和其分类数
     cls_datasets = {
-        'Appendix':2,
-        'BUS-BRA':2,
-        'BUSI':2,
-        'Fatty-Liver':2,
+        # 'Appendix':2,
+        # 'BUS-BRA':2,
+        # 'BUSI':2,
+        # 'Fatty-Liver':2,
         'private_Appendix': 2,
         'private_Breast': 2,
         'private_Breast_luminal': 4,  # 4分类
@@ -331,59 +320,60 @@ def omni_train(args, model, snapshot_path):
             except Exception as e:
                 logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
     
-    # 为每个分类数据集创建单独的DataLoader
-    cls_dataloaders = {}
-    # 改进的权重配置 - 基于数据平衡和任务难度的考虑
-    cls_dataset_weights = {
-        'Appendix': 1.0,
-        'BUS-BRA': 1.0,
-        'BUSI': 1.0,
-        'Fatty-Liver': 1.0,
-        'private_Appendix': 1.8,        # 增加权重（通常数据较少）
-        'private_Breast': 1.0,          # 基准权重
-        'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
-        'private_Liver': 1.6            # 适度增加
-    }
+    # # 为每个分类数据集创建单独的DataLoader
+    # cls_dataloaders = {}
+    # # 改进的权重配置 - 基于数据平衡和任务难度的考虑
+    # cls_dataset_weights = {
+    #     'Appendix': 1.0,
+    #     'BUS-BRA': 1.0,
+    #     'BUSI': 1.0,
+    #     'Fatty-Liver': 1.0,
+    #     'private_Appendix': 1.8,        # 增加权重（通常数据较少）
+    #     'private_Breast': 1.0,          # 基准权重
+    #     'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
+    #     'private_Liver': 1.6            # 适度增加
+    # }
     
-    logging.info("Creating classification DataLoaders for each dataset...")  
-    for dataset_name, num_classes in cls_datasets.items():
-        dataset_path = os.path.join(args.root_path, "classification", dataset_name)
-        if os.path.exists(dataset_path):
-            try:
-                db_cls = USdatasetOmni_cls_decoders(
-                    base_dir=dataset_path,
-                    split="train",
-                    transform=RandomGenerator_Cls(output_size=[args.img_size, args.img_size]),
-                    prompt=args.prompt
-                )
+    # logging.info("Creating classification DataLoaders for each dataset...")  
+    # for dataset_name, num_classes in cls_datasets.items():
+    #     dataset_path = os.path.join(args.root_path, "classification", dataset_name)
+    #     if os.path.exists(dataset_path):
+    #         try:
+    #             db_cls = USdatasetOmni_cls_decoders(
+    #                 base_dir=dataset_path,
+    #                 split="train",
+    #                 transform=RandomGenerator_Cls(output_size=[args.img_size, args.img_size]),
+    #                 prompt=args.prompt
+    #             )
                 
-                # 使用DDP sampler
-                sampler = torch.utils.data.distributed.DistributedSampler(
-                    db_cls,
-                    num_replicas=world_size,
-                    rank=rank, 
-                    shuffle=True
-                )
+    #             # 使用DDP sampler
+    #             sampler = torch.utils.data.distributed.DistributedSampler(
+    #                 db_cls,
+    #                 num_replicas=world_size,
+    #                 rank=rank, 
+    #                 shuffle=True
+    #             )
                 
-                dataloader = DataLoader(
-                    db_cls,
-                    batch_size=batch_size,
-                    num_workers=12,  # 减少每个loader的worker数
-                    pin_memory=True,
-                    worker_init_fn=worker_init_fn,
-                    sampler=sampler
-                )
+    #             dataloader = DataLoader(
+    #                 db_cls,
+    #                 batch_size=batch_size,
+    #                 num_workers=12,  # 减少每个loader的worker数
+    #                 pin_memory=True,
+    #                 worker_init_fn=worker_init_fn,
+    #                 sampler=sampler
+    #             )
                 
-                cls_dataloaders[dataset_name] = {
-                    'loader': dataloader,
-                    'sampler': sampler,
-                    'weight': cls_dataset_weights.get(dataset_name, 1.0),
-                    'num_classes': num_classes,
-                    'size': len(db_cls)
-                }
-                logging.info(f"Created classification DataLoader for {dataset_name}: {len(db_cls)} samples, {num_classes} classes")
-            except Exception as e:
-                logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
+    #             cls_dataloaders[dataset_name] = {
+    #                 'loader': dataloader,
+    #                 'sampler': sampler,
+    #                 'weight': cls_dataset_weights.get(dataset_name, 1.0),
+    #                 'num_classes': num_classes,
+    #                 'size': len(db_cls)
+    #             }
+    #             logging.info(f"Created classification DataLoader for {dataset_name}: {len(db_cls)} samples, {num_classes} classes")
+    #         except Exception as e:
+    #             logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
+    
 
     model = model.to(device=device)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -418,16 +408,20 @@ def omni_train(args, model, snapshot_path):
 
     # 计算总迭代次数
     total_seg_iterations = sum(len(info['loader']) for info in seg_dataloaders.values())
-    total_cls_iterations = sum(len(info['loader']) for info in cls_dataloaders.values())
-    total_iterations = total_seg_iterations + total_cls_iterations
+    # total_cls_iterations = sum(len(info['loader']) for info in cls_dataloaders.values())
+    # total_iterations = total_seg_iterations + total_cls_iterations
+    total_iterations = total_seg_iterations
     max_iterations = args.max_epochs * total_iterations
 
     # warmup_batch可通过args.warmup_batch指定，默认5
     warmup_batch = args.warmup_batch if args.warmup_batch > 0 else 0
     lr_scheduler = WarmupCosineLRScheduler(optimizer, base_lr, max_iterations, warmup_iters=warmup_batch)
 
-    logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
-        batch_size, total_seg_iterations, total_cls_iterations, total_iterations, max_iterations))
+    logging.info("{} batch size. {} total seg iterations  = {} total iterations per epoch. {} max iterations ".format(
+        batch_size, total_seg_iterations, total_iterations, max_iterations))
+
+    # logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
+    #     batch_size, total_seg_iterations, total_cls_iterations, total_iterations, max_iterations))
     best_performance = 0.0
     best_epoch = 0
 
@@ -449,8 +443,9 @@ def omni_train(args, model, snapshot_path):
         # 为每个数据集的sampler设置epoch
         for dataset_name, info in seg_dataloaders.items():
             info['sampler'].set_epoch(epoch_num)
-        for dataset_name, info in cls_dataloaders.items():
-            info['sampler'].set_epoch(epoch_num)
+
+        # for dataset_name, info in cls_dataloaders.items():
+        #     info['sampler'].set_epoch(epoch_num)
 
         # ========== 分割任务训练 - 加权采样 ==========
         logging.info("Training segmentation tasks...")
@@ -526,81 +521,81 @@ def omni_train(args, model, snapshot_path):
                     logging.info('Dataset: %s, global iteration %d and seg iteration %d : loss : %f' %
                                  (dataset_name, global_iter_num, seg_iter_num, loss.item()))
 
-        # ========== 分类任务训练 - 加权采样 ==========
-        logging.info("Training classification tasks...")
+        # # ========== 分类任务训练 - 加权采样 ==========
+        # logging.info("Training classification tasks...")
         
-        # 创建加权采样池
-        cls_batch_pool = []
-        for dataset_name, dataset_info in cls_dataloaders.items():
-            dataloader = dataset_info['loader']
-            weight = dataset_info['weight']
-            num_classes = dataset_info['num_classes']
+        # # 创建加权采样池
+        # cls_batch_pool = []
+        # for dataset_name, dataset_info in cls_dataloaders.items():
+        #     dataloader = dataset_info['loader']
+        #     weight = dataset_info['weight']
+        #     num_classes = dataset_info['num_classes']
             
-            # 根据权重决定每个数据集的采样次数
-            sample_count = int(len(dataloader) * weight)
-            sample_count = max(1, sample_count)  # 确保至少采样一次
+        #     # 根据权重决定每个数据集的采样次数
+        #     sample_count = int(len(dataloader) * weight)
+        #     sample_count = max(1, sample_count)  # 确保至少采样一次
             
-            # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
+        #     # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
             
-            # 将批次添加到采样池，重复次数根据权重决定
-            batch_list = list(enumerate(dataloader))
-            if weight <= 1.0:
-                # 权重<=1时，随机采样子集
-                sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
-            else:
-                # 权重>1时，重复采样
-                sampled_batches = random.choices(batch_list, k=sample_count)
+        #     # 将批次添加到采样池，重复次数根据权重决定
+        #     batch_list = list(enumerate(dataloader))
+        #     if weight <= 1.0:
+        #         # 权重<=1时，随机采样子集
+        #         sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
+        #     else:
+        #         # 权重>1时，重复采样
+        #         sampled_batches = random.choices(batch_list, k=sample_count)
             
-            for i_batch, sampled_batch in sampled_batches:
-                cls_batch_pool.append((dataset_name, num_classes, i_batch, sampled_batch))
+        #     for i_batch, sampled_batch in sampled_batches:
+        #         cls_batch_pool.append((dataset_name, num_classes, i_batch, sampled_batch))
         
-        # 随机打乱采样池
-        random.shuffle(cls_batch_pool)
-        logging.info(f"Total classification batches after weighted sampling: {len(cls_batch_pool)}")
+        # # 随机打乱采样池
+        # random.shuffle(cls_batch_pool)
+        # logging.info(f"Total classification batches after weighted sampling: {len(cls_batch_pool)}")
         
-        # 训练加权采样后的批次
-        for dataset_name, num_classes, i_batch, sampled_batch in tqdm(cls_batch_pool, total=len(cls_batch_pool), desc="Cls-Training"):
+        # # 训练加权采样后的批次
+        # for dataset_name, num_classes, i_batch, sampled_batch in tqdm(cls_batch_pool, total=len(cls_batch_pool), desc="Cls-Training"):
                     
-                image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-                image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
+        #         image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+        #         image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
 
-                if args.prompt:
-                    position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-                    task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-                    type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-                    nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
+        #         if args.prompt:
+        #             position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+        #             task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+        #             type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+        #             nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
                     
-                    # 直接调用对应数据集和分类数的decoder
-                    x_cls = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
-                                  use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
-                else:
-                    x_cls = model(image_batch, use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
+        #             # 直接调用对应数据集和分类数的decoder
+        #             x_cls = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
+        #                           use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
+        #         else:
+        #             x_cls = model(image_batch, use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
 
-                # 计算分类损失
-                if num_classes == 2:
-                    loss = cls_ce_loss_2way(x_cls, label_batch[:].long())
-                elif num_classes == 4:
-                    loss = cls_ce_loss_4way(x_cls, label_batch[:].long())
-                else:
-                    raise ValueError(f"Unsupported num_classes: {num_classes}")
+        #         # 计算分类损失
+        #         if num_classes == 2:
+        #             loss = cls_ce_loss_2way(x_cls, label_batch[:].long())
+        #         elif num_classes == 4:
+        #             loss = cls_ce_loss_4way(x_cls, label_batch[:].long())
+        #         else:
+        #             raise ValueError(f"Unsupported num_classes: {num_classes}")
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+        #         optimizer.zero_grad()
+        #         loss.backward()
+        #         optimizer.step()
 
 
-                # lr_ = lr_scheduler.step()
+        #         lr_ = lr_scheduler.step()
 
-                cls_iter_num = cls_iter_num + 1
-                global_iter_num = global_iter_num + 1
+        #         cls_iter_num = cls_iter_num + 1
+        #         global_iter_num = global_iter_num + 1
 
-                writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
-                writer.add_scalar(f'info/cls_loss_{dataset_name}', loss, cls_iter_num)
-                writer.add_scalar('info/cls_loss_total', loss, cls_iter_num)
+        #         writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
+        #         writer.add_scalar(f'info/cls_loss_{dataset_name}', loss, cls_iter_num)
+        #         writer.add_scalar('info/cls_loss_total', loss, cls_iter_num)
 
-                if global_iter_num % 50 == 0:  # 减少日志频率
-                    logging.info('Dataset: %s, global iteration %d and cls iteration %d : loss : %f' %
-                                 (dataset_name, global_iter_num, cls_iter_num, loss.item()))
+        #         if global_iter_num % 50 == 0:  # 减少日志频率
+        #             logging.info('Dataset: %s, global iteration %d and cls iteration %d : loss : %f' %
+        #                          (dataset_name, global_iter_num, cls_iter_num, loss.item()))
 
         
         # ========== 验证和模型保存逻辑 ==========
@@ -655,7 +650,7 @@ def omni_train(args, model, snapshot_path):
 
                     metric_list = 0.0
                     count_matrix = np.ones((len(db_val), num_classes-1))
-                    for i_batch, sampled_batch in tqdm(enumerate(val_loader)):
+                    for i_batch, sampled_batch in tqdm(enumerate(val_loader), total=len(val_loader)):
                         image, label = sampled_batch["image"], sampled_batch["label"]
                         if args.prompt:
                             position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float()
@@ -691,6 +686,8 @@ def omni_train(args, model, snapshot_path):
                     seg_avg_performance += performance
 
                 seg_avg_performance = seg_avg_performance / (len(seg_val_set)+1e-6)
+                
+
                 total_performance += seg_avg_performance
                 writer.add_scalar('info/val_metric_seg_Total', seg_avg_performance, epoch_num)
                 
@@ -721,7 +718,7 @@ def omni_train(args, model, snapshot_path):
 
                     label_list = []
                     prediction_prob_list = []
-                    for i_batch, sampled_batch in tqdm(enumerate(val_loader)):
+                    for i_batch, sampled_batch in tqdm(enumerate(val_loader), total=len(val_loader)):
                         image, label = sampled_batch["image"], sampled_batch["label"]
                         if args.prompt:
                             position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float()
@@ -755,12 +752,15 @@ def omni_train(args, model, snapshot_path):
                     cls_avg_performance += performance
 
                 cls_avg_performance = cls_avg_performance / (len(cls_val_set)+1e-6)
+
                 total_performance += cls_avg_performance
                 writer.add_scalar('info/val_metric_cls_Total', cls_avg_performance, epoch_num)
 
                 TotalAvgPerformance = total_performance/2
                 # TotalAvgPerformance = total_performance
 
+                logging.info('Segmentation average performance: %f' % seg_avg_performance)
+                logging.info('Classification average performance: %f' % cls_avg_performance)
                 logging.info('This epoch %d Validation performance: %f' % (epoch_num, TotalAvgPerformance))
                 logging.info('But the best epoch is: %d and performance: %f' % (best_epoch, best_performance))
                 writer.add_scalar('info/val_metric_TotalMean', TotalAvgPerformance, epoch_num)

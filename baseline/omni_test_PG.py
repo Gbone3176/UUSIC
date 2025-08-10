@@ -65,8 +65,8 @@ def inference(args, model, test_save_path=None):
     import csv
     import time
 
-    if not os.path.exists(f"{args.output_dir}/result.csv"):
-        with open(f"{args.output_dir}/result.csv", 'w', newline='') as csvfile:
+    if not os.path.exists(f"{args.output_dir}/result_{args.resume.split('/')[-1][:-4]}.csv"):
+        with open(f"{args.output_dir}/result_{args.resume.split('/')[-1][:-4]}.csv", 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['dataset', 'task', 'metric', 'time'])
 
@@ -150,7 +150,7 @@ def inference(args, model, test_save_path=None):
         logging.info('Testing performance in best val model: mean_dice : %f' % (performance))
         
         if int(os.environ["LOCAL_RANK"]) == 0:  
-            with open(f"{args.output_dir}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{args.output_dir}/result_{args.resume.split('/')[-1][:-4]}.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
                     writer.writerow([dataset_name, 'omni_seg_prompt@'+args.output_dir, performance,
@@ -229,7 +229,7 @@ def inference(args, model, test_save_path=None):
         logging.info('Testing performance in best val model: acc : %f' % (performance))
 
         if int(os.environ["LOCAL_RANK"]) == 0:
-            with open(f"{args.output_dir}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{args.output_dir}/result_{args.resume.split('/')[-1][:-4]}.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
                     writer.writerow([dataset_name, 'omni_cls_prompt@'+args.output_dir, performance,

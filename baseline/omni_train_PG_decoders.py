@@ -89,6 +89,8 @@ if __name__ == "__main__":
     ).cuda()
     if args.pretrain_ckpt is not None:
         net.load_from_self(args.pretrain_ckpt)
+    elif args.resume is not None:
+        print(f"Load from {args.resume} later...")
     else:
         net.load_from(config)
 

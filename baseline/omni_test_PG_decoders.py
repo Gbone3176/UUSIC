@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import sys
+import copy
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
@@ -65,8 +66,8 @@ def inference(args, model, test_save_path=None, dirname=None):
     import csv
     import time
 
-    if not os.path.exists(f"{dirname}/result.csv"):
-        with open(f"{dirname}/result.csv", 'w', newline='') as csvfile:
+    if not os.path.exists(f"{dirname}/result_{args.resume.split('/')[-1][:-4]}.csv"):
+        with open(f"{dirname}/result_{args.resume.split('/')[-1][:-4]}.csv", 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['dataset', 'task', 'metric', 'time'])
 
@@ -145,7 +146,7 @@ def inference(args, model, test_save_path=None, dirname=None):
         logging.info('Testing performance in best val model: mean_dice : %f' % (performance))
         
         if int(os.environ["LOCAL_RANK"]) == 0:  
-            with open(f"{dirname}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{dirname}/result_{args.resume.split('/')[-1][:-4]}.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
                     writer.writerow([dataset_name, 'omni_seg_decoders_prompt@'+dirname, performance,
@@ -226,7 +227,7 @@ def inference(args, model, test_save_path=None, dirname=None):
         logging.info('Testing performance in best val model: acc : %f' % (performance))
 
         if int(os.environ["LOCAL_RANK"]) == 0:
-            with open(f"{dirname}/result.csv", 'a', newline='') as csvfile:
+            with open(f"{dirname}/result_{args.resume.split('/')[-1][:-4]}.csv", 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 if args.prompt:
                     writer.writerow([dataset_name, 'omni_cls_decoders_prompt@'+dirname, performance,
@@ -280,7 +281,7 @@ if __name__ == "__main__":
     torch.distributed.init_process_group(backend="nccl", init_method='env://', world_size=1, rank=0)
     model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
 
-    import copy
+    
     print("Loading checkpoint from ", snapshot)
     if "latest" in snapshot:
         model.load_state_dict(torch.load(snapshot, map_location='cpu')['model'])
@@ -314,7 +315,7 @@ if __name__ == "__main__":
     logging.info(snapshot_name)
 
     if args.is_saveout:
-        args.test_save_dir = os.path.join(dirname, "predictions")
+        args.test_save_dir = os.path.join(dirname, f"predictions_{snapshot_name[:-4]}")
         test_save_path = args.test_save_dir
         os.makedirs(test_save_path, exist_ok=True)
     else:

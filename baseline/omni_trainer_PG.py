@@ -63,11 +63,11 @@ def omni_train(args, model, snapshot_path):
         'DDTI': (7952, 0.25),               # 对应weight_base[0] = 0.25 (Thyroid相关)
         'Fetal_HC': (699, 0.5),             # 对应weight_base[12] = 0.5
         'KidneyUS': (340, 1),               # 对应weight_base[8] = 1
-        'private_Breast_luminal': (165, 2), # 对应weight_base[10] = 2
-        'private_Cardiac': (53, 4),         # 对应weight_base[11] = 4
-        'private_Fetal_Head': (84, 4),      # 对应weight_base[4] = 4
+        'private_Breast_luminal': (165, 3), # 对应weight_base[10] = 2
+        'private_Cardiac': (53, 2),         # 对应weight_base[11] = 4
+        'private_Fetal_Head': (84, 1),      # 对应weight_base[4] = 4
         'private_Kidney': (46, 4),          # 对应weight_base[3] = 4
-        'private_Thyroid': (299, 1)         # 对应weight_base[9] = 4
+        'private_Thyroid': (299, 4)         # 对应weight_base[9] = 4
     }
     
     sample_weight_seq = [[seg_datasets_weight[seg_subset_name][1]] *
@@ -98,9 +98,9 @@ def omni_train(args, model, snapshot_path):
         'BUS-BRA': (1312, 0.25),             # 对应weight_base[7] = 0.25 (大规模数据低权重)
         'BUSI': (452, 1),                    # 对应weight_base[2] = 1
         'Fatty-Liver': (385, 1),             # 接近weight_base[6]的350样本，权重=1
-        'private_Appendix': (46, 4),         # 对应weight_base[3] = 4 (小样本高权重)
-        'private_Breast': (105, 3),          # 对应weight_base[1] = 3
-        'private_Breast_luminal': (165, 2),  # 对应weight_base[10] = 2
+        'private_Appendix': (46, 2),         # 对应weight_base[3] = 4 (小样本高权重)
+        'private_Breast': (105, 4),          # 对应weight_base[1] = 3
+        'private_Breast_luminal': (165, 1),  # 对应weight_base[10] = 2
         'private_Liver': (72, 4)             # 接近weight_base[4]的84样本，权重=4
     }
 
@@ -285,13 +285,13 @@ def omni_train(args, model, snapshot_path):
             total_performance = 0.0
 
             seg_val_set = [
-                "BUS-BRA",
-                "BUSIS",
-                "BUSI",
-                "CAMUS",
-                "DDTI",
-                "Fetal_HC",
-                "KidneyUS",
+                # "BUS-BRA",
+                # "BUSIS",
+                # "BUSI",
+                # "CAMUS",
+                # "DDTI",
+                # "Fetal_HC",
+                # "KidneyUS",
                 "private_Thyroid",
                 "private_Kidney",
                 "private_Fetal_Head",
@@ -355,10 +355,10 @@ def omni_train(args, model, snapshot_path):
             writer.add_scalar('info/val_metric_seg_Total', seg_avg_performance, epoch_num)
             
             cls_val_set = [
-                "Appendix",
-                "BUS-BRA",
-                "BUSI",
-                "Fatty-Liver",
+                # "Appendix",
+                # "BUS-BRA",
+                # "BUSI",
+                # "Fatty-Liver",
                 "private_Liver",
                 "private_Breast_luminal",
                 "private_Breast",
@@ -482,7 +482,16 @@ def omni_train(args, model, snapshot_path):
                 for i, (epoch, perf, path) in enumerate(best_models):
                     logging.info("  Rank {}: Epoch {} - Performance {:.4f} - {}".format(
                         i+1, epoch, perf, os.path.basename(path)))
-
+            # Save model every 20 epochs
+            if epoch_num % 20 == 0 and epoch_num > 0:
+                # Create a path for the periodic save
+                periodic_save_path = os.path.join(snapshot_path, 'epoch{}_performance_{}.pth'.format(
+                    epoch_num, round(TotalAvgPerformance, 4)))
+                
+                # Save the model
+                torch.save(model.state_dict(), periodic_save_path)
+                logging.info("Saved periodic checkpoint at epoch {} to {}".format(
+                    epoch_num, periodic_save_path))
         model.train()
 
     writer.close()

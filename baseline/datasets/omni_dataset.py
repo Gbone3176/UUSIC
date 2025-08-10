@@ -172,14 +172,14 @@ class USdatasetOmni_seg(Dataset):
         self.subset_len = []
         self.prompt = prompt
 
-        print('='*20)
-        seg_data_sets = os.listdir(os.path.join(base_dir, "segmentation"))
-        print(f"Using private datasets: {seg_data_sets} for segmentation task.")
-        for dataset_name in os.listdir(os.path.join(base_dir, "segmentation")):
-            self.sample_list.extend(list_add_prefix(os.path.join(
-                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
-            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
-                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+        # print('='*20)
+        # seg_data_sets = os.listdir(os.path.join(base_dir, "segmentation"))
+        # print(f"Using private datasets: {seg_data_sets} for segmentation task.")
+        # for dataset_name in os.listdir(os.path.join(base_dir, "segmentation")):
+        #     self.sample_list.extend(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
+        #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
 
         ### only for private certain dataset
         # private_datasets = ["private_Thyroid"]
@@ -190,17 +190,17 @@ class USdatasetOmni_seg(Dataset):
         #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
         #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
         #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
-            
-        # ### only for private dataset
-        # private_datasets = [d for d in os.listdir(os.path.join(base_dir, "segmentation")) 
-        #            if d.startswith("private_")]
-        # print('='*20)
-        # print(f"Using private datasets: {private_datasets} for segmentation task.")
-        # for dataset_name in private_datasets:
-        #     self.sample_list.extend(list_add_prefix(os.path.join(
-        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
-        #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
-        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+    
+        ### only for private dataset
+        private_datasets = [d for d in os.listdir(os.path.join(base_dir, "segmentation")) 
+                   if d.startswith("private_")]
+        print('='*20)
+        print(f"Using private datasets: {private_datasets} for segmentation task.")
+        for dataset_name in private_datasets:
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
 
     def __len__(self):
         return len(self.sample_list)
@@ -271,26 +271,26 @@ class USdatasetOmni_cls(Dataset):
         self.prompt = prompt
 
 
-        print('='*20)
-        cls_data_sets = os.listdir(os.path.join(base_dir, "classification"))
-        print(f"Using private datasets: {cls_data_sets} for classification task.")
-        
-        for dataset_name in os.listdir(os.path.join(base_dir, "classification")):
-            self.sample_list.extend(list_add_prefix(os.path.join(
-                base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))
-            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
-                base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
-
-            
-        # private_datasets = [d for d in os.listdir(os.path.join(base_dir, "classification"))
-        #                    if d.startswith("private_")]
         # print('='*20)
-        # print(f"Using private datasets: {private_datasets} for classification task.")
-        # for dataset_name in private_datasets:
+        # cls_data_sets = os.listdir(os.path.join(base_dir, "classification"))
+        # print(f"Using private datasets: {cls_data_sets} for classification task.")
+
+        # for dataset_name in os.listdir(os.path.join(base_dir, "classification")):
         #     self.sample_list.extend(list_add_prefix(os.path.join(
         #         base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))
         #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
         #         base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
+
+            
+        private_datasets = [d for d in os.listdir(os.path.join(base_dir, "classification"))
+                           if d.startswith("private_")]
+        print('='*20)
+        print(f"Using private datasets: {private_datasets} for classification task.")
+        for dataset_name in private_datasets:
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
 
     def __len__(self):
         return len(self.sample_list)
