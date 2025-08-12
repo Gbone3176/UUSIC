@@ -140,6 +140,7 @@ def omni_seg_test_TU(image, label, net, classes, ClassStartIndex=1, test_save_pa
                   nature_prompt=None,
                   position_prompt=None,
                   task_prompt=None,
+                  dataset_name=None
                   ):
     label = label.cpu().detach().numpy()
     image_save = image.cpu().detach().numpy()
@@ -152,7 +153,7 @@ def omni_seg_test_TU(image, label, net, classes, ClassStartIndex=1, test_save_pa
     net.eval()
     with torch.no_grad():
         if prompt:
-            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt))[0]
+            seg_out = net(input, position_prompt, task_prompt, type_prompt, nature_prompt)[0]
         else:
             seg_out = net(input)[0]
         out_label_back_transform = torch.cat(
@@ -166,9 +167,9 @@ def omni_seg_test_TU(image, label, net, classes, ClassStartIndex=1, test_save_pa
 
     if test_save_path is not None:
         image = (image_save - np.min(image_save)) / (np.max(image_save) - np.min(image_save))
-        cv2.imwrite(test_save_path + '/'+case + "_pred.png", (prediction.transpose(1, 2, 0)*255).astype(np.uint8))
-        cv2.imwrite(test_save_path + '/'+case + "_img.png", ((image.squeeze(0).transpose(1, 2, 0))*255).astype(np.uint8))
-        cv2.imwrite(test_save_path + '/'+case + "_gt.png", (label.transpose(1, 2, 0)*255).astype(np.uint8))
+        cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_pred.png", (prediction.transpose(1, 2, 0)*255).astype(np.uint8))
+        cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_img.png", ((image.squeeze(0).transpose(1, 2, 0))*255).astype(np.uint8))
+        cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_gt.png", (label.transpose(1, 2, 0)*255).astype(np.uint8))
     return metric_list
 
 

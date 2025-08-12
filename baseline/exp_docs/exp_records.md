@@ -920,3 +920,8 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
     --seed 42 \
     --output_dir exp_out/trail_debug_35 \
 
+
+- trail_debug_36：TransUnet + prompt
+    - 单独训练分割数据，train+val 一共90%的数据
+    - trainer：vit_seg_modeling_v2
+    
