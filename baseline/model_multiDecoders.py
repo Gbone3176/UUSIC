@@ -64,8 +64,6 @@ type_prompt_one_hot_dict = {
     "location": [0, 0, 1],
 }
 
-
-
 class Model:
     def __init__(self):
         print("Initializing model...")
@@ -96,7 +94,7 @@ class Model:
         self.network = ViT_omni(config, prompt=args.prompt).to(self.device)
 
 
-        snapshot = '/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_33-4/best_model_18_0.7983.pth'
+        snapshot = '/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_33-10/best_model_72_0.8114.pth'
         
 
         print("Loading checkpoint from ", snapshot)
@@ -129,6 +127,7 @@ class Model:
             dataset_name = data_dict['dataset_name']
             organ_name = data_dict['organ']
             decoder_name = "private_" + dataset_name
+            # print(decoder_name)
             task_type = "seg" if task == 'segmentation' else "cls"
             num_classes = 2 if task == 'segmentation' else 4 if dataset_name == 'Breast_luminal' else 2
 

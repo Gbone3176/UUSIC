@@ -201,6 +201,10 @@ class USdatasetOmni_seg(Dataset):
                 base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
             self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
                 base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, "val.txt"), dataset_name, "imgs"))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, "val.txt"), dataset_name, "imgs"))))
 
     def __len__(self):
         return len(self.sample_list)
@@ -291,6 +295,10 @@ class USdatasetOmni_cls(Dataset):
                 base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))
             self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
                 base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "classification", dataset_name, "val.txt"), dataset_name, None))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "classification", dataset_name, "val.txt"), dataset_name, None))))
 
     def __len__(self):
         return len(self.sample_list)

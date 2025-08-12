@@ -134,6 +134,44 @@ def omni_seg_test(image, label, net, classes, ClassStartIndex=1, test_save_path=
     return metric_list
 
 
+def omni_seg_test_TU(image, label, net, classes, ClassStartIndex=1, test_save_path=None, case=None,
+                  prompt=False,
+                  type_prompt=None,
+                  nature_prompt=None,
+                  position_prompt=None,
+                  task_prompt=None,
+                  ):
+    label = label.cpu().detach().numpy()
+    image_save = image.cpu().detach().numpy()
+    input = image.cuda()
+    if prompt:
+        position_prompt = position_prompt.cuda()
+        task_prompt = task_prompt.cuda()
+        type_prompt = type_prompt.cuda()
+        nature_prompt = nature_prompt.cuda()
+    net.eval()
+    with torch.no_grad():
+        if prompt:
+            seg_out = net((input, position_prompt, task_prompt, type_prompt, nature_prompt))[0]
+        else:
+            seg_out = net(input)[0]
+        out_label_back_transform = torch.cat(
+            [seg_out[:, 0:1], seg_out[:, ClassStartIndex:ClassStartIndex+classes-1]], axis=1)
+        out = torch.argmax(torch.softmax(out_label_back_transform, dim=1), dim=1)
+        prediction = out.cpu().detach().numpy()
+
+    metric_list = []
+    for i in range(1, classes):
+        metric_list.append(calculate_metric_percase(prediction == i, label == i))
+
+    if test_save_path is not None:
+        image = (image_save - np.min(image_save)) / (np.max(image_save) - np.min(image_save))
+        cv2.imwrite(test_save_path + '/'+case + "_pred.png", (prediction.transpose(1, 2, 0)*255).astype(np.uint8))
+        cv2.imwrite(test_save_path + '/'+case + "_img.png", ((image.squeeze(0).transpose(1, 2, 0))*255).astype(np.uint8))
+        cv2.imwrite(test_save_path + '/'+case + "_gt.png", (label.transpose(1, 2, 0)*255).astype(np.uint8))
+    return metric_list
+
+
 def omni_seg_test_decoders(image, label, net, classes, ClassStartIndex=1, test_save_path=None, case=None,
                   prompt=False,
                   type_prompt=None,

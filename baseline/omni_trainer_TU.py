@@ -22,8 +22,10 @@ from datasets.dataset_aug_norm import RandomGenerator_Cls, RandomGenerator_Seg, 
 from datasets.omni_dataset import WeightedRandomSamplerDDP
 from datasets.omni_dataset import USdatasetOmni_cls, USdatasetOmni_seg
 from sklearn.metrics import roc_auc_score
-from utils import omni_seg_test
+from utils import omni_seg_test_TU
 
+def to_chw(x):
+    return x.permute(0, 3, 1, 2).contiguous() if x.dim()==4 and x.size(-1) in (1, 3) else x
 
 def omni_train(args, model, snapshot_path):
 
@@ -171,6 +173,9 @@ def omni_train(args, model, snapshot_path):
 
         for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
             image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+
+            image_batch = to_chw(image_batch).to(device=device)
+
             image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
             if args.prompt:
                 position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
@@ -195,7 +200,7 @@ def omni_train(args, model, snapshot_path):
             if progress >= 0.2:
                 lr_ = base_lr * (progress ** 0.9)
             else:
-                lr_ = base_lr * (0.2 ** 0.9)  # 保持在30%进度时的学习率
+                lr_ = base_lr * (0.2 ** 0.9)  # 保持在20%进度时的学习率
                 
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr_
@@ -210,61 +215,63 @@ def omni_train(args, model, snapshot_path):
                          (global_iter_num, seg_iter_num, loss.item()))
 
         
-        # for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
-        #     image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-        #     num_classes_batch = sampled_batch['num_classes']
-        #     image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
-        #     if args.prompt:
-        #         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-        #         task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-        #         type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-        #         nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
-        #         (_, x_cls_2, x_cls_4) = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt))
-        #     else:
-        #         (_, x_cls_2, x_cls_4) = model(image_batch)
-
-        #     loss = 0.0
+        for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
+            image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
             
-        #     mask_2_way = (num_classes_batch == 2)
-        #     mask_4_way = (num_classes_batch == 4)
+            num_classes_batch = sampled_batch['num_classes']
+            image_batch = to_chw(image_batch).to(device=device)
+            label_batch = label_batch.to(device=device)
+            if args.prompt:
+                position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+                task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+                type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+                nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
+                (_, x_cls_2, x_cls_4) = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt))
+            else:
+                (_, x_cls_2, x_cls_4) = model(image_batch)
+
+            loss = 0.0
+            
+            mask_2_way = (num_classes_batch == 2)
+            mask_4_way = (num_classes_batch == 4)
 
 
-        #     if mask_2_way.any():
-        #         outputs_2_way = x_cls_2[mask_2_way]
-        #         labels_2_way = label_batch[mask_2_way]
-        #         loss_ce_2 = cls_ce_loss_2way(outputs_2_way, labels_2_way[:].long())
-        #         loss += loss_ce_2
+            if mask_2_way.any():
+                outputs_2_way = x_cls_2[mask_2_way]
+                labels_2_way = label_batch[mask_2_way]
+                loss_ce_2 = cls_ce_loss_2way(outputs_2_way, labels_2_way[:].long())
+                loss += loss_ce_2
 
 
-        #     if mask_4_way.any():
-        #         outputs_4_way = x_cls_4[mask_4_way]
-        #         labels_4_way = label_batch[mask_4_way]
-        #         loss_ce_4 = cls_ce_loss_4way(outputs_4_way, labels_4_way[:].long())
-        #         loss += loss_ce_4
+            if mask_4_way.any():
+                outputs_4_way = x_cls_4[mask_4_way]
+                labels_4_way = label_batch[mask_4_way]
+                loss_ce_4 = cls_ce_loss_4way(outputs_4_way, labels_4_way[:].long())
+                loss += loss_ce_4
 
-        #     # loss_ce = cls_ce_loss(x_cls, label_batch[:].long())
-        #     # loss = loss_ce
+            # loss_ce = cls_ce_loss(x_cls, label_batch[:].long())
+            # loss = loss_ce
 
-        #     optimizer.zero_grad()
-        #     loss.backward()
-        #     optimizer.step()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        #     progress = 1.0 - global_iter_num / max_iterations
-        #     if progress >= 0.3:
-        #         lr_ = base_lr * (progress ** 0.9)
-        #     else:
-        #         lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = lr_
+            progress = 1.0 - global_iter_num / max_iterations
+            if progress >= 0.3:
+                lr_ = base_lr * (progress ** 0.9)
+            else:
+                lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = lr_
 
-        #     cls_iter_num = cls_iter_num + 1
-        #     global_iter_num = global_iter_num + 1
+            cls_iter_num = cls_iter_num + 1
+            global_iter_num = global_iter_num + 1
 
-        #     writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
-        #     writer.add_scalar('info/cls_loss', loss, cls_iter_num)
+            writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
+            writer.add_scalar('info/cls_loss', loss, cls_iter_num)
 
-        #     logging.info('global iteration %d and cls iteration %d : loss : %f' %
-        #                  (global_iter_num, cls_iter_num, loss.item()))
+            logging.info('global iteration %d and cls iteration %d : loss : %f' %
+                         (global_iter_num, cls_iter_num, loss.item()))
         
         
         dist.barrier()
@@ -318,12 +325,13 @@ def omni_train(args, model, snapshot_path):
                 count_matrix = np.ones((len(db_val), num_classes-1))
                 for i_batch, sampled_batch in tqdm(enumerate(val_loader)):
                     image, label = sampled_batch["image"], sampled_batch["label"]
+                    image = to_chw(image)
                     if args.prompt:
                         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float()
                         task_prompt = torch.tensor([[0]*position_prompt.shape[0], [1]*position_prompt.shape[0]]).permute([1, 0]).float()
                         type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float()
                         nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float()
-                        metric_i = omni_seg_test(image, label, model,
+                        metric_i = omni_seg_test_TU(image, label, model,
                                                  classes=num_classes,
                                                  prompt=args.prompt,
                                                  type_prompt=type_prompt,
@@ -332,7 +340,7 @@ def omni_train(args, model, snapshot_path):
                                                  task_prompt=task_prompt
                                                  )
                     else:
-                        metric_i = omni_seg_test(image, label, model,
+                        metric_i = omni_seg_test_TU(image, label, model,
                                                  classes=num_classes)
 
                     # 实际上这里的metric_i是多类别分割的结果，这个任务只有二类分割，只对一个标签做处理
@@ -387,6 +395,7 @@ def omni_train(args, model, snapshot_path):
                 prediction_prob_list = []
                 for i_batch, sampled_batch in tqdm(enumerate(val_loader)):
                     image, label = sampled_batch["image"], sampled_batch["label"]
+                    image = to_chw(image)
                     if args.prompt:
                         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float()
                         # task_prompt = torch.stack([[0]*position_prompt.shape[0], [1]*position_prompt.shape[0]]).permute([1, 0]).float()

@@ -371,12 +371,20 @@ class USdatasetOmni_cls(Dataset):
 
 
 class USdatasetOmni_seg_decoders(Dataset):
+
+    """ 33-10 train + val """
+
     def __init__(self, base_dir, split, transform=None, prompt=False):
         self.transform = transform
         self.split = split
         self.data_dir = base_dir
 
         self.sample_list = open(os.path.join(self.data_dir, self.split+'.txt')).readlines()
+
+        # with open(os.path.join(self.data_dir, self.split+'.txt'), 'r') as f1, \
+        #     open(os.path.join(self.data_dir, "val.txt"), 'r') as f2:
+        #     self.sample_list = f1.readlines() + f2.readlines()
+
         self.prompt = prompt
 
     def __len__(self):
@@ -447,6 +455,11 @@ class USdatasetOmni_cls_decoders(Dataset):
         self.split = split
         self.data_dir = base_dir
         self.sample_list = open(os.path.join(self.data_dir, self.split+'.txt')).readlines()
+
+        # with open(os.path.join(self.data_dir, self.split+'.txt'), 'r') as f1, \
+        #     open(os.path.join(self.data_dir, "val.txt"), 'r') as f2:
+        #     self.sample_list = f1.readlines() + f2.readlines()
+        
         self.prompt = prompt
 
     def __len__(self):

@@ -758,10 +758,10 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
     - 数据集：private_appendix
     - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
     - lr:1e-5
-    - 使用33的206ep(分类效果号)之后的继续在私有分割数据集上微调
+    - 使用33的206ep(分类效果好)之后的继续在私有分割数据集上微调
     - 冻结encoder
 
-performance:0.8008
+编码器 0.8008  VS  单编码器 0.7515
 
     | Dataset          | Task Category               | Metric Score  |
 |------------------|-----------------------------|---------------|
@@ -775,3 +775,148 @@ performance:0.8008
 | Breast_luminal   | omni_cls_decoders_prompt    | 0.661972      |
 | Breast           | omni_cls_decoders_prompt    | 0.733333      |
 | Appendix         | omni_cls_decoders_prompt    | 0.904762      |
+
+
+
+
+## 第四次提交与第二次提交对比
+
+### 分类任务指标对比
+| 指标/数据集       | 第四次提交_Appendix | 第二次提交_Appendix | Δ    | 第四次提交_Breast | 第二次提交_Breast | Δ     | 第四次提交_Breast_luminal | 第二次提交_Breast_luminal | Δ    |
+|-------------------|----------------|----------------|------|--------------|--------------|-------|----------------------|----------------------|------|
+| Accuracy          | 0.6667         | 0.7333         | ↑10% | 0.7273       | 0.6761       | ↓7%   | 0.4883               | 0.5195               | ↑6%  |
+| AUC               | 0.6816         | 0.8925         | ↑31% | 0.8211       | 0.7585       | ↓8%   | 0.4727               | 0.4709               | ↓0.4%|
+| T2-Score          | 0.6741         | 0.8129         | ↑21% | 0.7742       | 0.7173       | ↓7%   | 0.4805               | 0.4952               | ↑3%  |
+| 指标/数据集       | 第四次提交_Liver | 第二次提交_Liver | Δ    |
+|-|-|-|-|
+| Accuracy          | 0.6446      | 0.7025      | ↑9%  |
+| AUC               | 0.7687      | 0.8499      | ↑11% |
+| T2-Score          | 0.7067      | 0.7762      | ↑10% |
+
+### 分割任务指标对比
+| 指标/数据集       | 第四次提交_Breast | 第二次提交_Breast | Δ    | 第四次提交_Breast_luminal | 第二次提交_Breast_luminal | Δ    |
+|-------------------|--------------|--------------|------|----------------------|----------------------|------|
+| DSC               | 0.7221       | 0.7116       | ↓1%  | 0.6223               | 0.6403               | ↑3%  |
+| NSD               | 0.1122       | 0.0855       | ↓24% | 0.0536               | 0.0474               | ↓12% |
+| T1-Score          | 0.8050       | 0.8131       | ↑1%  | 0.7843               | 0.7965               | ↑2%  |
+| 指标/数据集       | 第四次提交_Cardiac | 第二次提交_Cardiac | Δ    | 第四次提交_Fetal_Head | 第二次提交_Fetal_Head | Δ    |
+|-|-|-|-|-|-|-|
+| DSC               | 0.7521        | 0.7138        | ↓5%  | 0.8574           | 0.8204           | ↓4%  |
+| NSD               | 0.0368        | 0.0312        | ↓15% | 0.0776           | 0.0583           | ↓25% |
+| T1-Score          | 0.8576        | 0.8413        | ↓2%  | 0.8899           | 0.8810           | ↓1%  |
+| 指标/数据集       | 第四次提交_Kidney | 第二次提交_Kidney | Δ    | 第四次提交_Thyroid | 第二次提交_Thyroid | Δ    |
+|-|-|-|-|-|-|-|
+| DSC               | 0.7972       | 0.8070       | ↑1%  | 0.4072        | 0.4759        | ↑17% |
+| NSD               | 0.0651       | 0.0567       | ↓13% | 0.0346        | 0.0422        | ↑22% |
+| T1-Score          | 0.8661       | 0.8751       | ↑1%  | 0.6863        | 0.7168        | ↑4%  |
+
+## 关键发现
+1. **显著改进**：
+   - Appendix分类任务全面提升（AUC↑31%最显著）
+   - Thyroid分割DSC↑17%但NSD同步↑22%，需权衡精度与平滑度
+
+2. **性能下降**：
+   - Breast分类AUC↓8%，但分割指标保持稳定
+   - Fetal_Head的NSD↓25%显示边缘检测改进，但DSC轻微下降
+
+3. **矛盾现象**：
+   - Breast_luminal分类Accuracy↑6%但AUC↓0.4%
+   - Cardiac分割DSC↓5%但NSD↓15%（可能过平滑）
+
+4. **稳定表现**：
+   - Liver分类各项指标均提升9-11%
+   - Kidney分割保持高精度(DSC>0.79)
+-------------------------------------------------------
+
+
+
+- trail_debug_33-6：单编码器多解码器
+    - 数据集：private_seg
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-4
+    - bs：8
+    - 使用33的190ep(分类效果号)之后的继续在私有分割数据集上微调
+    - 冻结encoder
+
+- trail_debug_33-7：单编码器多解码器
+    - 数据集：private_seg
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-6
+    - bs：8
+    - 使用33-6的124ep(分类效果号)之后的继续在全部私有分割数据集上继续微调
+    - 冻结encoder
+
+- trail_debug_33-8：单编码器多解码器
+    - 数据集：private_appendix
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-6
+    - bs：8
+    - 使用33-6的124ep(分类效果号)之后的继续在全部私有分割数据集上继续微调
+    - 冻结encoder
+
+- trail_debug_33-9：单编码器多解码器
+    - 数据集：private_appendix
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-6
+    - bs：128
+    - 使用33-8的58ep之后的继续在全部私有数据集上继续微调
+    - 冻结encoder
+    - 调低wd：0.005
+
+- trail_debug_33-10：单编码器多解码器
+    - 加10%的数据：7+2
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr:1e-6
+    - bs：128
+    - 使用33-8的58ep之后的继续在全部私有数据集上继续微调
+    - 冻结encoder
+    - 调低wd：0.001
+
+- trail_debug_33-11：单编码器多解码器
+    - 单独使用val的20%数据训练模型
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr：1e-5
+    - bs：128
+    - resume：使用33-8的58ep
+    - 不冻结encoder
+
+- trail_debug_34：单编码器单解码器
+    - 将val的20%数据加进去训练模型
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder_V3
+    - lr：1e-5
+    - bs：128
+    - resume：/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_15/best_model_757_0.7515.pth
+    - 不冻结encoder
+
+- trail_debug_34：单编码器单解码器
+    - train+val 一共90%的数据
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder
+    - lr：1e-5
+    - bs：128
+    - resume：/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_15/best_model_757_0.7515.pth
+
+- trail_debug_34-1：单编码器单解码器
+    - 单独训练分割数据，train+val 一共90%的数据
+    - trainer：omni_trainer_PG_decoders_unfreezeEncoder
+    - lr：1e-3
+    - bs：128
+    - 冻结encoder
+    - resume：/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_34/best_model_154_0.7594.pth
+
+
+- trail_debug_35：TransUnet 
+    - 单独训练分割数据，train+val 一共90%的数据
+    - trainer：vit_seg_modeling
+    
+    --nproc_per_node=1 \
+    --master_port=29501 \
+    omni_train_TU.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-4 \
+    --max_epochs 400 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_35 \
+

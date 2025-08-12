@@ -101,7 +101,10 @@ def inference(args, model, test_save_path=None, dirname=None):
         for i_batch, sampled_batch in tqdm(enumerate(testloader)):
             image, label, case_name = sampled_batch["image"], sampled_batch["label"], sampled_batch['case_name'][0]
             if args.prompt:
-                position_prompt = torch.tensor(np.array(sampled_batch['position_prompt'])).permute([1, 0]).float()
+                position_prompt = torch.tensor(np.array(sampled_batch['position_prompt']))
+                position_prompt = position_prompt.permute([1, 0])
+                position_prompt = position_prompt.float()
+
                 task_prompt = torch.tensor(np.array([[1], [0]])).permute([1, 0]).float()
                 type_prompt = torch.tensor(np.array(sampled_batch['type_prompt'])).permute([1, 0]).float()
                 nature_prompt = torch.tensor(np.array(sampled_batch['nature_prompt'])).permute([1, 0]).float()

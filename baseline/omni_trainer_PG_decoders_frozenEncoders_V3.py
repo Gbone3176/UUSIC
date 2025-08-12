@@ -98,7 +98,7 @@ def load_encoder_weights_and_freeze(model, resume_path):
             skipped.append(k)
 
     model_state.update(loadable)
-    missing_before = [k for k in model_state.keys() if k not in loadable and k not in stripped_state]
+    missing_before = [k for k in model_state.keys() if k not in loadable and k not in state]
 
     # 实际加载
     result = model.load_state_dict(model_state, strict=False)
@@ -125,7 +125,8 @@ def load_encoder_weights_and_freeze(model, resume_path):
         is_decoder = any(k in name for k in decoder_keywords)
         # 仅当判断为 encoder 且不含 decoder 关键词才冻结
         if is_encoder and not is_decoder:
-            param.requires_grad = False
+            # param.requires_grad = False
+            param.requires_grad = True
             frozen += param.numel()
         else:
             param.requires_grad = True
@@ -273,10 +274,10 @@ def omni_train(args, model, snapshot_path):
         'Fetal_HC': 1.0,
         'KidneyUS': 1.0,
         'private_Breast': 1.0,          # 基准权重
-        'private_Breast_luminal': 1.8,  # 略微增加
-        'private_Cardiac': 1.8,         # 较大增加（通常数据较少）
-        'private_Fetal_Head': 1.8,      # 较大增加（通常数据较少）
-        'private_Kidney': 1.5,          # 中等增加
+        'private_Breast_luminal': 1.2,  # 略微增加
+        'private_Cardiac': 1.2,         # 较大增加（通常数据较少）
+        'private_Fetal_Head': 1.2,      # 较大增加（通常数据较少）
+        'private_Kidney': 1.2,          # 中等增加
         'private_Thyroid': 2.5         # 最大增加（通常数据最少）
     }
     
@@ -288,7 +289,7 @@ def omni_train(args, model, snapshot_path):
 
                 db_seg = USdatasetOmni_seg_decoders(
                     base_dir=dataset_path,
-                    split="train",
+                    split="val",
                     transform=RandomGenerator_Seg(output_size=[args.img_size, args.img_size]),
                     prompt=args.prompt
                 )
@@ -320,59 +321,59 @@ def omni_train(args, model, snapshot_path):
             except Exception as e:
                 logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
     
-    # # 为每个分类数据集创建单独的DataLoader
-    # cls_dataloaders = {}
-    # # 改进的权重配置 - 基于数据平衡和任务难度的考虑
-    # cls_dataset_weights = {
-    #     'Appendix': 1.0,
-    #     'BUS-BRA': 1.0,
-    #     'BUSI': 1.0,
-    #     'Fatty-Liver': 1.0,
-    #     'private_Appendix': 1.8,        # 增加权重（通常数据较少）
-    #     'private_Breast': 1.0,          # 基准权重
-    #     'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
-    #     'private_Liver': 1.6            # 适度增加
-    # }
+    # 为每个分类数据集创建单独的DataLoader
+    cls_dataloaders = {}
+    # 改进的权重配置 - 基于数据平衡和任务难度的考虑
+    cls_dataset_weights = {
+        'Appendix': 1.0,
+        'BUS-BRA': 1.0,
+        'BUSI': 1.0,
+        'Fatty-Liver': 1.0,
+        'private_Appendix': 1.0,        # 增加权重（通常数据较少）
+        'private_Breast': 1.0,          # 基准权重
+        'private_Breast_luminal': 2.5,  # 大幅增加（4分类任务且数据可能较少）
+        'private_Liver': 2.5            # 适度增加
+    }
     
-    # logging.info("Creating classification DataLoaders for each dataset...")  
-    # for dataset_name, num_classes in cls_datasets.items():
-    #     dataset_path = os.path.join(args.root_path, "classification", dataset_name)
-    #     if os.path.exists(dataset_path):
-    #         try:
-    #             db_cls = USdatasetOmni_cls_decoders(
-    #                 base_dir=dataset_path,
-    #                 split="train",
-    #                 transform=RandomGenerator_Cls(output_size=[args.img_size, args.img_size]),
-    #                 prompt=args.prompt
-    #             )
+    logging.info("Creating classification DataLoaders for each dataset...")  
+    for dataset_name, num_classes in cls_datasets.items():
+        dataset_path = os.path.join(args.root_path, "classification", dataset_name)
+        if os.path.exists(dataset_path):
+            try:
+                db_cls = USdatasetOmni_cls_decoders(
+                    base_dir=dataset_path,
+                    split="val",
+                    transform=RandomGenerator_Cls(output_size=[args.img_size, args.img_size]),
+                    prompt=args.prompt
+                )
                 
-    #             # 使用DDP sampler
-    #             sampler = torch.utils.data.distributed.DistributedSampler(
-    #                 db_cls,
-    #                 num_replicas=world_size,
-    #                 rank=rank, 
-    #                 shuffle=True
-    #             )
+                # 使用DDP sampler
+                sampler = torch.utils.data.distributed.DistributedSampler(
+                    db_cls,
+                    num_replicas=world_size,
+                    rank=rank, 
+                    shuffle=True
+                )
                 
-    #             dataloader = DataLoader(
-    #                 db_cls,
-    #                 batch_size=batch_size,
-    #                 num_workers=12,  # 减少每个loader的worker数
-    #                 pin_memory=True,
-    #                 worker_init_fn=worker_init_fn,
-    #                 sampler=sampler
-    #             )
+                dataloader = DataLoader(
+                    db_cls,
+                    batch_size=batch_size,
+                    num_workers=12,  # 减少每个loader的worker数
+                    pin_memory=True,
+                    worker_init_fn=worker_init_fn,
+                    sampler=sampler
+                )
                 
-    #             cls_dataloaders[dataset_name] = {
-    #                 'loader': dataloader,
-    #                 'sampler': sampler,
-    #                 'weight': cls_dataset_weights.get(dataset_name, 1.0),
-    #                 'num_classes': num_classes,
-    #                 'size': len(db_cls)
-    #             }
-    #             logging.info(f"Created classification DataLoader for {dataset_name}: {len(db_cls)} samples, {num_classes} classes")
-    #         except Exception as e:
-    #             logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
+                cls_dataloaders[dataset_name] = {
+                    'loader': dataloader,
+                    'sampler': sampler,
+                    'weight': cls_dataset_weights.get(dataset_name, 1.0),
+                    'num_classes': num_classes,
+                    'size': len(db_cls)
+                }
+                logging.info(f"Created classification DataLoader for {dataset_name}: {len(db_cls)} samples, {num_classes} classes")
+            except Exception as e:
+                logging.warning(f"Failed to create DataLoader for {dataset_name}: {e}")
     
 
     model = model.to(device=device)
@@ -395,7 +396,7 @@ def omni_train(args, model, snapshot_path):
 
     # 创建优化器（只优化可训练的参数）
     trainable_params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = optim.AdamW(trainable_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
+    optimizer = optim.AdamW(trainable_params, lr=base_lr, weight_decay=0.005, betas=(0.9, 0.999))
 
     logging.info(f"Optimizer created with {len(trainable_params)} trainable parameter groups")
 
@@ -408,20 +409,20 @@ def omni_train(args, model, snapshot_path):
 
     # 计算总迭代次数
     total_seg_iterations = sum(len(info['loader']) for info in seg_dataloaders.values())
-    # total_cls_iterations = sum(len(info['loader']) for info in cls_dataloaders.values())
-    # total_iterations = total_seg_iterations + total_cls_iterations
-    total_iterations = total_seg_iterations
+    total_cls_iterations = sum(len(info['loader']) for info in cls_dataloaders.values())
+    total_iterations = total_seg_iterations + total_cls_iterations
+    # total_iterations = total_cls_iterations
     max_iterations = args.max_epochs * total_iterations
 
     # warmup_batch可通过args.warmup_batch指定，默认5
     warmup_batch = args.warmup_batch if args.warmup_batch > 0 else 0
     lr_scheduler = WarmupCosineLRScheduler(optimizer, base_lr, max_iterations, warmup_iters=warmup_batch)
 
-    logging.info("{} batch size. {} total seg iterations  = {} total iterations per epoch. {} max iterations ".format(
-        batch_size, total_seg_iterations, total_iterations, max_iterations))
+    # logging.info("{} batch size. {} total cls iterations  = {} total iterations per epoch. {} max iterations ".format(
+    #     batch_size, total_cls_iterations, total_iterations, max_iterations))
 
-    # logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
-    #     batch_size, total_seg_iterations, total_cls_iterations, total_iterations, max_iterations))
+    logging.info("{} batch size. {} total seg iterations + {} total cls iterations = {} total iterations per epoch. {} max iterations ".format(
+        batch_size, total_seg_iterations, total_cls_iterations, total_iterations, max_iterations))
     best_performance = 0.0
     best_epoch = 0
 
@@ -444,8 +445,8 @@ def omni_train(args, model, snapshot_path):
         for dataset_name, info in seg_dataloaders.items():
             info['sampler'].set_epoch(epoch_num)
 
-        # for dataset_name, info in cls_dataloaders.items():
-        #     info['sampler'].set_epoch(epoch_num)
+        for dataset_name, info in cls_dataloaders.items():
+            info['sampler'].set_epoch(epoch_num)
 
         # ========== 分割任务训练 - 加权采样 ==========
         logging.info("Training segmentation tasks...")
@@ -521,81 +522,81 @@ def omni_train(args, model, snapshot_path):
                     logging.info('Dataset: %s, global iteration %d and seg iteration %d : loss : %f' %
                                  (dataset_name, global_iter_num, seg_iter_num, loss.item()))
 
-        # # ========== 分类任务训练 - 加权采样 ==========
-        # logging.info("Training classification tasks...")
+        # ========== 分类任务训练 - 加权采样 ==========
+        logging.info("Training classification tasks...")
         
-        # # 创建加权采样池
-        # cls_batch_pool = []
-        # for dataset_name, dataset_info in cls_dataloaders.items():
-        #     dataloader = dataset_info['loader']
-        #     weight = dataset_info['weight']
-        #     num_classes = dataset_info['num_classes']
+        # 创建加权采样池
+        cls_batch_pool = []
+        for dataset_name, dataset_info in cls_dataloaders.items():
+            dataloader = dataset_info['loader']
+            weight = dataset_info['weight']
+            num_classes = dataset_info['num_classes']
             
-        #     # 根据权重决定每个数据集的采样次数
-        #     sample_count = int(len(dataloader) * weight)
-        #     sample_count = max(1, sample_count)  # 确保至少采样一次
+            # 根据权重决定每个数据集的采样次数
+            sample_count = int(len(dataloader) * weight)
+            sample_count = max(1, sample_count)  # 确保至少采样一次
             
-        #     # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
+            # logging.info(f"Dataset {dataset_name}: original batches={len(dataloader)}, weight={weight}, target samples={sample_count}")
             
-        #     # 将批次添加到采样池，重复次数根据权重决定
-        #     batch_list = list(enumerate(dataloader))
-        #     if weight <= 1.0:
-        #         # 权重<=1时，随机采样子集
-        #         sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
-        #     else:
-        #         # 权重>1时，重复采样
-        #         sampled_batches = random.choices(batch_list, k=sample_count)
+            # 将批次添加到采样池，重复次数根据权重决定
+            batch_list = list(enumerate(dataloader))
+            if weight <= 1.0:
+                # 权重<=1时，随机采样子集
+                sampled_batches = random.sample(batch_list, min(sample_count, len(batch_list)))
+            else:
+                # 权重>1时，重复采样
+                sampled_batches = random.choices(batch_list, k=sample_count)
             
-        #     for i_batch, sampled_batch in sampled_batches:
-        #         cls_batch_pool.append((dataset_name, num_classes, i_batch, sampled_batch))
+            for i_batch, sampled_batch in sampled_batches:
+                cls_batch_pool.append((dataset_name, num_classes, i_batch, sampled_batch))
         
-        # # 随机打乱采样池
-        # random.shuffle(cls_batch_pool)
-        # logging.info(f"Total classification batches after weighted sampling: {len(cls_batch_pool)}")
+        # 随机打乱采样池
+        random.shuffle(cls_batch_pool)
+        logging.info(f"Total classification batches after weighted sampling: {len(cls_batch_pool)}")
         
-        # # 训练加权采样后的批次
-        # for dataset_name, num_classes, i_batch, sampled_batch in tqdm(cls_batch_pool, total=len(cls_batch_pool), desc="Cls-Training"):
+        # 训练加权采样后的批次
+        for dataset_name, num_classes, i_batch, sampled_batch in tqdm(cls_batch_pool, total=len(cls_batch_pool), desc="Cls-Training"):
                     
-        #         image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-        #         image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
+                image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+                image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
 
-        #         if args.prompt:
-        #             position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-        #             task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-        #             type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-        #             nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
+                if args.prompt:
+                    position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+                    task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+                    type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+                    nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
                     
-        #             # 直接调用对应数据集和分类数的decoder
-        #             x_cls = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
-        #                           use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
-        #         else:
-        #             x_cls = model(image_batch, use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
+                    # 直接调用对应数据集和分类数的decoder
+                    x_cls = model((image_batch, position_prompt, task_prompt, type_prompt, nature_prompt),
+                                  use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
+                else:
+                    x_cls = model(image_batch, use_dataset_specific=True, dataset_name=cls_data_map[dataset_name], task_type='cls', num_classes=num_classes)
 
-        #         # 计算分类损失
-        #         if num_classes == 2:
-        #             loss = cls_ce_loss_2way(x_cls, label_batch[:].long())
-        #         elif num_classes == 4:
-        #             loss = cls_ce_loss_4way(x_cls, label_batch[:].long())
-        #         else:
-        #             raise ValueError(f"Unsupported num_classes: {num_classes}")
+                # 计算分类损失
+                if num_classes == 2:
+                    loss = cls_ce_loss_2way(x_cls, label_batch[:].long())
+                elif num_classes == 4:
+                    loss = cls_ce_loss_4way(x_cls, label_batch[:].long())
+                else:
+                    raise ValueError(f"Unsupported num_classes: {num_classes}")
 
-        #         optimizer.zero_grad()
-        #         loss.backward()
-        #         optimizer.step()
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
 
-        #         lr_ = lr_scheduler.step()
+                lr_ = lr_scheduler.step()
 
-        #         cls_iter_num = cls_iter_num + 1
-        #         global_iter_num = global_iter_num + 1
+                cls_iter_num = cls_iter_num + 1
+                global_iter_num = global_iter_num + 1
 
-        #         writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
-        #         writer.add_scalar(f'info/cls_loss_{dataset_name}', loss, cls_iter_num)
-        #         writer.add_scalar('info/cls_loss_total', loss, cls_iter_num)
+                writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
+                writer.add_scalar(f'info/cls_loss_{dataset_name}', loss, cls_iter_num)
+                writer.add_scalar('info/cls_loss_total', loss, cls_iter_num)
 
-        #         if global_iter_num % 50 == 0:  # 减少日志频率
-        #             logging.info('Dataset: %s, global iteration %d and cls iteration %d : loss : %f' %
-        #                          (dataset_name, global_iter_num, cls_iter_num, loss.item()))
+                if global_iter_num % 50 == 0:  # 减少日志频率
+                    logging.info('Dataset: %s, global iteration %d and cls iteration %d : loss : %f' %
+                                 (dataset_name, global_iter_num, cls_iter_num, loss.item()))
 
         
         # ========== 验证和模型保存逻辑 ==========

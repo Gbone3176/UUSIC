@@ -95,7 +95,7 @@ class Model:
         self.network = ViT_omni(config, prompt=args.prompt).to(self.device)
 
 
-        snapshot_path = '/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_15/best_model_757_0.7515.pth'
+        snapshot_path = '/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_34-1/best_model_34_0.7601.pth'
         pretrained_dict = torch.load(snapshot_path, map_location=self.device)
         
 
