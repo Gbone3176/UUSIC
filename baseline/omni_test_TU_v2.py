@@ -10,7 +10,7 @@ import torch.distributed as dist
 from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 
-from datasets.dataset_aug_norm import CenterCropGenerator
+from datasets.dataset_aug_norm_mc import CenterCropGenerator
 from datasets.dataset_aug_norm import USdatasetClsFlexible, USdatasetSegFlexible
 from datasets.omni_dataset import position_prompt_one_hot_dict, task_prompt_one_hot_dict, type_prompt_one_hot_dict, nature_prompt_one_hot_dict
 

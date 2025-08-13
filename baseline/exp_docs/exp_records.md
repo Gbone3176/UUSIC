@@ -924,4 +924,30 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 - trail_debug_36：TransUnet + prompt
     - 单独训练分割数据，train+val 一共90%的数据
     - trainer：vit_seg_modeling_v2
-    
+
+- trail_debug_36-1：TransUnet + prompt
+    - 36的续训
+
+    --batch_size 64 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_36-1 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_36/best_model_239_0.8348.pth
+
+- trail_debug_37：TransUnet + prompt
+    - 单独训练分割数据集
+
+    --batch_size 64 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_37 \
+    --prompt \
+
+- trail_debug_38：TransUnet + prompt
+    - 分割+分类
+    - 更新预处理

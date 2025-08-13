@@ -18,10 +18,11 @@ from torch.utils.tensorboard import SummaryWriter
 
 from utils import DiceLoss
 from datasets.dataset_aug_norm import USdatasetCls, USdatasetSeg
-from datasets.dataset_aug_norm import RandomGenerator_Cls, RandomGenerator_Seg, CenterCropGenerator
+from datasets.dataset_aug_norm_mc import RandomGenerator_Cls, RandomGenerator_Seg, CenterCropGenerator
 from datasets.omni_dataset import WeightedRandomSamplerDDP
 from datasets.omni_dataset import USdatasetOmni_cls, USdatasetOmni_seg
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, accuracy_score
+
 from utils import omni_seg_test_TU
 
 def to_chw(x):
@@ -100,9 +101,9 @@ def omni_train(args, model, snapshot_path):
         'BUS-BRA': (1312, 0.25),             # 对应weight_base[7] = 0.25 (大规模数据低权重)
         'BUSI': (452, 1),                    # 对应weight_base[2] = 1
         'Fatty-Liver': (385, 1),             # 接近weight_base[6]的350样本，权重=1
-        'private_Appendix': (46, 2),         # 对应weight_base[3] = 4 (小样本高权重)
+        'private_Appendix': (46, 3),         # 对应weight_base[3] = 4 (小样本高权重)
         'private_Breast': (105, 4),          # 对应weight_base[1] = 3
-        'private_Breast_luminal': (165, 1),  # 对应weight_base[10] = 2
+        'private_Breast_luminal': (165, 3),  # 对应weight_base[10] = 2
         'private_Liver': (72, 4)             # 接近weight_base[4]的84样本，权重=4
     }
 
@@ -428,7 +429,11 @@ def omni_train(args, model, snapshot_path):
                 prediction_probs_reshaped = np.array(prediction_prob_list[:-1]).reshape(-1, num_classes)
                 all_prediction_probs = np.concatenate((prediction_probs_reshaped, prediction_prob_list[-1]))
 
-                performance = roc_auc_score(label_list_OneHot, all_prediction_probs, multi_class='ovo')
+                # performance = roc_auc_score(label_list_OneHot, all_prediction_probs, multi_class='ovo')
+
+                y_true = np.argmax(label_list_OneHot, axis=1)
+                y_pred = np.argmax(all_prediction_probs, axis=1)
+                performance = accuracy_score(y_true, y_pred)
 
                 writer.add_scalar('info/val_cls_metric_{}'.format(dataset_name), performance, epoch_num)
 
