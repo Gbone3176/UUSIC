@@ -4,7 +4,73 @@ from medpy import metric
 import torch.nn as nn
 import cv2
 import os
+import torch.nn.functional as F
 
+class FocalLoss(nn.Module):
+    """
+    Multi-class Focal Loss for segmentation.
+    - inputs: (B, C, H, W) logits or probabilities
+    - target: (B, H, W) with class indices in [0, C-1]
+    """
+    def __init__(self, n_classes=2, gamma=2.0, alpha=None, eps=1e-7):
+        super(FocalLoss, self).__init__()
+        self.n_classes = n_classes
+        self.gamma = gamma
+        self.eps = eps
+
+        # alpha: per-class weight for focal loss, shape (C,)
+        if alpha is None:
+            self.alpha = torch.ones(n_classes, dtype=torch.float32)
+        else:
+            # list/tuple/tensor -> tensor(C,)
+            self.alpha = torch.as_tensor(alpha, dtype=torch.float32)
+            assert self.alpha.numel() == n_classes, "alpha length must equal n_classes"
+
+    def _one_hot_encoder(self, input_tensor):
+        tensor_list = []
+        for i in range(self.n_classes):
+            temp_prob = input_tensor == i
+            tensor_list.append(temp_prob.unsqueeze(1))
+        output_tensor = torch.cat(tensor_list, dim=1)
+        return output_tensor.float()
+
+    def forward(self, inputs, target, weight=None, softmax=False):
+        """
+        inputs: (B, C, H, W) logits/probs
+        target: (B, H, W) int64
+        weight: optional per-class weight list/tuple, length C
+        softmax: if True, apply softmax to inputs first
+        """
+        if softmax:
+            probs = F.softmax(inputs, dim=1)
+        else:
+            probs = inputs  # assume already probabilities if softmax=False
+
+        target_1h = self._one_hot_encoder(target).type_as(probs)  # (B, C, H, W)
+
+        if weight is None:
+            weight = [1.0] * self.n_classes
+        # to device & tensor
+        weight = torch.as_tensor(weight, dtype=probs.dtype, device=probs.device)
+        alpha = self.alpha.to(device=probs.device, dtype=probs.dtype)
+
+        loss = 0.0
+        eps = self.eps
+
+        # 按类别分别计算，再做加权平均（与 DiceLoss 风格一致）
+        for c in range(self.n_classes):
+            p_c = probs[:, c, ...].clamp(min=eps, max=1.0 - eps)      # (B, H, W)
+            mask_c = target_1h[:, c, ...]                              # (B, H, W), {0,1}
+
+            # focal term: -alpha * (1 - p_t)^gamma * log(p_t)
+            fl_c = - alpha[c] * torch.pow(1.0 - p_c, self.gamma) * torch.log(p_c)
+            # 只在该类的正样本像素上取平均
+            denom = mask_c.sum() + eps
+            loss_c = (fl_c * mask_c).sum() / denom
+
+            loss = loss + weight[c] * loss_c
+
+        return loss / self.n_classes
 
 class DiceLoss(nn.Module):
     def __init__(self, n_classes=2):

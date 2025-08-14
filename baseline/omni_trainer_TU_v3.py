@@ -14,9 +14,9 @@ from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torch.utils.tensorboard import SummaryWriter
+from torch import nn
 
-
-from utils import DiceLoss
+from utils import DiceLoss, FocalLoss
 from datasets.dataset_aug_norm import USdatasetCls, USdatasetSeg
 from datasets.dataset_aug_norm_mc import RandomGenerator_Cls, RandomGenerator_Seg, CenterCropGenerator
 from datasets.omni_dataset import WeightedRandomSamplerDDP
@@ -24,35 +24,99 @@ from datasets.omni_dataset import USdatasetOmni_cls, USdatasetOmni_seg
 from sklearn.metrics import roc_auc_score, accuracy_score
 from utils import omni_seg_test_TU
 
-def freeze_all_but_classification_head(model):
-    """
-    冻结除 MultiTaskClassifier 以外的所有参数；整个分类器模块参与训练。
-    返回：可训练参数列表（便于构建优化器）
-    """
-    # 兼容 DDP
-    net = model.module if hasattr(model, "module") else model
+import types
+import torch.nn as nn
 
-    # 1) 全部冻结
+def _set_requires_grad(module: nn.Module, flag: bool):
+    for p in module.parameters():
+        p.requires_grad = flag
+
+def _freeze_module(module: nn.Module):
+    """冻结参数并锁定 eval，包含 BN/Dropout 的稳定化。"""
+    _set_requires_grad(module, False)
+    module.eval()
+    # 冻结 BN 的统计与仿射
+    for m in module.modules():
+        if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
+            m.track_running_stats = True
+            m.momentum = 0.0
+            if m.affine:
+                if m.weight is not None: m.weight.requires_grad = False
+                if m.bias  is not None: m.bias.requires_grad  = False
+
+def _get_net(model: nn.Module) -> nn.Module:
+    """兼容 DDP/DP 包装，返回实际网络对象。"""
+    return model.module if hasattr(model, "module") else model
+
+def freeze_all_but_classifier(model: nn.Module, verbose: bool = True):
+    """
+    DDP/DP 兼容版：
+    冻结 transformer + decoder + segmentation_head，仅训练 classifier_head。
+    还会“锁定” model.train()：任何时候调用 model.train() 都只让 classifier_head 切换，其他分支保持 eval。
+    返回：classifier_head 的参数列表（用于构造优化器）
+    """
+    net = _get_net(model)
+
+    # --- 1) 冻结与分割相关的分支 ---
+    if hasattr(net, "transformer"):
+        _freeze_module(net.transformer)
+    else:
+        raise AttributeError("model.transformer 不存在，检查你的模型定义。")
+
+    if hasattr(net, "decoder"):
+        _freeze_module(net.decoder)
+    else:
+        raise AttributeError("model.decoder 不存在，检查你的模型定义。")
+
+    if hasattr(net, "segmentation_head"):
+        _freeze_module(net.segmentation_head)
+    else:
+        raise AttributeError("model.segmentation_head 不存在，检查你的模型定义。")
+
+    # --- 2) 仅开放分类头 ---
+    if hasattr(net, "classifier_head"):
+        _set_requires_grad(net.classifier_head, True)
+        net.classifier_head.train()  # 让其 BN/Dropout 生效
+    else:
+        raise AttributeError("model.classifier_head 不存在，检查你的模型定义。")
+
+    # --- 3) 劫持最外层 model.train()，防止被训练循环改回 ---
+    def _locked_train(self, mode: bool = True):
+        # 先按默认行为切换外层（DDP/DP）的模式
+        super(type(self), self).train(mode)
+        inner = _get_net(self)
+        # 冻结分支永远保持 eval
+        if hasattr(inner, "transformer"):      inner.transformer.eval()
+        if hasattr(inner, "decoder"):          inner.decoder.eval()
+        if hasattr(inner, "segmentation_head"):inner.segmentation_head.eval()
+        # 只有分类头跟随 mode
+        if hasattr(inner, "classifier_head"):  inner.classifier_head.train(mode)
+        return self
+
+    model.train = types.MethodType(_locked_train, model)
+    model.train(True)  # 触发一次，确保当前状态一致
+
+    # --- 4) 统计信息 ---
+    if verbose:
+        n_total = sum(p.numel() for p in net.parameters())
+        n_train = sum(p.numel() for p in net.parameters() if p.requires_grad)
+        print(f"[Freeze] trainable params: {n_train:,} / {n_total:,} "
+              f"({n_train/n_total*100:.4f}%) | only classifier_head is trainable.")
+
+    # --- 5) 返回仅分类头参数（用于优化器） ---
+    return list(net.classifier_head.parameters())
+
+def unfreeze_all(model: nn.Module, verbose: bool = True):
+    """DDP/DP 兼容：恢复所有参数可训练并回到常规 train 模式。"""
+    net = _get_net(model)
     for p in net.parameters():
-        p.requires_grad = False
-
-    # 2) 解冻整个 MultiTaskClassifier（包括 norm, fc1, fc2, head2, head4）
-    trainable_params = []
-    for n, p in net.classifier_head.named_parameters():
         p.requires_grad = True
-        trainable_params.append(p)
+    model.train(True)
+    if verbose:
+        n_total = sum(p.numel() for p in net.parameters())
+        n_train = sum(p.numel() for p in net.parameters() if p.requires_grad)
+        print(f"[Unfreeze] trainable params: {n_train:,} / {n_total:,} ({n_train/n_total*100:.4f}%).")
 
-    # 3) 切换模式：全网 eval，分类器 train（使其 BN/Dropout 生效）
-    model.eval()
-    net.classifier_head.train()
-
-    # 4) 打印统计
-    total = sum(p.numel() for p in net.parameters())
-    trainable = sum(p.numel() for p in net.parameters() if p.requires_grad)
-    print(f"[Freeze] trainable params: {trainable:,} / {total:,} ({trainable/total*100:.4f}%) "
-          f"| MultiTaskClassifier: norm+fc1+fc2+head2+head4")
-
-    return trainable_params
 
 
 def classifier_trainable_params(model):
@@ -166,18 +230,21 @@ def omni_train(args, model, snapshot_path):
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu_id], find_unused_parameters=True)
 
     # 只训练分类器：先冻结，再用仅包含可训练参数的优化器
-    freeze_all_but_classification_head(model)
+    cls_params = freeze_all_but_classifier(model)
 
     model.train()
 
     seg_ce_loss = CrossEntropyLoss()
     seg_dice_loss = DiceLoss()
+    seg_focal_loss = FocalLoss(gamma=2.0, alpha=[0.25, 0.75])  # 可选：如果需要使用Focal Loss
+
     # cls_ce_loss = CrossEntropyLoss()
 
     cls_ce_loss_2way = CrossEntropyLoss()
     cls_ce_loss_4way = CrossEntropyLoss()
 
-    optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
+    # optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
+    optimizer = optim.AdamW(cls_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
 
     resume_epoch = 0
     if args.resume is not None:
@@ -205,53 +272,53 @@ def omni_train(args, model, snapshot_path):
         iterator = tqdm(range(resume_epoch, max_epoch), ncols=70, disable=False)
 
     for epoch_num in iterator:
-        logging.info("skip seg training...")
-    #     logging.info("\n epoch: {}".format(epoch_num))
-    #     weighted_sampler_seg.set_epoch(epoch_num)
-    #     weighted_sampler_cls.set_epoch(epoch_num)
+        logging.info("\n epoch: {}".format(epoch_num))
+        weighted_sampler_seg.set_epoch(epoch_num)
+        weighted_sampler_cls.set_epoch(epoch_num)
+        
+        # for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
+        #     image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
 
-    #     for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
-    #         image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+        #     image_batch = to_chw(image_batch).to(device=device)
 
-    #         image_batch = to_chw(image_batch).to(device=device)
-
-    #         image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
-    #         if args.prompt:
-    #             position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-    #             task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-    #             type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-    #             nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device) 
+        #     image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
+        #     if args.prompt:
+        #         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+        #         task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+        #         type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+        #         nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device) 
                 
-    #             (x_seg, _, _) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
-    #         else:
-    #             (x_seg, _, _) = model(image_batch)
+        #         (x_seg, _, _) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
+        #     else:
+        #         (x_seg, _, _) = model(image_batch)
 
-    #         loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
-    #         loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
-    #         loss = 0.28 * loss_ce + 0.72 * loss_dice
+        #     # loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
+        #     loss_focal = seg_focal_loss(x_seg, label_batch[:].long(), softmax=True)
+        #     loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
+        #     loss = 0.4 * loss_focal + 0.6 * loss_dice
 
-    #         optimizer.zero_grad()
-    #         loss.backward()
-    #         optimizer.step()
+        #     optimizer.zero_grad()
+        #     loss.backward()
+        #     optimizer.step()
             
-    #         # 修改学习率衰减策略：当进度超过70%时保持恒定
-    #         progress = 1.0 - global_iter_num / max_iterations
-    #         if progress >= 0.2:
-    #             lr_ = base_lr * (progress ** 0.9)
-    #         else:
-    #             lr_ = base_lr * (0.2 ** 0.9)  # 保持在20%进度时的学习率
+        #     # 修改学习率衰减策略：当进度超过70%时保持恒定
+        #     progress = 1.0 - global_iter_num / max_iterations
+        #     if progress >= 0.2:
+        #         lr_ = base_lr * (progress ** 0.9)
+        #     else:
+        #         lr_ = base_lr * (0.2 ** 0.9)  # 保持在20%进度时的学习率
                 
-    #         for param_group in optimizer.param_groups:
-    #             param_group['lr'] = lr_
+        #     for param_group in optimizer.param_groups:
+        #         param_group['lr'] = lr_
 
-    #         seg_iter_num = seg_iter_num + 1
-    #         global_iter_num = global_iter_num + 1
+        #     seg_iter_num = seg_iter_num + 1
+        #     global_iter_num = global_iter_num + 1
 
-    #         writer.add_scalar('info/lr_seg', lr_, seg_iter_num)
-    #         writer.add_scalar('info/seg_loss', loss, seg_iter_num)
+        #     writer.add_scalar('info/lr_seg', lr_, seg_iter_num)
+        #     writer.add_scalar('info/seg_loss', loss, seg_iter_num)
 
-    #         logging.info('global iteration %d and seg iteration %d : loss : %f' %
-    #                      (global_iter_num, seg_iter_num, loss.item()))
+        #     logging.info('global iteration %d and seg iteration %d : loss : %f' %
+        #                  (global_iter_num, seg_iter_num, loss.item()))
 
         
         for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):

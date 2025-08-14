@@ -939,6 +939,8 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 
 - trail_debug_37：TransUnet + prompt
     - 单独训练分割数据集
+    - 没更新预处理
+    - 单卡直接跑
 
     --batch_size 64 \
     --base_lr 1e-5 \
@@ -949,5 +951,131 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
     --prompt \
 
 - trail_debug_38：TransUnet + prompt
+    - 单独训练分割数据集
+    - 更新预处理
+    - 单卡直接跑
+
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 192 \
+    --base_lr 1e-4 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_38 \
+    --prompt \
+
+
+- trail_debug_38-1：TransUnet + prompt + mc_preprocess
+    - 全部数据集
+    - 更新预处理
+    - 单卡跑
+
+
+- trail_debug_39：TransUnet + prompt
     - 分割+分类
     - 更新预处理
+    - 双卡
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 192 \
+    --base_lr 1e-4 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_39 \
+    --prompt \
+
+- trail_debug_39-1：TransUnet + prompt
+    - 分割+分类
+    - 更新预处理
+    - 双卡
+    - 调小lr继续训练
+
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_39-1 \
+    --prompt \
+
+- trail_debug_39-2：TransUnet + prompt
+    - 分割+分类
+    - 更新预处理
+    - 双卡
+    - 调小lr=1e-5继续训练
+    - 重头开始
+    - bs=128
+
+- trail_debug_39-3：TransUnet + prompt
+    - 分割+分类
+    - 更新预处理
+    - 双卡
+    - 调小lr继续训练
+    - 重头开始
+    - 小batch
+
+    omni_train_TU_v2.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 64 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 23 \
+    --output_dir exp_out/trail_debug_39-3 \
+    --prompt \
+
+- trail_debug_39-4：TransUnet + prompt
+    - 单独训练分类数据(出错了，其实还是在训练全部的网络)
+    - 更新预处理
+    - 双卡
+    - 调小lr继续训练
+    - 重头开始
+    - 小batch
+
+    omni_train_TU_v2.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 23 \
+    --output_dir exp_out/trail_debug_39-4 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_39-3/best_model_752_0.7735.pth
+
+- trail_debug_40：TransUnet + prompt + focal loss
+    train: omni_train_TU_v3.py
+    trainer: omni_trainer_TU_v3.py
+
+    omni_train_TU_v3.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_40 \
+    --prompt \
+
+- trail_debug_41: TransUnet + prompt + focal loss + label smooth
+
+- trail_debug_39-5：TransUnet + prompt
+    - 单独训练分类数据
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_39-5 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_39-3/best_model_752_0.7735.pth
+

@@ -5,8 +5,7 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 
-from omni_trainer_TU_v2 import omni_train
-# from config_PG import get_config   # 如果你还需要读取/打印一些swin配置可以保留；但不再用来建模
+from omni_trainer_TU_v3 import omni_train
 from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
 from datasets.omni_dataset import position_prompt_one_hot_dict, task_prompt_one_hot_dict, type_prompt_one_hot_dict, nature_prompt_one_hot_dict
 

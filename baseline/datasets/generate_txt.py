@@ -29,7 +29,7 @@ for dataset in os.listdir(source_path):
         val_num = int(num_images * 0.2)
         test_num = num_images - train_num - val_num
         import random
-        random.seed(42)
+        random.seed(23)
         random.shuffle(all_images_list)
         train_images = all_images_list[:train_num]
         val_images = all_images_list[train_num : train_num + val_num]
@@ -73,7 +73,7 @@ for dataset in os.listdir(source_path):
         val_num = int(num_images * 0.2)
         test_num = num_images - train_num - val_num
         import random
-        random.seed(42)
+        random.seed(23)
         random.shuffle(all_images_list)
         train_images = all_images_list[:train_num]
         val_images = all_images_list[train_num : train_num + val_num]
