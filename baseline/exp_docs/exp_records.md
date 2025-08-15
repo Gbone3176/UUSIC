@@ -1079,3 +1079,48 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
     --prompt \
     --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_39-3/best_model_752_0.7735.pth
 
+- trail_debug_39-6：TransUnet + prompt
+    - 冻结backbone和分类头，单独训练分割数据
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-5 \
+    --max_epochs 1000 \
+    --gpu 0 \
+    --seed 42 \
+    --output_dir exp_out/trail_debug_39-5 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_39-3/best_model_752_0.7735.pth
+
+- trail_debug_41：TransUnet + prompt + weighted ce_loss_4
+    - 冻结backbone和分类头，单独训练 Breast_luminal 
+    - lr 1e-3
+
+- trail_debug_41-1：TransUnet + prompt + weighted ce_loss_4
+    - 冻结backbone和分类头，单独训练 Breast_luminal 
+    - lr 1e-3
+    - seed 23
+    **不work**
+
+
+- trail_debug_42：TransUnet + prompt + weighted_ce_loss_4
+    - networks.vit_seg_modeling_v3: 将四分类头直接放在resnet后面，
+    - 全部数据集一起训练
+    - 开放所有权重
+    - lr 1e-4
+    omni_train_TU_v2.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-4 \
+    --max_epochs 720 \
+    --gpu 0 \
+    --seed 1206 \
+    --output_dir exp_out/trail_debug_42 \
+    --prompt \
+
+- TU_mixup: mixup+cutmix
+
+- trail_debug_42-1：TransUnet + prompt + weighted ce_loss_4
+    - 继续分割
+    /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_42/best_model_119_0.7943.pth

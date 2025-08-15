@@ -69,6 +69,25 @@ ACT2FN = {
     "swish": swish
 }
 
+class EarlyHead4(nn.Module):
+    """4-way classifier directly on ResNet (hybrid stem) feature."""
+    def __init__(self, in_ch: int, mid: int = 256, drop: float = 0.2):
+        super().__init__()
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.norm = nn.BatchNorm1d(in_ch)
+        self.fc1  = nn.Linear(in_ch, mid)
+        self.act  = nn.GELU()
+        self.drop = nn.Dropout(drop)
+        self.fc2  = nn.Linear(mid, 4)
+
+    def forward(self, feat: torch.Tensor):
+        # feat: (B, C, H, W) from ResNetV2 output
+        z = self.pool(feat).flatten(1)  # (B, C)
+        z = self.norm(z)
+        z = self.fc1(z); z = self.act(z); z = self.drop(z)
+        logits4 = self.fc2(z)
+        return logits4
+
 
 class Attention(nn.Module):
     """Multi-head self attention with optional prompt modulation (head-wise FiLM)."""
@@ -211,15 +230,17 @@ class Embeddings(nn.Module):
         self.dropout = Dropout(config.transformer["dropout_rate"])
 
     def forward(self, x):
+        resnet_feat = None
         if self.hybrid:
             x, features = self.hybrid_model(x)
+            resnet_feat = x
         else:
             features = None
         x = self.patch_embeddings(x)  # (B, hidden, h, w)
         x = x.flatten(2).transpose(-1, -2)  # (B, n_patches, hidden)
         embeddings = x + self.position_embeddings
         embeddings = self.dropout(embeddings)
-        return embeddings, features
+        return embeddings, features ,resnet_feat
 
 
 class Block(nn.Module):
@@ -332,14 +353,14 @@ class Transformer(nn.Module):
     def forward(self, input_ids):
         if self.use_prompt and isinstance(input_ids, (tuple, list)):
             x, pos_oh, task_oh, type_oh, nature_oh = input_ids
-            embedding_output, features = self.embeddings(x)
+            embedding_output, features, res_feat = self.embeddings(x)
             encoded, attn_weights = self.encoder(embedding_output,
                                                  prompt_tuple=(pos_oh, task_oh, type_oh, nature_oh))
         else:
             x = input_ids
-            embedding_output, features = self.embeddings(x)
+            embedding_output, features, res_feat = self.embeddings(x)
             encoded, attn_weights = self.encoder(embedding_output, prompt_tuple=None)
-        return encoded, attn_weights, features
+        return encoded, attn_weights, features, res_feat
 
 
 class Conv2dReLU(nn.Sequential):
@@ -461,6 +482,11 @@ class VisionTransformer(nn.Module):
             drop=0.2
         )
 
+        self.early_head4 = None
+        if self.transformer.embeddings.hybrid:
+            in_ch_early = self.transformer.embeddings.hybrid_model.width * 16
+            self.early_head4 = EarlyHead4(in_ch=in_ch_early, mid=max(256, config.hidden_size // 2), drop=0.2)
+
     def forward(self, *args):
         """
         支持两种调用：
@@ -474,7 +500,7 @@ class VisionTransformer(nn.Module):
             image = args[0]
             if image.size(1) == 1:
                 image = image.repeat(1, 3, 1, 1)
-            x_tokens, attn_weights, features = self.transformer(image)
+            x_tokens, attn_weights, features, resnet_feat = self.transformer(image)
         else:
             # ---- prompt path ----
             if len(args) == 1 and isinstance(args[0], (tuple, list)):
@@ -487,7 +513,7 @@ class VisionTransformer(nn.Module):
                 image = image.repeat(1, 3, 1, 1)
 
             # Transformer 已支持 tuple 形式的带 prompt 输入
-            x_tokens, attn_weights, features = self.transformer((image, pos_oh, task_oh, type_oh, nature_oh))
+            x_tokens, attn_weights, features, resnet_feat = self.transformer((image, pos_oh, task_oh, type_oh, nature_oh))
 
         # --- segmentation branch ---
         x_dec = self.decoder(x_tokens, features)
@@ -495,6 +521,11 @@ class VisionTransformer(nn.Module):
 
         # --- classification branch ---
         x_cls_2, x_cls_4 = self.classifier_head(x_tokens, x_dec)
+
+        # 用 early_head4 替换四分类（若存在 hybrid）
+        if self.early_head4 is not None and resnet_feat is not None:
+            x_cls_4 = self.early_head4(resnet_feat)
+            # print("[debug] Using early head for 4-way classification from hybrid stem feature.")
 
         return x_seg, x_cls_2, x_cls_4
 

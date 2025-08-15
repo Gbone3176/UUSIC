@@ -286,6 +286,8 @@ class USdatasetOmni_cls(Dataset):
         #         base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
 
             
+        # private_datasets = [d for d in os.listdir(os.path.join(base_dir, "classification"))
+        #                    if d == "private_Breast_luminal"]
         private_datasets = [d for d in os.listdir(os.path.join(base_dir, "classification"))
                            if d.startswith("private_")]
         print('='*20)
@@ -299,6 +301,203 @@ class USdatasetOmni_cls(Dataset):
                 base_dir, "classification", dataset_name, "val.txt"), dataset_name, None))
             self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
                 base_dir, "classification", dataset_name, "val.txt"), dataset_name, None))))
+
+    def __len__(self):
+        return len(self.sample_list)
+
+    def __getitem__(self, idx):
+
+        img_name = self.sample_list[idx].strip('\n')
+        img_path = os.path.join(self.data_dir, "classification", img_name)
+
+        image = cv2.imread(img_path)
+        dataset_name = img_name.split("/")[0]
+        label = int(img_name.split("/")[-2])
+
+        if not self.prompt:
+            sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+        else:
+            if dataset_name in available_type_prompt_list:
+                random_number = random.random()
+                mask_path = os.path.join(self.data_dir, "segmentation",
+                                         "/".join([img_name.split("/")[0], "masks", img_name.split("/")[2]]))
+                if random_number < 0.3:
+                    sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+                    sample['type_prompt'] = type_prompt_one_hot_dict["whole"]
+                elif random_number < 0.6:
+                    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                    x, y, w, h = cv2.boundingRect(mask)
+                    length = max(w, h)
+
+                    if 0 in image[y:y+length, x:x+length, :].shape:
+                        sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+                        sample['type_prompt'] = type_prompt_one_hot_dict["whole"]
+                    else:
+                        image = image[y:y+length, x:x+length, :]
+                        sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+                        sample['type_prompt'] = type_prompt_one_hot_dict["local"]
+                else:
+                    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                    mask[mask > 0] = 255
+                    image = image + (np.expand_dims(mask, axis=2)*0.1).astype('uint8')
+                    sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+                    sample['type_prompt'] = type_prompt_one_hot_dict["location"]
+            else:
+                sample = {'image': image/255.0, 'label': np.zeros(image.shape[:2])}
+                sample['type_prompt'] = type_prompt_one_hot_dict["whole"]
+        if self.transform:
+            sample = self.transform(sample)
+        sample['label'] = torch.from_numpy(np.array(label))
+        sample['case_name'] = self.sample_list[idx].strip('\n')
+        sample['nature_prompt'] = nature_prompt_one_hot_dict[nature_prompt_dict[dataset_name]]
+        sample['position_prompt'] = position_prompt_one_hot_dict[position_prompt_dict[dataset_name]]
+        sample['task_prompt'] = task_prompt_one_hot_dict["classification"]
+
+        if dataset_name == "private_Breast_luminal":
+            sample['num_classes'] = 4
+        else:
+            sample['num_classes'] = 2
+
+        return sample
+    
+class USdatasetOmni_seg_mix(Dataset):
+    def __init__(self, base_dir, split, transform=None, prompt=False):
+        self.transform = transform
+        self.split = split
+        self.data_dir = base_dir
+        self.sample_list = []
+        self.subset_len = []
+        self.prompt = prompt
+
+        # print('='*20)
+        # seg_data_sets = os.listdir(os.path.join(base_dir, "segmentation"))
+        # print(f"Using private datasets: {seg_data_sets} for segmentation task.")
+        # for dataset_name in os.listdir(os.path.join(base_dir, "segmentation")):
+        #     self.sample_list.extend(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
+        #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+
+        ### only for private certain dataset
+        # private_datasets = ["private_Thyroid"]
+        # print('='*20)
+        # print(f"Using private datasets: {private_datasets} for segmentation task.")
+        # for dataset_name in private_datasets:
+        #     self.sample_list.extend(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
+        #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+        #         base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+    
+        ### only for private dataset
+        private_datasets = [d for d in os.listdir(os.path.join(base_dir, "segmentation")) 
+                   if d.startswith("private_")]
+        print('='*20)
+        print(f"Using private datasets: {private_datasets} for segmentation task.")
+        for dataset_name in private_datasets:
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, split + ".txt"), dataset_name, "imgs"))))
+            self.sample_list.extend(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, "val.txt"), dataset_name, "imgs"))
+            self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+                base_dir, "segmentation", dataset_name, "val.txt"), dataset_name, "imgs"))))
+
+    def __len__(self):
+        return len(self.sample_list)
+
+    def __getitem__(self, idx):
+
+        img_name = self.sample_list[idx].strip('\n')
+        img_path = os.path.join(self.data_dir, "segmentation", img_name)
+        label_path = os.path.join(self.data_dir, "segmentation", img_name).replace("imgs", "masks")
+
+        image = cv2.imread(img_path)
+        label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE)
+
+        if label is None:
+            print(label_path)
+
+        dataset_name = img_name.split("/")[0]
+        label_info = open(os.path.join(self.data_dir, "segmentation", dataset_name, "config.yaml")).readlines()
+
+        label_info_list = [info.strip().split(":") for info in label_info]
+        for single_label_info in label_info_list:
+            label_index = int(single_label_info[0])
+            label_value_in_image = int(single_label_info[2])
+            label[label == label_value_in_image] = label_index
+
+        label[label > 0] = 1
+
+        if not self.prompt:
+            sample = {'image': image/255.0, 'label': label, 'nature_for_aug':nature_prompt_dict[dataset_name]}
+        else:
+            if random.random() > 0.5:
+                x, y, w, h = cv2.boundingRect(label)  #输出所有非零像素点的最小外接矩形
+                length = max(w, h)
+
+                if 0 in image[y:y+length, x:x+length, :].shape:
+                    image = image
+                    label = label
+                    sample = {'image': image/255.0, 'label': label, 'nature_for_aug':nature_prompt_dict[dataset_name]}
+                    sample['type_prompt'] = type_prompt_one_hot_dict["whole"]
+                else:
+                    image = image[y:y+length, x:x+length, :]
+                    label = label[y:y+length, x:x+length]
+                    sample = {'image': image/255.0, 'label': label, 'nature_for_aug':nature_prompt_dict[dataset_name]}
+                    sample['type_prompt'] = type_prompt_one_hot_dict["local"]
+
+            else:
+                sample = {'image': image/255.0, 'label': label, 'nature_for_aug':nature_prompt_dict[dataset_name]}
+                sample['type_prompt'] = type_prompt_one_hot_dict["whole"]
+                pass
+            
+        if self.transform:
+            sample = self.transform(sample)
+        sample['case_name'] = self.sample_list[idx].strip('\n')
+        sample['nature_prompt'] = nature_prompt_one_hot_dict[nature_prompt_dict[dataset_name]]
+        sample['position_prompt'] = position_prompt_one_hot_dict[position_prompt_dict[dataset_name]]
+        sample['task_prompt'] = task_prompt_one_hot_dict["segmentation"]
+
+        return sample
+
+
+class USdatasetOmni_cls_mix(Dataset):
+    def __init__(self, base_dir, split, transform=None, prompt=False, dataset_name=None):
+        self.transform = transform
+        self.split = split
+        self.data_dir = base_dir
+        self.sample_list = []
+        self.subset_len = []
+        self.prompt = prompt
+        self.dataset_name = dataset_name
+
+
+        # print('='*20)
+        # cls_data_sets = os.listdir(os.path.join(base_dir, "classification"))
+        # print(f"Using private datasets: {cls_data_sets} for classification task.")
+
+        # for dataset_name in os.listdir(os.path.join(base_dir, "classification")):
+        #     self.sample_list.extend(list_add_prefix(os.path.join(
+        #         base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))
+        #     self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+        #         base_dir, "classification", dataset_name, split + ".txt"), dataset_name, None))))
+
+            
+        # private_datasets = [d for d in os.listdir(os.path.join(base_dir, "classification"))
+        #                    if d == "private_Breast_luminal"]
+
+        print('='*20)
+        print(f"Using private datasets: {self.dataset_name} for classification task.")
+
+        self.sample_list.extend(list_add_prefix(os.path.join(
+            base_dir, "classification", self.dataset_name, split + ".txt"), dataset_name, None))
+        self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+            base_dir, "classification", self.dataset_name, split + ".txt"), dataset_name, None))))
+        self.sample_list.extend(list_add_prefix(os.path.join(
+            base_dir, "classification", self.dataset_name, "val.txt"), dataset_name, None))
+        self.subset_len.append((dataset_name, len(list_add_prefix(os.path.join(
+            base_dir, "classification", self.dataset_name, "val.txt"), dataset_name, None))))
 
     def __len__(self):
         return len(self.sample_list)

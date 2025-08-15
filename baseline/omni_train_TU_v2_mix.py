@@ -5,9 +5,8 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 
-from omni_trainer_TU_v2 import omni_train
-# from config_PG import get_config   # 如果你还需要读取/打印一些swin配置可以保留；但不再用来建模
-from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from omni_trainer_TU_v2_mix import omni_train
+from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
 from datasets.omni_dataset import position_prompt_one_hot_dict, task_prompt_one_hot_dict, type_prompt_one_hot_dict, nature_prompt_one_hot_dict
 
 POSITION_LEN = len(position_prompt_one_hot_dict)
@@ -27,22 +26,6 @@ parser.add_argument('--img_size', type=int, default=224, help='input patch size 
 parser.add_argument('--seed', type=int, default=1234, help='random seed')
 parser.add_argument('--resume', help='resume from checkpoint')
 
-# 下面这几个是原来 Swin 的参数（保留无妨，但不会用于建模）
-parser.add_argument('--cfg', type=str, default="configs/swin_tiny_patch4_window7_224_lite-PG.yaml",
-                    metavar="FILE", help='path to config file', )
-parser.add_argument("--opts", help="Modify config options by adding 'KEY VALUE' pairs. ",
-                    default=None, nargs='+')
-parser.add_argument('--zip', action='store_true', help='use zipped dataset instead of folder dataset')
-parser.add_argument('--cache-mode', type=str, default='part', choices=['no', 'full', 'part'])
-
-parser.add_argument('--accumulation-steps', type=int, help="gradient accumulation steps")
-parser.add_argument('--use-checkpoint', action='store_true', help="whether to use gradient checkpointing to save memory")
-parser.add_argument('--amp-opt-level', type=str, default='O1', choices=['O0', 'O1', 'O2'],
-                    help='mixed precision opt level, if O0, no amp is used')
-parser.add_argument('--tag', help='tag of experiment')
-parser.add_argument('--eval', action='store_true', help='Perform evaluation only')
-parser.add_argument('--throughput', action='store_true', help='Test throughput only')
-
 # 你自己的 .pth checkpoint（断点续训）
 parser.add_argument('--pretrain_ckpt', type=str, help='pretrained checkpoint (.pth)')
 
@@ -57,6 +40,14 @@ parser.add_argument('--n_classes_seg', type=int, default=2, help='num classes fo
 # prompt/adapter 关闭
 parser.add_argument('--prompt', action='store_true', help='(deprecated here) using prompt for training')
 parser.add_argument('--adapter_ft', action='store_true', help='(deprecated here) using adapter for fine-tuning')
+
+# ====== Mixup and CutMix 参数 ======
+parser.add_argument('--mixup_alpha', type=float, default=0.8, help='mixup alpha parameter')
+parser.add_argument('--cutmix_alpha', type=float, default=1.0, help='cutmix alpha parameter')
+parser.add_argument('--mixup_prob', type=float, default=1.0, help='probability of applying mixup/cutmix')
+parser.add_argument('--cutmix_prob', type=float, default=1.0, help='probability of applying cutmix when both enabled')
+parser.add_argument('--mixup_switch_prob', type=float, default=0.5, help='probability of switching to cutmix when both enabled')
+
 
 args = parser.parse_args()
 
@@ -97,28 +88,20 @@ if __name__ == "__main__":
         task_len=TASK_LEN,
         type_len=TYPE_LEN,
         nature_len=NAT_LEN
-    ).cuda()
+    )
 
-    # ViT 官方/社区预训练（.npz）
-    if args.vit_pretrained is not None and os.path.isfile(args.vit_pretrained):
-        print(f"[ViT] Loading pretrained from {args.vit_pretrained}")
-        vit_weights = np.load(args.vit_pretrained)
-        net.load_from(vit_weights)
+    if args.pretrain_ckpt is not None:
+        print(f"Loading pretrained checkpoint from {args.pretrain_ckpt}")
+        net.load_state_dict(torch.load(args.pretrain_ckpt, map_location='cpu'), strict=False)
 
-    # 你自己的断点续训（.pth）
-    if args.pretrain_ckpt is not None and os.path.isfile(args.pretrain_ckpt):
-        print(f"[CKPT] Resuming weights from {args.pretrain_ckpt}")
-        state = torch.load(args.pretrain_ckpt, map_location='cpu')
-        if 'model' in state:
-            net.load_state_dict(state['model'], strict=False)
-        else:
-            for key in list(state.keys()):
-                if key.startswith('module.'):
-                    state[key[7:]] = state.pop(key)
-            ret = net.load_state_dict(state, strict=False)
-            print("missing_keys: ", len(ret.missing_keys), "unexpected_keys:", len(ret.unexpected_keys))
+    # ===== 打印 Mixup/CutMix 配置 =====
+    print(f"** Mixup/CutMix Configuration **")
+    print(f"  mixup_alpha: {args.mixup_alpha}")
+    print(f"  cutmix_alpha: {args.cutmix_alpha}")
+    print(f"  mixup_prob: {args.mixup_prob}")
+    print(f"  cutmix_prob: {args.cutmix_prob}")
+    print(f"  mixup_switch_prob: {args.mixup_switch_prob}")
 
-    # 强制关闭 adapter
-    args.adapter_ft = False
-
-    omni_train(args, net, args.output_dir)
+    # ===== 开始训练 =====
+    snapshot_path = args.output_dir
+    omni_train(args, net, snapshot_path) 

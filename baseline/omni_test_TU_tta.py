@@ -26,7 +26,7 @@ from sklearn.metrics import accuracy_score
 import cv2  # 添加cv2导入，用于保存图像
 
 # === 使用 TransUNet ===
-from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
 
 
 parser = argparse.ArgumentParser()
@@ -298,7 +298,7 @@ def inference(args, model, device, test_save_path=None):
 
     if is_main_process():
         os.makedirs(args.output_dir, exist_ok=True)
-        result_csv = f"{args.output_dir}/result_{os.path.splitext(os.path.basename(args.resume))[0]}.csv"
+        result_csv = f"{args.output_dir}/tta_result_{os.path.splitext(os.path.basename(args.resume))[0]}.csv"
         if not os.path.exists(result_csv):
             with open(result_csv, 'w', newline='') as f:
                 csv.writer(f).writerow(['dataset', 'task', 'metric', 'time'])
@@ -575,6 +575,8 @@ def inference(args, model, device, test_save_path=None):
 
         labels = labels.detach().cpu().numpy()
         preds  = preds.detach().cpu().numpy()
+        print("labels: ", labels)
+        print("preds: ", preds)
 
         if labels.size > 0:
             performance = accuracy_score(labels, preds)
@@ -694,7 +696,7 @@ if __name__ == "__main__":
     # ===== 日志（仅 rank0 写文件）=====
     if is_main_process():
         os.makedirs(args.output_dir, exist_ok=True)
-        log_path = os.path.join(args.output_dir, f"test_result_{os.path.splitext(os.path.basename(args.resume))[0]}.txt")
+        log_path = os.path.join(args.output_dir, f"tta_test_result_{os.path.splitext(os.path.basename(args.resume))[0]}.txt")
         with open(log_path, "a"):
             pass
         logging.basicConfig(filename=log_path, level=logging.INFO,

@@ -10,6 +10,7 @@ import torch.distributed as dist
 from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 
+
 from datasets.dataset_aug_norm_mc import CenterCropGenerator
 from datasets.dataset_aug_norm import USdatasetClsFlexible, USdatasetSegFlexible
 from datasets.omni_dataset import position_prompt_one_hot_dict, task_prompt_one_hot_dict, type_prompt_one_hot_dict, nature_prompt_one_hot_dict
@@ -21,10 +22,10 @@ NAT_LEN = len(nature_prompt_one_hot_dict)
 
 
 from utils import omni_seg_test_TU
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, recall_score
 
 # === 使用 TransUNet ===
-from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
 
 
 parser = argparse.ArgumentParser()
@@ -258,9 +259,24 @@ def inference(args, model, device, test_save_path=None):
 
 
         if labels.size > 0:
+            if num_classes == 4:
+                # 计算 4 类分类的 recall
+                recall_per_class = recall_score(labels, preds, average=None, zero_division=0) 
+            else:
+                # 二分类的 recall
+                recall_per_class = recall_score(labels, preds, average=None, zero_division=0)
+
+            # 计算准确率
             performance = accuracy_score(labels, preds)
         else:
             performance = 0.0
+            recall_per_class = 0.0
+
+        if is_main_process():
+            print(f'[CLS] {dataset_name} recall: {recall_per_class}')
+            print('labels', labels)
+            print('preds',preds)
+            logging.info('[CLS] %s acc: %.4f', dataset_name, performance)
 
         if is_main_process():
             logging.info('[CLS] %s acc: %.4f', dataset_name, performance)

@@ -6,7 +6,7 @@ import torch
 import torch.backends.cudnn as cudnn
 
 from omni_trainer_TU_v3 import omni_train
-from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
 from datasets.omni_dataset import position_prompt_one_hot_dict, task_prompt_one_hot_dict, type_prompt_one_hot_dict, nature_prompt_one_hot_dict
 
 POSITION_LEN = len(position_prompt_one_hot_dict)
@@ -116,6 +116,41 @@ if __name__ == "__main__":
                     state[key[7:]] = state.pop(key)
             ret = net.load_state_dict(state, strict=False)
             print("missing_keys: ", len(ret.missing_keys), "unexpected_keys:", len(ret.unexpected_keys))
+    
+    # #加载除了分类器之外的其他权重
+    # if args.pretrain_ckpt is not None and os.path.isfile(args.pretrain_ckpt):
+    #     print(f"[CKPT] Resuming weights (except classifier) from {args.pretrain_ckpt}")
+    #     state = torch.load(args.pretrain_ckpt, map_location="cpu")
+
+    #     # 1) 取出 state_dict（兼容 {'model': xxx} 或直接是 dict）
+    #     src = state.get("model", state)
+
+    #     # 2) 过滤：去掉 DDP 前缀；丢弃分类器参数；丢弃形状不匹配的键
+    #     dst_sd = net.state_dict()
+    #     filtered, skipped_cls, skipped_mismatch = {}, [], []
+
+    #     for k, v in src.items():
+    #         name = k[7:] if k.startswith("module.") else k
+
+    #         # 跳过分类器
+    #         if name.startswith("classifier_head.") or ".classifier_head." in name:
+    #             skipped_cls.append(name)
+    #             continue
+
+    #         # 只加载存在且形状一致的权重
+    #         if name in dst_sd and dst_sd[name].shape == v.shape:
+    #             filtered[name] = v
+    #         else:
+    #             skipped_mismatch.append(name)
+
+    #     # 3) 加载（严格度放宽，允许未匹配到的键）
+    #     ret = net.load_state_dict(filtered, strict=False)
+
+    #     # 4) 打印统计
+    #     print(f"[CKPT] loaded={len(filtered)} | skipped_cls={len(skipped_cls)} | "
+    #         f"skipped_shape_mismatch={len(skipped_mismatch)}")
+    #     if ret.missing_keys or ret.unexpected_keys:
+    #         print(f"[CKPT] missing_keys={len(ret.missing_keys)} unexpected_keys={len(ret.unexpected_keys)}")
 
     # 强制关闭 adapter
     args.adapter_ft = False

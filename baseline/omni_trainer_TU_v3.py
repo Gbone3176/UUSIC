@@ -48,7 +48,7 @@ def _get_net(model: nn.Module) -> nn.Module:
     """兼容 DDP/DP 包装，返回实际网络对象。"""
     return model.module if hasattr(model, "module") else model
 
-def freeze_all_but_classifier(model: nn.Module, verbose: bool = True):
+def freeze_all_but_seghead(model: nn.Module, verbose: bool = True):
     """
     DDP/DP 兼容版：
     冻结 transformer + decoder + segmentation_head，仅训练 classifier_head。
@@ -68,17 +68,22 @@ def freeze_all_but_classifier(model: nn.Module, verbose: bool = True):
     else:
         raise AttributeError("model.decoder 不存在，检查你的模型定义。")
 
-    if hasattr(net, "segmentation_head"):
-        _freeze_module(net.segmentation_head)
-    else:
-        raise AttributeError("model.segmentation_head 不存在，检查你的模型定义。")
-
-    # --- 2) 仅开放分类头 ---
     if hasattr(net, "classifier_head"):
-        _set_requires_grad(net.classifier_head, True)
-        net.classifier_head.train()  # 让其 BN/Dropout 生效
+        _freeze_module(net.classifier_head)
     else:
         raise AttributeError("model.classifier_head 不存在，检查你的模型定义。")
+    
+    if hasattr(net, "early_head4"):
+        _freeze_module(net.early_head4)
+    else:
+        raise AttributeError("model.early_head4 不存在，检查你的模型定义。")
+
+    # --- 2) 仅开放分割头 ---
+    if hasattr(net, "segmentation_head"):
+        _set_requires_grad(net.segmentation_head, True)
+        net.segmentation_head.train()  # 让其 BN/Dropout 生效
+    else:
+        raise AttributeError("model.segmentation_head 不存在，检查你的模型定义。")
 
     # --- 3) 劫持最外层 model.train()，防止被训练循环改回 ---
     def _locked_train(self, mode: bool = True):
@@ -88,9 +93,10 @@ def freeze_all_but_classifier(model: nn.Module, verbose: bool = True):
         # 冻结分支永远保持 eval
         if hasattr(inner, "transformer"):      inner.transformer.eval()
         if hasattr(inner, "decoder"):          inner.decoder.eval()
-        if hasattr(inner, "segmentation_head"):inner.segmentation_head.eval()
+        if hasattr(inner, "classifier_head"):  inner.classifier_head.eval()
+        if hasattr(inner, "early_head4"):      inner.early_head4.eval()
         # 只有分类头跟随 mode
-        if hasattr(inner, "classifier_head"):  inner.classifier_head.train(mode)
+        if hasattr(inner, "segmentation_head"):  inner.segmentation_head.train(mode)
         return self
 
     model.train = types.MethodType(_locked_train, model)
@@ -101,7 +107,7 @@ def freeze_all_but_classifier(model: nn.Module, verbose: bool = True):
         n_total = sum(p.numel() for p in net.parameters())
         n_train = sum(p.numel() for p in net.parameters() if p.requires_grad)
         print(f"[Freeze] trainable params: {n_train:,} / {n_total:,} "
-              f"({n_train/n_total*100:.4f}%) | only classifier_head is trainable.")
+              f"({n_train/n_total*100:.4f}%) | only segmentation_head is trainable.")
 
     # --- 5) 返回仅分类头参数（用于优化器） ---
     return list(net.classifier_head.parameters())
@@ -230,18 +236,18 @@ def omni_train(args, model, snapshot_path):
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu_id], find_unused_parameters=True)
 
     # 只训练分类器：先冻结，再用仅包含可训练参数的优化器
-    cls_params = freeze_all_but_classifier(model)
+    cls_params = freeze_all_but_seghead(model)
 
     model.train()
 
     seg_ce_loss = CrossEntropyLoss()
     seg_dice_loss = DiceLoss()
-    seg_focal_loss = FocalLoss(gamma=2.0, alpha=[0.25, 0.75])  # 可选：如果需要使用Focal Loss
+    # seg_focal_loss = FocalLoss(gamma=2.0, alpha=[0.25, 0.75])  # 可选：如果需要使用Focal Loss
 
     # cls_ce_loss = CrossEntropyLoss()
-
+    weight = torch.tensor([6.94,10.72, 1.52, 9.44], dtype=torch.float32).to(device)
     cls_ce_loss_2way = CrossEntropyLoss()
-    cls_ce_loss_4way = CrossEntropyLoss()
+    cls_ce_loss_4way = CrossEntropyLoss(weight=weight)
 
     # optimizer = optim.AdamW(model.parameters(), lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
     optimizer = optim.AdamW(cls_params, lr=base_lr, weight_decay=0.01, betas=(0.9, 0.999))
@@ -276,108 +282,108 @@ def omni_train(args, model, snapshot_path):
         weighted_sampler_seg.set_epoch(epoch_num)
         weighted_sampler_cls.set_epoch(epoch_num)
         
-        # for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
-        #     image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-
-        #     image_batch = to_chw(image_batch).to(device=device)
-
-        #     image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
-        #     if args.prompt:
-        #         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-        #         task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-        #         type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-        #         nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device) 
-                
-        #         (x_seg, _, _) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
-        #     else:
-        #         (x_seg, _, _) = model(image_batch)
-
-        #     # loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
-        #     loss_focal = seg_focal_loss(x_seg, label_batch[:].long(), softmax=True)
-        #     loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
-        #     loss = 0.4 * loss_focal + 0.6 * loss_dice
-
-        #     optimizer.zero_grad()
-        #     loss.backward()
-        #     optimizer.step()
-            
-        #     # 修改学习率衰减策略：当进度超过70%时保持恒定
-        #     progress = 1.0 - global_iter_num / max_iterations
-        #     if progress >= 0.2:
-        #         lr_ = base_lr * (progress ** 0.9)
-        #     else:
-        #         lr_ = base_lr * (0.2 ** 0.9)  # 保持在20%进度时的学习率
-                
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = lr_
-
-        #     seg_iter_num = seg_iter_num + 1
-        #     global_iter_num = global_iter_num + 1
-
-        #     writer.add_scalar('info/lr_seg', lr_, seg_iter_num)
-        #     writer.add_scalar('info/seg_loss', loss, seg_iter_num)
-
-        #     logging.info('global iteration %d and seg iteration %d : loss : %f' %
-        #                  (global_iter_num, seg_iter_num, loss.item()))
-
-        
-        for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
+        for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
             image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-            
-            num_classes_batch = sampled_batch['num_classes']
+
             image_batch = to_chw(image_batch).to(device=device)
-            label_batch = label_batch.to(device=device)
+
+            image_batch, label_batch = image_batch.to(device=device), label_batch.to(device=device)
             if args.prompt:
                 position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
                 task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
                 type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-                nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
-                (_, x_cls_2, x_cls_4) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
+                nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device) 
+                
+                (x_seg, _, _) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
             else:
-                (_, x_cls_2, x_cls_4) = model(image_batch)
+                (x_seg, _, _) = model(image_batch)
 
-            loss = 0.0
-            
-            mask_2_way = (num_classes_batch == 2)
-            mask_4_way = (num_classes_batch == 4)
-
-
-            if mask_2_way.any():
-                outputs_2_way = x_cls_2[mask_2_way]
-                labels_2_way = label_batch[mask_2_way]
-                loss_ce_2 = cls_ce_loss_2way(outputs_2_way, labels_2_way[:].long())
-                loss += loss_ce_2
-
-
-            if mask_4_way.any():
-                outputs_4_way = x_cls_4[mask_4_way]
-                labels_4_way = label_batch[mask_4_way]
-                loss_ce_4 = cls_ce_loss_4way(outputs_4_way, labels_4_way[:].long())
-                loss += loss_ce_4
-
-            # loss_ce = cls_ce_loss(x_cls, label_batch[:].long())
-            # loss = loss_ce
+            loss_ce = seg_ce_loss(x_seg, label_batch[:].long())
+            # loss_focal = seg_focal_loss(x_seg, label_batch[:].long(), softmax=True)
+            loss_dice = seg_dice_loss(x_seg, label_batch, softmax=True)
+            loss = 0.4 * loss_ce + 0.6 * loss_dice
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
+            
+            # 修改学习率衰减策略：当进度超过70%时保持恒定
             progress = 1.0 - global_iter_num / max_iterations
-            if progress >= 0.3:
+            if progress >= 0.2:
                 lr_ = base_lr * (progress ** 0.9)
             else:
-                lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
+                lr_ = base_lr * (0.2 ** 0.9)  # 保持在20%进度时的学习率
+                
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr_
 
-            cls_iter_num = cls_iter_num + 1
+            seg_iter_num = seg_iter_num + 1
             global_iter_num = global_iter_num + 1
 
-            writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
-            writer.add_scalar('info/cls_loss', loss, cls_iter_num)
+            writer.add_scalar('info/lr_seg', lr_, seg_iter_num)
+            writer.add_scalar('info/seg_loss', loss, seg_iter_num)
 
-            logging.info('global iteration %d and cls iteration %d : loss : %f' %
-                         (global_iter_num, cls_iter_num, loss.item()))
+            logging.info('global iteration %d and seg iteration %d : loss : %f' %
+                         (global_iter_num, seg_iter_num, loss.item()))
+
+        
+        # for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
+        #     image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+            
+        #     num_classes_batch = sampled_batch['num_classes']
+        #     image_batch = to_chw(image_batch).to(device=device)
+        #     label_batch = label_batch.to(device=device)
+        #     if args.prompt:
+        #         position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+        #         task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+        #         type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+        #         nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
+        #         (_, x_cls_2, x_cls_4) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
+        #     else:
+        #         (_, x_cls_2, x_cls_4) = model(image_batch)
+
+        #     loss = 0.0
+            
+        #     mask_2_way = (num_classes_batch == 2)
+        #     mask_4_way = (num_classes_batch == 4)
+
+
+        #     if mask_2_way.any():
+        #         outputs_2_way = x_cls_2[mask_2_way]
+        #         labels_2_way = label_batch[mask_2_way]
+        #         loss_ce_2 = cls_ce_loss_2way(outputs_2_way, labels_2_way[:].long())
+        #         loss += loss_ce_2
+
+
+        #     if mask_4_way.any():
+        #         outputs_4_way = x_cls_4[mask_4_way]
+        #         labels_4_way = label_batch[mask_4_way]
+        #         loss_ce_4 = cls_ce_loss_4way(outputs_4_way, labels_4_way[:].long())
+        #         loss += loss_ce_4
+
+        #     # loss_ce = cls_ce_loss(x_cls, label_batch[:].long())
+        #     # loss = loss_ce
+
+        #     optimizer.zero_grad()
+        #     loss.backward()
+        #     optimizer.step()
+
+        #     progress = 1.0 - global_iter_num / max_iterations
+        #     if progress >= 0.3:
+        #         lr_ = base_lr * (progress ** 0.9)
+        #     else:
+        #         lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
+        #     for param_group in optimizer.param_groups:
+        #         param_group['lr'] = lr_
+
+        #     cls_iter_num = cls_iter_num + 1
+        #     global_iter_num = global_iter_num + 1
+
+        #     writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
+        #     writer.add_scalar('info/cls_loss', loss, cls_iter_num)
+
+        #     logging.info('global iteration %d and cls iteration %d : loss : %f' %
+        #                  (global_iter_num, cls_iter_num, loss.item()))
         
         
         dist.barrier()

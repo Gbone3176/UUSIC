@@ -14,15 +14,22 @@ from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torch.utils.tensorboard import SummaryWriter
+import torch.nn.functional as F
 
 
 from utils import DiceLoss
 from datasets.dataset_aug_norm import USdatasetCls, USdatasetSeg
 from datasets.dataset_aug_norm_mc import RandomGenerator_Cls, RandomGenerator_Seg, CenterCropGenerator
 from datasets.omni_dataset import WeightedRandomSamplerDDP
-from datasets.omni_dataset import USdatasetOmni_cls, USdatasetOmni_seg
+from datasets.omni_dataset import USdatasetOmni_cls_mix, USdatasetOmni_seg
 from sklearn.metrics import roc_auc_score, accuracy_score
 from utils import omni_seg_test_TU
+from mixup_cutmix_utils import (
+    apply_mixup_cutmix, 
+    compute_mixup_loss, 
+    log_augmentation_info
+)
+
 
 def freeze_all_but_classification_head(model):
     """
@@ -127,39 +134,65 @@ def omni_train(args, model, snapshot_path):
                                  sampler=weighted_sampler_seg
                                  )
 
-    db_train_cls = USdatasetOmni_cls(base_dir=args.root_path, split="train", transform=transforms.Compose(
-        [RandomGenerator_Cls(output_size=[args.img_size, args.img_size])]), prompt=args.prompt)
-
-    cls_datasets_weight = {
-        'Appendix': (981, 1),                # 默认权重1（未在weight_base中明确对应）
-        'BUS-BRA': (1312, 0.25),             # 对应weight_base[7] = 0.25 (大规模数据低权重)
-        'BUSI': (452, 1),                    # 对应weight_base[2] = 1
-        'Fatty-Liver': (385, 1),             # 接近weight_base[6]的350样本，权重=1
-        'private_Appendix': (46, 3),         # 对应weight_base[3] = 4 (小样本高权重)
-        'private_Breast': (105, 4),          # 对应weight_base[1] = 3
-        'private_Breast_luminal': (165, 3),  # 对应weight_base[10] = 2
-        'private_Liver': (72, 4)             # 接近weight_base[4]的84样本，权重=4
+    # ====== 按数据集分别构建分类数据加载器 ======
+    # 每个数据集单独构建DataLoader，避免不同病灶类型混合
+    cls_datasets = {
+        'Appendix': (981, 1, 2),           # (样本数, 权重, 类别数)
+        'BUS-BRA': (1312, 0.25, 2),
+        'BUSI': (452, 1, 2),
+        'Fatty-Liver': (385, 1, 2),
+        'private_Appendix': (46, 3, 2),
+        'private_Breast': (105, 4, 2),
+        'private_Liver': (72, 4, 2),
+        'private_Breast_luminal': (165, 3, 4)
     }
-
-    sample_weight_seq = [[cls_datasets_weight[cls_subset_name][1]] *element 
-                         for (cls_subset_name, element) in db_train_cls.subset_len]
-    sample_weight_seq = [element for sublist in sample_weight_seq for element in sublist]
-
-    weighted_sampler_cls = WeightedRandomSamplerDDP(
-        data_set=db_train_cls,
-        weights=sample_weight_seq,
-        num_replicas=world_size,
-        rank=rank,
-        num_samples=len(db_train_cls),
-        replacement=True
-    )
-    trainloader_cls = DataLoader(db_train_cls,
-                                 batch_size=batch_size,
-                                 num_workers=32,
-                                 pin_memory=True,
-                                 worker_init_fn=worker_init_fn,
-                                 sampler=weighted_sampler_cls
-                                 )
+    
+    # 为每个数据集创建单独的DataLoader
+    trainloaders_cls = {}
+    weighted_samplers_cls = {}
+    
+    for dataset_name, (sample_count, weight, num_classes) in cls_datasets.items():
+        # 创建只包含单个数据集的数据集对象
+        db_train_cls_single = USdatasetOmni_cls_mix(
+            base_dir=args.root_path, 
+            split="train", 
+            transform=transforms.Compose([RandomGenerator_Cls(output_size=[args.img_size, args.img_size])]), 
+            prompt=args.prompt,
+            dataset_name=dataset_name
+            )
+        
+        if len(db_train_cls_single) > 0:
+            # 创建权重采样器
+            sample_weight_seq = [weight] * len(db_train_cls_single)
+            
+            weighted_sampler = WeightedRandomSamplerDDP(
+                data_set=db_train_cls_single,
+                weights=sample_weight_seq,
+                num_replicas=world_size,
+                rank=rank,
+                num_samples=len(db_train_cls_single),
+                replacement=True
+            )
+            
+            # 创建DataLoader
+            trainloader = DataLoader(
+                db_train_cls_single,
+                batch_size=batch_size,
+                num_workers=32,
+                pin_memory=True,
+                worker_init_fn=worker_init_fn,
+                sampler=weighted_sampler
+            )
+            
+            trainloaders_cls[dataset_name] = {
+                'loader': trainloader,
+                'sampler': weighted_sampler,
+                'num_classes': num_classes,
+                'weight': weight
+            }
+    
+    # 计算总迭代次数
+    total_cls_iterations = sum(len(info['loader']) for info in trainloaders_cls.values())
 
     model = model.to(device=device)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -190,7 +223,7 @@ def omni_train(args, model, snapshot_path):
     seg_iter_num = 0
     cls_iter_num = 0
     max_epoch = args.max_epochs
-    total_iterations = (len(trainloader_seg) + len(trainloader_cls))
+    total_iterations = (len(trainloader_seg) + total_cls_iterations)
     max_iterations = args.max_epochs * total_iterations
     logging.info("{} batch size. {} iterations per epoch. {} max iterations ".format(
         batch_size, total_iterations, max_iterations))
@@ -205,10 +238,12 @@ def omni_train(args, model, snapshot_path):
         iterator = tqdm(range(resume_epoch, max_epoch), ncols=70, disable=False)
 
     for epoch_num in iterator:
-        logging.info("skip seg training...")
+
         logging.info("\n epoch: {}".format(epoch_num))
         weighted_sampler_seg.set_epoch(epoch_num)
-        weighted_sampler_cls.set_epoch(epoch_num)
+        # 设置分类数据采样器的epoch
+        for dataset_name, info in trainloaders_cls.items():
+            info['sampler'].set_epoch(epoch_num)
 
         for i_batch, sampled_batch in tqdm(enumerate(trainloader_seg), total=len(trainloader_seg)):
             image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
@@ -254,60 +289,75 @@ def omni_train(args, model, snapshot_path):
                          (global_iter_num, seg_iter_num, loss.item()))
 
         
-        for i_batch, sampled_batch in tqdm(enumerate(trainloader_cls), total=len(trainloader_cls)):
-            image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+        # ====== 按数据集分别训练分类任务 ======
+        for dataset_name, info in trainloaders_cls.items():
+            trainloader = info['loader']
+            num_classes = info['num_classes']
             
-            num_classes_batch = sampled_batch['num_classes']
-            image_batch = to_chw(image_batch).to(device=device)
-            label_batch = label_batch.to(device=device)
-            if args.prompt:
-                position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
-                task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
-                type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
-                nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
-                (_, x_cls_2, x_cls_4) = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
-            else:
-                (_, x_cls_2, x_cls_4) = model(image_batch)
-
-            loss = 0.0
+            # 选择对应的损失函数
+            if num_classes == 2:
+                cls_loss_fn = cls_ce_loss_2way
+                output_idx = 1  # x_cls_2
+            else:  # num_classes == 4
+                cls_loss_fn = cls_ce_loss_4way
+                output_idx = 2  # x_cls_4
             
-            mask_2_way = (num_classes_batch == 2)
-            mask_4_way = (num_classes_batch == 4)
+            for i_batch, sampled_batch in tqdm(enumerate(trainloader), total=len(trainloader), 
+                                               desc=f"Training {dataset_name}"):
+                image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+                
+                image_batch = to_chw(image_batch).to(device=device)
+                label_batch = label_batch.to(device=device)
+                
+                # ====== 应用 Mixup/CutMix 数据增强 ======
+                # 每个batch中的样本都是同一数据集，类别数一致，可以安全使用mixup/cutmix
+                image_batch, label_batch_a, label_batch_b, lam, augmentation_type = apply_mixup_cutmix(
+                    image_batch, label_batch, torch.full((image_batch.size(0),), num_classes, device=device), args, device
+                )
+                
+                if args.prompt:
+                    position_prompt = torch.stack(sampled_batch['position_prompt']).permute([1, 0]).float().to(device=device)
+                    task_prompt = torch.stack(sampled_batch['task_prompt']).permute([1, 0]).float().to(device=device)
+                    type_prompt = torch.stack(sampled_batch['type_prompt']).permute([1, 0]).float().to(device=device)
+                    nature_prompt = torch.stack(sampled_batch['nature_prompt']).permute([1, 0]).float().to(device=device)
+                    model_output = model(image_batch, position_prompt, task_prompt, type_prompt, nature_prompt)
+                else:
+                    model_output = model(image_batch)
+                
+                # 获取对应的分类输出
+                x_cls = model_output[output_idx]
 
+                # 计算损失
+                if augmentation_type > 0:  # 使用了Mixup或CutMix
+                    loss_ce = compute_mixup_loss(
+                        x_cls, label_batch_a, label_batch_b, lam, 
+                        cls_loss_fn, num_classes, f"{dataset_name}_classification"
+                    )
+                else:  # 未使用数据增强
+                    loss_ce = cls_loss_fn(x_cls, label_batch[:].long())
 
-            if mask_2_way.any():
-                outputs_2_way = x_cls_2[mask_2_way]
-                labels_2_way = label_batch[mask_2_way]
-                loss_ce_2 = cls_ce_loss_2way(outputs_2_way, labels_2_way[:].long())
-                loss += loss_ce_2
+                optimizer.zero_grad()
+                loss_ce.backward()
+                optimizer.step()
 
+                progress = 1.0 - global_iter_num / max_iterations
+                if progress >= 0.3:
+                    lr_ = base_lr * (progress ** 0.9)
+                else:
+                    lr_ = base_lr * (0.3 ** 0.9)
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = lr_
 
-            if mask_4_way.any():
-                outputs_4_way = x_cls_4[mask_4_way]
-                labels_4_way = label_batch[mask_4_way]
-                loss_ce_4 = cls_ce_loss_4way(outputs_4_way, labels_4_way[:].long())
-                loss += loss_ce_4
+                cls_iter_num = cls_iter_num + 1
+                global_iter_num = global_iter_num + 1
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+                # 记录数据增强相关信息
+                writer.add_scalar(f'info/lr_cls_{dataset_name}', lr_, cls_iter_num)
+                writer.add_scalar(f'info/cls_loss_{dataset_name}', loss_ce, cls_iter_num)
+                log_augmentation_info(writer, cls_iter_num, augmentation_type, lam, f"cls_{dataset_name}")
 
-            progress = 1.0 - global_iter_num / max_iterations
-            if progress >= 0.3:
-                lr_ = base_lr * (progress ** 0.9)
-            else:
-                lr_ = base_lr * (0.3 ** 0.9)  # 保持在30%进度时的学习率
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = lr_
-
-            cls_iter_num = cls_iter_num + 1
-            global_iter_num = global_iter_num + 1
-
-            writer.add_scalar('info/lr_cls', lr_, cls_iter_num)
-            writer.add_scalar('info/cls_loss', loss, cls_iter_num)
-
-            logging.info('global iteration %d and cls iteration %d : loss : %f' %
-                         (global_iter_num, cls_iter_num, loss.item()))
+                logging.info('global iteration %d and %s iteration %d : loss : %f, aug_type: %d, lam: %.3f' %
+                             (global_iter_num, dataset_name, cls_iter_num, loss_ce.item(), augmentation_type, lam))
         
         
         dist.barrier()
