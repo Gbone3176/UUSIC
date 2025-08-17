@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 
 from config_PG import get_config
-from networks.vit_seg_modeling_v4 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
 from datasets.dataset_aug_norm_mc import CenterCropGenerator
 
 # -------- Prompt 相关映射 --------

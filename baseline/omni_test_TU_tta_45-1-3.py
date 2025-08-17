@@ -52,192 +52,200 @@ parser.add_argument('--prompt', action='store_true', help='(deprecated here) usi
 parser.add_argument('--adapter_ft', action='store_true', help='(deprecated here) using adapter for fine-tuning')
 
 # —— TTA 相关 —— #
-parser.add_argument('--use_tta', action='store_true', help='enable test time augmentation')
+parser.add_argument('--use_tta', action='store_true', help='enable test time augmentation (enabled for ALL datasets)')
+parser.add_argument('--ms_scales_thyroid', type=str, default='0.9,1.0,1.1',
+                    help='Multi-scale factors for TTA on private_Thyroid only, comma-separated.')
+parser.add_argument('--ms_scales_default', type=str, default='1.0',
+                    help='Scales for all other datasets (and all classification). Usually "1.0".')
 
 args = parser.parse_args()
 
 
+def _parse_scales(s):
+    try:
+        return [float(x) for x in str(s).split(',') if str(x).strip()]
+    except Exception:
+        return [1.0]
+
+args.ms_scales_thyroid_list = _parse_scales(args.ms_scales_thyroid)
+args.ms_scales_default_list = _parse_scales(args.ms_scales_default)
+
+
 class TTAGenerator:
-    """Test Time Augmentation Generator"""
-    
-    def __init__(self, img_size=224):
+    """Test Time Augmentation Generator (with optional multi-scale)."""
+
+    def __init__(self, img_size=224, scales=(1.0,)):
         self.img_size = img_size
+        self.scales = tuple(scales)
         # ImageNet标准化参数
         self.IMAGENET_DEFAULT_MEAN = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-        self.IMAGENET_DEFAULT_STD = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
-    
+        self.IMAGENET_DEFAULT_STD  = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+
     def apply_geometric_transforms(self, image_np):
         """
-        几何变换组 (4个)
-        输入: numpy array (H, W, C), 值域[0,1]
-        输出: list of numpy arrays
+        几何变换组（4个）：无、水平翻转、垂直翻转、水平+垂直翻转
+        输入: numpy array (H, W, C), [0,1]
         """
         transforms = []
-        
-        # 1. 原图
-        transforms.append(image_np.copy())
-        
-        # 2. 水平翻转
-        transforms.append(np.flip(image_np, axis=1).copy())
-        
-        # 3. 垂直翻转
-        transforms.append(np.flip(image_np, axis=0).copy())
-        
-        # 4. 水平+垂直翻转
+        transforms.append(image_np.copy())                           # 0: none
+        transforms.append(np.flip(image_np, axis=1).copy())          # 1: hflip
+        transforms.append(np.flip(image_np, axis=0).copy())          # 2: vflip
         temp = np.flip(image_np, axis=1)
-        transforms.append(np.flip(temp, axis=0).copy())
-        
+        transforms.append(np.flip(temp, axis=0).copy())              # 3: hvflip
         return transforms
-    
+
     def apply_photometric_transforms(self, image_np):
         """
-        光度变换组 (5个)
-        输入: numpy array (H, W, C), 值域[0,1]
-        输出: list of numpy arrays
+        光度变换组（5个）：无、gamma(0.8)、gamma(1.2)、contrast(0.9)、contrast(1.1)
+        输入: numpy array (H, W, C), [0,1]
         """
         transforms = []
-        
-        # 1. 原图
-        transforms.append(image_np.copy())
-        
-        # 2. Gamma=0.8
-        img_gamma_08 = np.power(image_np, 0.8)
-        transforms.append(np.clip(img_gamma_08, 0, 1))
-        
-        # 3. Gamma=1.2
-        img_gamma_12 = np.power(image_np, 1.2)
-        transforms.append(np.clip(img_gamma_12, 0, 1))
-        
-        # 4. 对比度=0.9
-        img_contrast_09 = image_np * 0.9
-        transforms.append(np.clip(img_contrast_09, 0, 1))
-        
-        # 5. 对比度=1.1
-        img_contrast_11 = image_np * 1.1
-        transforms.append(np.clip(img_contrast_11, 0, 1))
-        
+        transforms.append(image_np.copy())                           # 0: none
+        transforms.append(np.clip(np.power(image_np, 0.8), 0, 1))    # 1
+        transforms.append(np.clip(np.power(image_np, 1.2), 0, 1))    # 2
+        transforms.append(np.clip(image_np * 0.9, 0, 1))             # 3
+        transforms.append(np.clip(image_np * 1.1, 0, 1))             # 4
         return transforms
-    
+
     def normalize_and_convert(self, image_np):
         """
-        标准化并转换为tensor (HWC格式)
+        标准化并转换为tensor (HWC)，内部会做 CHW 标准化再转回 HWC，方便复用你原有 to_chw()
         """
-        # 转换为tensor: HWC -> CHW -> 标准化 -> HWC
         image_tensor = torch.from_numpy(image_np.astype(np.float32)).permute(2, 0, 1)
         image_tensor = (image_tensor - self.IMAGENET_DEFAULT_MEAN) / self.IMAGENET_DEFAULT_STD
         image_tensor = image_tensor.permute(1, 2, 0)  # CHW -> HWC
         return image_tensor
-    
+
+    def _scale_and_fit(self, image_np, scale):
+        """
+        多尺度：先按比例缩放到 new_size，再中心裁剪/反射填充回固定输入尺寸，不改变模型输入大小。
+        """
+        import cv2
+        target = self.img_size
+        new_size = max(1, int(round(target * float(scale))))
+        scaled = cv2.resize(image_np.astype(np.float32), (new_size, new_size), interpolation=cv2.INTER_LINEAR)
+
+        if new_size > target:
+            s = (new_size - target) // 2
+            scaled = scaled[s:s+target, s:s+target, :]
+        elif new_size < target:
+            pad = target - new_size
+            top = pad // 2
+            bottom = pad - top
+            left = pad // 2
+            right = pad - left
+            scaled = np.pad(scaled, ((top, bottom), (left, right), (0, 0)), mode='reflect')
+
+        if scaled.shape[0] != target or scaled.shape[1] != target:
+            scaled = cv2.resize(scaled, (target, target), interpolation=cv2.INTER_LINEAR)
+
+        return np.clip(scaled, 0, 1).astype(np.float32)
+
     def generate_tta_samples(self, sample):
         """
-        生成所有TTA样本 - 根据nature决定变换策略
-        - tumor: 4个几何变换 × 5个光度变换 = 20个变换
-        - 非tumor: 只用5个光度变换
-        返回: list of augmented samples
+        生成 TTA 样本：
+        - 所有数据集：几何×光度
+        - 多尺度：由 self.scales 控制（Thyroid 多尺度；其他数据集通常为 [1.0]）
         """
-        image = sample['image']  # 应该是 (H, W, C) tensor, 已标准化
-        nature = sample.get('nature_for_aug', 'unknown')  # 获取nature信息
-        
-        # 先逆标准化回到[0,1]范围的numpy array
+        image = sample['image']  # HWC tensor 或 numpy
+        nature = sample.get('nature_for_aug', 'unknown')
+
+        # 逆标准化回 [0,1] numpy
         if isinstance(image, torch.Tensor):
-            # HWC -> CHW
             image_chw = image.permute(2, 0, 1)
-            # 逆标准化
             image_chw = image_chw * self.IMAGENET_DEFAULT_STD + self.IMAGENET_DEFAULT_MEAN
-            # CHW -> HWC, 转为numpy
-            image_np = image_chw.permute(1, 2, 0).numpy()
+            image_np = image_chw.permute(1, 2, 0).cpu().numpy()
         else:
             image_np = image
-        
-        # 确保值域在[0,1]
-        image_np = np.clip(image_np, 0, 1)
-        
+        image_np = np.clip(image_np, 0, 1).astype(np.float32)
+
         tta_samples = []
-        
-        if nature == "tumor":
-            # tumor: 使用几何变换 × 光度变换的完全组合
-            geo_transforms = self.apply_geometric_transforms(image_np)  # 4个
-            photo_transforms = self.apply_photometric_transforms(image_np)  # 5个
-            
-            # 完全组合：每个几何变换 × 每个光度变换
-            for geo_idx, geo_img in enumerate(geo_transforms):
-                for photo_idx, photo_params in enumerate(photo_transforms):
-                    # 应用光度变换到几何变换后的图像
-                    if photo_idx == 0:
-                        # 原始光度（不变换）
-                        final_img = geo_img.copy()
-                    elif photo_idx == 1:
-                        # Gamma=0.8
-                        final_img = np.clip(np.power(geo_img, 0.8), 0, 1)
-                    elif photo_idx == 2:
-                        # Gamma=1.2
-                        final_img = np.clip(np.power(geo_img, 1.2), 0, 1)
-                    elif photo_idx == 3:
-                        # 对比度=0.9
-                        final_img = np.clip(geo_img * 0.9, 0, 1)
-                    elif photo_idx == 4:
-                        # 对比度=1.1
-                        final_img = np.clip(geo_img * 1.1, 0, 1)
-                    
-                    # 创建TTA样本
+        for s in self.scales:
+            base_np = self._scale_and_fit(image_np, s)
+
+            if nature == "tumor":
+                # tumor: 4 geo × 5 photo
+                geo_transforms = self.apply_geometric_transforms(base_np)
+                for geo_idx, geo_img in enumerate(geo_transforms):
+                    for pid in range(5):
+                        if pid == 0:
+                            final_img = geo_img.copy()
+                        elif pid == 1:
+                            final_img = np.clip(np.power(geo_img, 0.8), 0, 1)
+                        elif pid == 2:
+                            final_img = np.clip(np.power(geo_img, 1.2), 0, 1)
+                        elif pid == 3:
+                            final_img = np.clip(geo_img * 0.9, 0, 1)
+                        else:
+                            final_img = np.clip(geo_img * 1.1, 0, 1)
+                        tta_sample = sample.copy()
+                        tta_sample['image'] = self.normalize_and_convert(final_img)
+                        tta_sample['geo_idx'] = geo_idx
+                        tta_samples.append(tta_sample)
+            else:
+                # 非 tumor: 仅 5 个光度（无需记录翻转）
+                photo_transforms = self.apply_photometric_transforms(base_np)
+                for photo_img in photo_transforms:
                     tta_sample = sample.copy()
-                    tta_sample['image'] = self.normalize_and_convert(final_img)
-                    tta_sample['geo_idx'] = geo_idx  # 记录几何变换索引，用于逆变换
+                    tta_sample['image'] = self.normalize_and_convert(photo_img)
+                    tta_sample['geo_idx'] = 0
                     tta_samples.append(tta_sample)
-        else:
-            # 非tumor: 只使用光度变换（几何变换索引都是0，即原图）
-            photo_transforms = self.apply_photometric_transforms(image_np)  # 5个
-            
-            for photo_idx, photo_img in enumerate(photo_transforms):
-                tta_sample = sample.copy()
-                tta_sample['image'] = self.normalize_and_convert(photo_img)
-                tta_sample['geo_idx'] = 0  # 非tumor只用原图几何形状
-                tta_samples.append(tta_sample)
-        
+
         return tta_samples
-    
+
+    # ==== 融合函数（保持 logits 空间融合 + 仅逆翻转）====
     def merge_predictions_seg(self, predictions_list, geo_indices):
         """
-        合并分割预测结果 (对概率图求平均)
-        predictions_list: list of tensors, each shape (C, H, W)
-        geo_indices: list of geometric transform indices for inverse transformation
+        合并分割预测结果（logits 空间）：
+        1) 按 geo_indices 做几何逆变换（仅翻转）到原图坐标；
+        2) 对每个视图的 logits 求平均；
+        3) 外部再 softmax/argmax。
         """
         if len(predictions_list) == 0:
             return None
-        
-        # 根据几何变换索引进行逆变换
+        corrected_logits = []
+        for logit, geo_idx in zip(predictions_list, geo_indices):
+            if geo_idx == 0:
+                corrected_logits.append(logit)
+            elif geo_idx == 1:  # 逆水平翻转
+                corrected_logits.append(torch.flip(logit, dims=[2]))
+            elif geo_idx == 2:  # 逆垂直翻转
+                corrected_logits.append(torch.flip(logit, dims=[1]))
+            elif geo_idx == 3:  # 逆水平+垂直翻转
+                tmp = torch.flip(logit, dims=[2])
+                corrected_logits.append(torch.flip(tmp, dims=[1]))
+            else:
+                corrected_logits.append(logit)
+        merged_logit = torch.stack(corrected_logits, dim=0).mean(dim=0)  # (C, H, W)
+        return merged_logit
+
+    def merge_predictions_seg_Probability(self, predictions_list, geo_indices):
+        """
+        合并分割预测（概率图求平均）
+        """
+        if len(predictions_list) == 0:
+            return None
         corrected_preds = []
-        
         for pred, geo_idx in zip(predictions_list, geo_indices):
             if geo_idx == 0:
-                # 原图 - 不变
                 corrected_preds.append(pred)
             elif geo_idx == 1:
-                # 水平翻转 - 逆水平翻转
                 corrected_preds.append(torch.flip(pred, dims=[2]))
             elif geo_idx == 2:
-                # 垂直翻转 - 逆垂直翻转
                 corrected_preds.append(torch.flip(pred, dims=[1]))
             elif geo_idx == 3:
-                # 水平+垂直翻转 - 逆水平+垂直翻转
-                temp = torch.flip(pred, dims=[2])  # 逆水平翻转
-                corrected_preds.append(torch.flip(temp, dims=[1]))  # 逆垂直翻转
-        
-        # 求平均
+                temp = torch.flip(pred, dims=[2])
+                corrected_preds.append(torch.flip(temp, dims=[1]))
         merged_pred = torch.stack(corrected_preds, dim=0).mean(dim=0)
         return merged_pred
-    
+
     def merge_predictions_cls(self, predictions_list):
         """
-        合并分类预测结果 (对logits求平均)
-        predictions_list: list of tensors, each shape (num_classes,)
+        合并分类预测结果 (logits 均值)
         """
         if len(predictions_list) == 0:
             return None
-        
-        # 直接对所有logits求平均 (分类任务不需要逆变换)
-        merged_pred = torch.stack(predictions_list, dim=0).mean(dim=0)
-        return merged_pred
+        return torch.stack(predictions_list, dim=0).mean(dim=0)
 
 
 def is_main_process():
@@ -257,7 +265,7 @@ def setup_ddp():
     return local_rank, device
 
 
-def omni_seg_test_TU_with_tta(image, label, merged_prediction, classes, ClassStartIndex=1, 
+def omni_seg_test_TU_with_tta(image, label, merged_prediction, classes, ClassStartIndex=1,
                               test_save_path=None, case=None, dataset_name=None):
     """
     使用预计算的TTA预测结果进行分割评估
@@ -265,25 +273,25 @@ def omni_seg_test_TU_with_tta(image, label, merged_prediction, classes, ClassSta
     """
     label = label.cpu().detach().numpy()
     image_save = image.cpu().detach().numpy()
-    
+
     # 使用预计算的合并预测
-    seg_out = merged_prediction.unsqueeze(0)  # 添加batch维度 (1, C, H, W)
+    seg_out = merged_prediction.unsqueeze(0)  # (1, C, H, W)
     out_label_back_transform = torch.cat(
         [seg_out[:, 0:1], seg_out[:, ClassStartIndex:ClassStartIndex+classes-1]], axis=1)
     out = torch.argmax(torch.softmax(out_label_back_transform, dim=1), dim=1)
     prediction = out.cpu().detach().numpy()
-    
+
     metric_list = []
     for i in range(1, classes):
         metric_list.append(calculate_metric_percase(prediction == i, label == i))
-    
+
     if test_save_path is not None:
         image = (image_save - np.min(image_save)) / (np.max(image_save) - np.min(image_save))
         os.makedirs(test_save_path + '/' + dataset_name, exist_ok=True)
         cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_pred.png", (prediction.transpose(1, 2, 0)*255).astype(np.uint8))
         cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_img.png", ((image.squeeze(0))*255).astype(np.uint8))
         cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_gt.png", (label.transpose(1, 2, 0)*255).astype(np.uint8))
-    
+
     return metric_list
 
 
@@ -304,9 +312,6 @@ def inference(args, model, device, test_save_path=None):
                 csv.writer(f).writerow(['dataset', 'task', 'metric', 'time'])
     else:
         result_csv = None
-
-    # 初始化TTA生成器
-    tta_generator = TTAGenerator(img_size=args.img_size) if args.use_tta else None
 
     seg_test_set = [
         "private_Thyroid",
@@ -343,6 +348,14 @@ def inference(args, model, device, test_save_path=None):
         if is_main_process():
             logging.info("%s: %d samples", dataset_name, len(ds))
 
+        # —— 为当前数据集选择尺度（Thyroid 多尺度，其余 1.0）——
+        if args.use_tta:
+            cur_scales = args.ms_scales_thyroid_list if dataset_name == "private_Thyroid" \
+                         else args.ms_scales_default_list
+            tta_generator_cur = TTAGenerator(img_size=args.img_size, scales=cur_scales)
+        else:
+            tta_generator_cur = None
+
         model.eval()
         metric_list = 0.0
         count_matrix = np.ones((len(ds), num_classes - 1))
@@ -352,53 +365,51 @@ def inference(args, model, device, test_save_path=None):
         for i_batch, sampled_batch in iterator:
             image, label, case_name = sampled_batch["image"], sampled_batch["label"], sampled_batch['case_name']
             case_name = case_name[0] if isinstance(case_name, (list, tuple)) else str(case_name)
-            
+
             if args.use_tta:
-                # TTA模式
-                # 注意：batch_size应该为1使用TTA
+                # 注意：batch_size=1
                 if image.size(0) != 1:
                     raise ValueError("TTA mode requires batch_size=1")
-                
+
                 # 准备单个sample
                 single_sample = {
-                    'image': image[0],  # 移除batch维度
+                    'image': image[0],
                     'label': label[0] if label is not None else None,
-                    'nature_for_aug': sampled_batch.get('nature_for_aug', ['unknown'])[0]  # 获取nature信息
+                    'nature_for_aug': sampled_batch.get('nature_for_aug', ['unknown'])[0]
                 }
                 if args.prompt:
                     single_sample['position_prompt'] = sampled_batch['position_prompt']
-                    single_sample['type_prompt'] = sampled_batch['type_prompt']
-                    single_sample['nature_prompt'] = sampled_batch['nature_prompt']
+                    single_sample['type_prompt']     = sampled_batch['type_prompt']
+                    single_sample['nature_prompt']   = sampled_batch['nature_prompt']
 
-                # 生成TTA样本
-                tta_samples = tta_generator.generate_tta_samples(single_sample)
-                
-                # 对每个TTA样本进行预测
+                # 生成 TTA 样本（Thyroid 会是多尺度，其余为单尺度）
+                tta_samples = tta_generator_cur.generate_tta_samples(single_sample)
+
+                # 逐个前向
                 tta_predictions = []
                 geo_indices = []
                 for tta_sample in tta_samples:
                     tta_image = to_chw(tta_sample['image'].unsqueeze(0)).to(device, non_blocking=True)
                     geo_indices.append(tta_sample['geo_idx'])
-                    
+
                     if args.prompt:
                         position_prompt = torch.tensor(np.array(tta_sample['position_prompt'])).permute([1, 0]).float()
-                        task_prompt = torch.tensor(np.array([[1], [0]])).permute([1, 0]).float()
-                        type_prompt = torch.tensor(np.array(tta_sample['type_prompt'])).permute([1, 0]).float()
-                        nature_prompt = torch.tensor(np.array(tta_sample['nature_prompt'])).permute([1, 0]).float()
-                        
+                        task_prompt     = torch.tensor(np.array([[1], [0]])).permute([1, 0]).float()
+                        type_prompt     = torch.tensor(np.array(tta_sample['type_prompt'])).permute([1, 0]).float()
+                        nature_prompt   = torch.tensor(np.array(tta_sample['nature_prompt'])).permute([1, 0]).float()
+
                         outputs = model(tta_image, position_prompt.cuda(), task_prompt.cuda(),
-                                       type_prompt.cuda(), nature_prompt.cuda())
+                                        type_prompt.cuda(), nature_prompt.cuda())
                     else:
                         outputs = model(tta_image)
-                    
-                    # 获取分割预测 (假设outputs[0]是分割结果)
-                    seg_pred = F.softmax(outputs[0], dim=1)  # (1, C, H, W)
-                    tta_predictions.append(seg_pred[0])  # 移除batch维度: (C, H, W)
-                
-                # 合并TTA预测
-                merged_pred = tta_generator.merge_predictions_seg(tta_predictions, geo_indices)
-                
-                # 使用TTA预测结果进行评估
+
+                    seg_logit = outputs[0]               # (1, C, H, W), logits
+                    tta_predictions.append(seg_logit[0]) # (C, H, W)
+
+                # 融合
+                merged_pred = tta_generator_cur.merge_predictions_seg(tta_predictions, geo_indices)
+
+                # 评估
                 metric_i = omni_seg_test_TU_with_tta(
                     image.to(device), label, merged_pred,
                     classes=num_classes,
@@ -406,15 +417,15 @@ def inference(args, model, device, test_save_path=None):
                     case=case_name,
                     dataset_name=dataset_name
                 )
-                
+
             else:
                 # 原始模式
                 image = to_chw(image).to(device, non_blocking=True)
                 if args.prompt:
                     position_prompt = torch.tensor(np.array(sampled_batch['position_prompt'])).permute([1, 0]).float()
-                    task_prompt = torch.tensor(np.array([[1], [0]])).permute([1, 0]).float()
-                    type_prompt = torch.tensor(np.array(sampled_batch['type_prompt'])).permute([1, 0]).float()
-                    nature_prompt = torch.tensor(np.array(sampled_batch['nature_prompt'])).permute([1, 0]).float()
+                    task_prompt     = torch.tensor(np.array([[1], [0]])).permute([1, 0]).float()
+                    type_prompt     = torch.tensor(np.array(sampled_batch['type_prompt'])).permute([1, 0]).float()
+                    nature_prompt   = torch.tensor(np.array(sampled_batch['nature_prompt'])).permute([1, 0]).float()
                     metric_i = omni_seg_test_TU(image, label, model,
                                              classes=num_classes,
                                              test_save_path=test_save_path,
@@ -431,7 +442,7 @@ def inference(args, model, device, test_save_path=None):
                                              classes=num_classes,
                                              test_save_path=test_save_path,
                                              case=case_name, dataset_name=dataset_name)
-            
+
             zero_label_flag = False
             for i in range(1, num_classes):
                 if not metric_i[i - 1][1]:
@@ -485,6 +496,12 @@ def inference(args, model, device, test_save_path=None):
         if is_main_process():
             logging.info("%s: %d samples", dataset_name, len(ds))
 
+        # 分类：也启用 TTA，但全部使用 default 尺度（通常 1.0）
+        if args.use_tta:
+            tta_generator_cur = TTAGenerator(img_size=args.img_size, scales=args.ms_scales_default_list)
+        else:
+            tta_generator_cur = None
+
         model.eval()
         label_list = []
         prediction_list = []
@@ -493,61 +510,57 @@ def inference(args, model, device, test_save_path=None):
         for i_batch, sampled_batch in iterator:
             image, label, case_name = sampled_batch["image"], sampled_batch["label"], sampled_batch['case_name']
             case_name = case_name[0] if isinstance(case_name, (list, tuple)) else str(case_name)
-            
+
             if args.use_tta:
-                # TTA模式
                 if image.size(0) != 1:
                     raise ValueError("TTA mode requires batch_size=1")
-                
-                # 准备单个sample
+
                 single_sample = {
                     'image': image[0],
                     'label': label[0] if label is not None else None,
-                    'nature_for_aug': sampled_batch.get('nature_for_aug', ['unknown'])[0]  # 获取nature信息
+                    'nature_for_aug': sampled_batch.get('nature_for_aug', ['unknown'])[0]
                 }
                 if args.prompt:
                     single_sample['position_prompt'] = sampled_batch['position_prompt']
-                    single_sample['type_prompt'] = sampled_batch['type_prompt']
-                    single_sample['nature_prompt'] = sampled_batch['nature_prompt']
-                
-                # 生成TTA样本
-                tta_samples = tta_generator.generate_tta_samples(single_sample)
-                
-                # 对每个TTA样本进行预测
+                    single_sample['type_prompt']     = sampled_batch['type_prompt']
+                    single_sample['nature_prompt']   = sampled_batch['nature_prompt']
+
+                tta_samples = tta_generator_cur.generate_tta_samples(single_sample)
+
                 tta_logits = []
                 for tta_sample in tta_samples:
                     tta_image = to_chw(tta_sample['image'].unsqueeze(0)).to(device, non_blocking=True)
-                    
+
                     if args.prompt:
                         position_prompt = torch.tensor(np.array(tta_sample['position_prompt'])).permute([1, 0]).float()
-                        task_prompt = torch.tensor(np.array([[0], [1]])).permute([1, 0]).float()
-                        type_prompt = torch.tensor(np.array(tta_sample['type_prompt'])).permute([1, 0]).float()
-                        nature_prompt = torch.tensor(np.array(tta_sample['nature_prompt'])).permute([1, 0]).float()
-                        
+                        task_prompt     = torch.tensor(np.array([[0], [1]])).permute([1, 0]).float()
+                        type_prompt     = torch.tensor(np.array(tta_sample['type_prompt'])).permute([1, 0]).float()
+                        nature_prompt   = torch.tensor(np.array(tta_sample['nature_prompt'])).permute([1, 0]).float()
+
                         outputs = model(tta_image, position_prompt.cuda(), task_prompt.cuda(),
-                                       type_prompt.cuda(), nature_prompt.cuda())
+                                        type_prompt.cuda(), nature_prompt.cuda())
                     else:
                         outputs = model(tta_image)
-                    
+
                     # 获取分类logits
                     logits = outputs[2] if num_classes == 4 else outputs[1]
-                    tta_logits.append(logits[0])  # 移除batch维度
-                
-                # 合并TTA预测
-                merged_logits = tta_generator.merge_predictions_cls(tta_logits)
+                    tta_logits.append(logits[0])  # (C,)
+
+                # 合并 TTA 预测
+                merged_logits = tta_generator_cur.merge_predictions_cls(tta_logits)
                 preds = torch.argmax(torch.softmax(merged_logits.unsqueeze(0), dim=1), dim=1)
-                
+
             else:
                 # 原始模式
                 image = to_chw(image).to(device, non_blocking=True)
-                
+
                 if args.prompt:
                     position_prompt = torch.tensor(np.array(sampled_batch['position_prompt'])).permute([1, 0]).float()
-                    task_prompt = torch.tensor(np.array([[0], [1]])).permute([1, 0]).float()
-                    type_prompt = torch.tensor(np.array(sampled_batch['type_prompt'])).permute([1, 0]).float()
-                    nature_prompt = torch.tensor(np.array(sampled_batch['nature_prompt'])).permute([1, 0]).float()
+                    task_prompt     = torch.tensor(np.array([[0], [1]])).permute([1, 0]).float()
+                    type_prompt     = torch.tensor(np.array(sampled_batch['type_prompt'])).permute([1, 0]).float()
+                    nature_prompt   = torch.tensor(np.array(sampled_batch['nature_prompt'])).permute([1, 0]).float()
                     outputs = model(image, position_prompt.cuda(), task_prompt.cuda(),
-                                   type_prompt.cuda(), nature_prompt.cuda())
+                                    type_prompt.cuda(), nature_prompt.cuda())
                 else:
                     outputs = model(image)
 
@@ -705,7 +718,9 @@ if __name__ == "__main__":
         logging.info(str(args))
         logging.info(os.path.basename(args.resume))
         if args.use_tta:
-            logging.info("TTA enabled: tumor (4 geo × 5 photo = 20), non-tumor (5 photo only)")
+            logging.info("TTA enabled for ALL datasets. Multi-scale ONLY for private_Thyroid.")
+            logging.info("Scales: Thyroid=%s ; Others(Class&Seg)=%s",
+                         args.ms_scales_thyroid, args.ms_scales_default)
 
     # ===== 保存输出目录 =====
     if args.is_saveout:

@@ -25,7 +25,7 @@ from utils import omni_seg_test_TU
 from sklearn.metrics import accuracy_score, recall_score
 
 # === 使用 TransUNet ===
-from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v2 import VisionTransformer, CONFIGS as VIT_CONFIGS
 
 
 parser = argparse.ArgumentParser()
@@ -87,7 +87,7 @@ def inference(args, model, device, test_save_path=None):
                 csv.writer(f).writerow(['dataset', 'task', 'metric', 'time'])
     else:
         result_csv = None
-
+    print(test_save_path)
     seg_test_set = [
         "private_Thyroid",
         "private_Kidney",

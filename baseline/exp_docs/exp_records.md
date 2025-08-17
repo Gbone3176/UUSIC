@@ -1124,3 +1124,61 @@ trail_debug_14:再13的基础上，单独训练分割100个epoch
 - trail_debug_42-1：TransUnet + prompt + weighted ce_loss_4
     - 继续分割
     /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_42/best_model_119_0.7943.pth
+
+
+
+- trail_debug_44：TransUnet + prompt + weighted_ce_loss_4
+    - networks.vit_seg_modeling_v4: 将整个分类头直接放在resnet后面
+    - 神他妈只训了分割!
+
+
+- trail_debug_44-1：TransUnet + prompt + weighted_ce_loss_4
+    - 只训early_classifier(use the feature from the ResNet),其他全部冻结
+    
+    torchrun \
+    --nproc_per_node=1 \
+    --master_port=23451 \
+    omni_train_TU_v4.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-4 \
+    --max_epochs 800 \
+    --gpu 0 \
+    --seed 1206 \
+    --output_dir exp_out/trail_debug_44-1 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44/best_model_129_0.5491.pth
+
+- trail_debug_44-2：TransUnet + prompt + weighted_ce_loss_4
+    - 只训classifier_head(use the features from the decoder),其他全部冻结
+
+    torchrun \
+    --nproc_per_node=1 \
+    --master_port=2345 \
+    omni_train_TU_v4.py \
+    --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+    --img_size 224 \
+    --batch_size 128 \
+    --base_lr 1e-4 \
+    --max_epochs 800 \
+    --gpu 0 \
+    --seed 1206 \
+    --output_dir exp_out/trail_debug_44-2 \
+    --prompt \
+    --pretrain_ckpt /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44/best_model_129_0.5491.pth
+
+    trail_debug_44-2-2：TransUnet + prompt + weighted_ce_loss_4
+    --base_lr 1e-5 \
+
+    trail_debug_44-2-3：TransUnet + prompt + weighted_ce_loss_4
+    --base_lr 1e-3 \
+
+- trail_debug_45:修改tta,看能不能继续提高分数
+
+    - trail_debug_45-1:对logit做平均,之后在转成概率图
+        - trail_debug_45-1-1:取消tumor的限制
+        - trail_debug_45-1-2:增加 8 向几何,多尺度,熵加权,Test-time Dropout,后处理
+        - trail_debug_45-1-3:回退到45-1,调高对比度
+
+    

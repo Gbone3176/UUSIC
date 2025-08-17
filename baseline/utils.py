@@ -232,6 +232,7 @@ def omni_seg_test_TU(image, label, net, classes, ClassStartIndex=1, test_save_pa
         metric_list.append(calculate_metric_percase(prediction == i, label == i))
 
     if test_save_path is not None:
+        os.makedirs(test_save_path + '/'+ dataset_name, exist_ok=True)
         image = (image_save - np.min(image_save)) / (np.max(image_save) - np.min(image_save))
         cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_pred.png", (prediction.transpose(1, 2, 0)*255).astype(np.uint8))
         cv2.imwrite(test_save_path + '/'+ dataset_name + '/'+case + "_img.png", ((image.squeeze(0).transpose(1, 2, 0))*255).astype(np.uint8))

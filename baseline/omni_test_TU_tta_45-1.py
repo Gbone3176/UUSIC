@@ -198,6 +198,35 @@ class TTAGenerator:
     
     def merge_predictions_seg(self, predictions_list, geo_indices):
         """
+        合并分割预测结果（在 logits 空间合并）：
+        1) 先按 geo_indices 做几何逆变换（flip 等）到原图坐标；
+        2) 对每个视图的 logits 求平均；
+        3) 在外部再做一次 softmax/argmax 得到最终掩码。
+        predictions_list: list[Tensor], 每个是 (C, H, W) 的 **logits**
+        geo_indices: 与 predictions_list 对齐的几何变换索引
+        """
+        if len(predictions_list) == 0:
+            return None
+
+        corrected_logits = []
+        for logit, geo_idx in zip(predictions_list, geo_indices):
+            if geo_idx == 0:
+                corrected_logits.append(logit)
+            elif geo_idx == 1:  # 逆水平翻转
+                corrected_logits.append(torch.flip(logit, dims=[2]))
+            elif geo_idx == 2:  # 逆垂直翻转
+                corrected_logits.append(torch.flip(logit, dims=[1]))
+            elif geo_idx == 3:  # 逆水平+垂直翻转
+                tmp = torch.flip(logit, dims=[2])
+                corrected_logits.append(torch.flip(tmp, dims=[1]))
+            else:
+                corrected_logits.append(logit)  # 兜底
+
+        merged_logit = torch.stack(corrected_logits, dim=0).mean(dim=0)  # (C, H, W)
+        return merged_logit
+
+    def merge_predictions_seg_Probability(self, predictions_list, geo_indices):
+        """
         合并分割预测结果 (对概率图求平均)
         predictions_list: list of tensors, each shape (C, H, W)
         geo_indices: list of geometric transform indices for inverse transformation
@@ -392,8 +421,10 @@ def inference(args, model, device, test_save_path=None):
                         outputs = model(tta_image)
                     
                     # 获取分割预测 (假设outputs[0]是分割结果)
-                    seg_pred = F.softmax(outputs[0], dim=1)  # (1, C, H, W)
-                    tta_predictions.append(seg_pred[0])  # 移除batch维度: (C, H, W)
+                    # seg_pred = F.softmax(outputs[0], dim=1)  # (1, C, H, W)
+                    # tta_predictions.append(seg_pred[0])  # 移除batch维度: (C, H, W)
+                    seg_logit = outputs[0]               # (1, C, H, W), logits
+                    tta_predictions.append(seg_logit[0]) # (C, H, W)
                 
                 # 合并TTA预测
                 merged_pred = tta_generator.merge_predictions_seg(tta_predictions, geo_indices)
