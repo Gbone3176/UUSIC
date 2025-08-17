@@ -1,4 +1,0 @@
-Dataset: private_Liver
-Num classes: 2
-Label: 0
-Image shape: torch.Size([224, 224, 3])
