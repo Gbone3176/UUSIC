@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 
 from config_PG import get_config
-from networks.vit_seg_modeling_v3 import VisionTransformer, CONFIGS as VIT_CONFIGS
+from networks.vit_seg_modeling_v4 import VisionTransformer, CONFIGS as VIT_CONFIGS
 from datasets.dataset_aug_norm_mc import CenterCropGenerator
 
 # -------- Prompt 相关映射 --------
@@ -207,10 +207,10 @@ class TTAGenerator:
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument('--input_dir', required=True)
-    p.add_argument('--data_list', required=True)
-    p.add_argument('--output_dir', required=True)
-    p.add_argument('--checkpoint', required=True, help='model ckpt (.pth)')
+    p.add_argument('--data_list', required=False, help='data list json file')
+    p.add_argument('--input_dir', required=False, help='input image directory')
+    p.add_argument('--output_dir', required=False, help='output directory for results')
+    p.add_argument('--checkpoint', required=False, help='model ckpt (.pth)')
     p.add_argument('--img_size', type=int, default=224)
     p.add_argument('--use_prompts', action='store_true', default=True)
     p.add_argument('--device', type=str, default='cuda')
@@ -235,7 +235,7 @@ def load_checkpoint(model, ckpt_path, device):
 
     try:
         m,u = try_load(strip_module(state))
-        print(f'Checkpoint loaded (missing {len(m)}, unexpected {len(u)})')
+        print(f'Checkpoint loaded from {ckpt_path}, (missing {len(m)}, unexpected {len(u)})')
     except Exception as e:
         print(f'Load attempt failed: {e}')
         
@@ -322,10 +322,9 @@ class InferenceModel:
                         seg_logits = outputs.get('seg_logits')
                     else:
                         seg_logits = outputs[0]
-                    
-                    # 获取概率图
-                    seg_probs = torch.softmax(seg_logits, dim=1)  # (1, C, H, W)
-                    tta_predictions.append(seg_probs[0])  # 移除batch维度: (C, H, W)
+
+                    # seg_probs = torch.softmax(seg_logits, dim=1)  # (1, C, H, W)
+                    tta_predictions.append(seg_logits[0])  # 移除batch维度: (C, H, W)
             
             # 合并TTA预测
             merged_probs = self.tta_generator.merge_predictions_seg(tta_predictions, geo_indices)
@@ -445,6 +444,16 @@ class InferenceModel:
 
 def main():
     args = parse_args()
+    args.input_dir = "./data/Val"
+    args.data_list = "./data/private_val_for_participants.json"
+    args.output_dir = "./sample_result_submission_44-2-3_367_0.8287"
+    args.checkpoint = "/cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44-2-3/best_model_367_0.8287.pth"  # 请替换为实际的模型路径
+    args.use_prompts = True
+    args.use_tta = True  # 启用TTA
+
+    if not args.checkpoint:
+        raise ValueError("Checkpoint path is required. Use --checkpoint to specify the model checkpoint.")
+
     with open(args.data_list, 'r') as f:
         data_list = json.load(f)
     model = InferenceModel(args)

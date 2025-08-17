@@ -1,0 +1,5538 @@
+{
+  "classification/Appendix/imgs/cls_00000.jpg": {
+    "probability": [
+      0.9435519576072693,
+      0.056448034942150116
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00001.jpg": {
+    "probability": [
+      5.242720817477675e-06,
+      0.9999947547912598
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00002.jpg": {
+    "probability": [
+      0.999981164932251,
+      1.8814189388649538e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00003.jpg": {
+    "probability": [
+      0.9708474278450012,
+      0.029152633622288704
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00004.jpg": {
+    "probability": [
+      0.9999996423721313,
+      3.155554111344827e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00005.jpg": {
+    "probability": [
+      0.9997528195381165,
+      0.000247147778281942
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00006.jpg": {
+    "probability": [
+      0.9994730353355408,
+      0.0005269527900964022
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00007.jpg": {
+    "probability": [
+      0.0005586351035162807,
+      0.9994413256645203
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00008.jpg": {
+    "probability": [
+      0.010539812035858631,
+      0.9894602298736572
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00009.jpg": {
+    "probability": [
+      0.015749869868159294,
+      0.9842500686645508
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00010.jpg": {
+    "probability": [
+      0.9995369911193848,
+      0.00046299706446006894
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00011.jpg": {
+    "probability": [
+      2.5427892680340847e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00012.jpg": {
+    "probability": [
+      9.427128588868072e-07,
+      0.9999990463256836
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00013.jpg": {
+    "probability": [
+      3.937229919870333e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00014.jpg": {
+    "probability": [
+      3.3309129321423825e-06,
+      0.9999966621398926
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00015.jpg": {
+    "probability": [
+      0.9999933242797852,
+      6.675492841168307e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00016.jpg": {
+    "probability": [
+      0.9997244477272034,
+      0.00027547916397452354
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00017.jpg": {
+    "probability": [
+      0.9999750852584839,
+      2.492379462637473e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00018.jpg": {
+    "probability": [
+      0.9999778270721436,
+      2.2169600924826227e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00019.jpg": {
+    "probability": [
+      1.0,
+      3.276297277921003e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00020.jpg": {
+    "probability": [
+      0.5670894980430603,
+      0.4329105317592621
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00021.jpg": {
+    "probability": [
+      0.9997681975364685,
+      0.00023180441348813474
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00022.jpg": {
+    "probability": [
+      1.4926541114235192e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00023.jpg": {
+    "probability": [
+      6.239534400265256e-08,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00024.jpg": {
+    "probability": [
+      0.16693508625030518,
+      0.8330649137496948
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00025.jpg": {
+    "probability": [
+      0.0005508111207745969,
+      0.9994491934776306
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00026.jpg": {
+    "probability": [
+      3.369690239196643e-05,
+      0.9999662637710571
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00027.jpg": {
+    "probability": [
+      0.8191713094711304,
+      0.18082867562770844
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00028.jpg": {
+    "probability": [
+      4.0450398955726996e-05,
+      0.9999595880508423
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00029.jpg": {
+    "probability": [
+      0.0006237749475985765,
+      0.9993762373924255
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00030.jpg": {
+    "probability": [
+      0.857500433921814,
+      0.14249958097934723
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00031.jpg": {
+    "probability": [
+      0.9800936579704285,
+      0.019906284287571907
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00032.jpg": {
+    "probability": [
+      0.9974103569984436,
+      0.002589673502370715
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00033.jpg": {
+    "probability": [
+      0.9952486157417297,
+      0.004751446656882763
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00034.jpg": {
+    "probability": [
+      0.8235852718353271,
+      0.17641477286815643
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00035.jpg": {
+    "probability": [
+      0.9997000694274902,
+      0.000299973355140537
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00036.jpg": {
+    "probability": [
+      1.4871707776364929e-07,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00037.jpg": {
+    "probability": [
+      1.7051770555553958e-05,
+      0.9999829530715942
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00038.jpg": {
+    "probability": [
+      4.573195383272832e-06,
+      0.9999954700469971
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00039.jpg": {
+    "probability": [
+      0.9999302625656128,
+      6.972520350245759e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00040.jpg": {
+    "probability": [
+      0.9998291730880737,
+      0.0001708538766251877
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00041.jpg": {
+    "probability": [
+      0.0005573270609602332,
+      0.9994426369667053
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00042.jpg": {
+    "probability": [
+      4.774801709572785e-06,
+      0.999995231628418
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00043.jpg": {
+    "probability": [
+      0.0004180378164164722,
+      0.9995819926261902
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00044.jpg": {
+    "probability": [
+      6.408307058336504e-07,
+      0.9999994039535522
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00045.jpg": {
+    "probability": [
+      6.449802754104894e-07,
+      0.9999994039535522
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00046.jpg": {
+    "probability": [
+      3.508644397243188e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00047.jpg": {
+    "probability": [
+      0.002233499428257346,
+      0.9977664947509766
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00048.jpg": {
+    "probability": [
+      0.521304190158844,
+      0.4786957800388336
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00049.jpg": {
+    "probability": [
+      7.435408770106733e-05,
+      0.9999256134033203
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00050.jpg": {
+    "probability": [
+      0.8239842057228088,
+      0.17601585388183594
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00051.jpg": {
+    "probability": [
+      0.1794351041316986,
+      0.8205649256706238
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00052.jpg": {
+    "probability": [
+      5.217479781549628e-10,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00053.jpg": {
+    "probability": [
+      6.870446572770916e-11,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00054.jpg": {
+    "probability": [
+      0.13782089948654175,
+      0.8621791005134583
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00055.jpg": {
+    "probability": [
+      0.9998849630355835,
+      0.00011498303501866758
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00056.jpg": {
+    "probability": [
+      0.9628248810768127,
+      0.03717506304383278
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00057.jpg": {
+    "probability": [
+      0.962300717830658,
+      0.037699297070503235
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00058.jpg": {
+    "probability": [
+      0.000125790829770267,
+      0.9998742341995239
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00059.jpg": {
+    "probability": [
+      0.004744528792798519,
+      0.9952554106712341
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00060.jpg": {
+    "probability": [
+      0.024336563423275948,
+      0.975663423538208
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00061.jpg": {
+    "probability": [
+      0.002331353025510907,
+      0.9976685643196106
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00062.jpg": {
+    "probability": [
+      0.01643473654985428,
+      0.9835652709007263
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00063.jpg": {
+    "probability": [
+      0.11831803619861603,
+      0.8816819787025452
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00064.jpg": {
+    "probability": [
+      0.01608842983841896,
+      0.9839116334915161
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00065.jpg": {
+    "probability": [
+      0.0003647297853603959,
+      0.9996352195739746
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00066.jpg": {
+    "probability": [
+      0.0032684109173715115,
+      0.9967316389083862
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00067.jpg": {
+    "probability": [
+      1.8254731912747957e-05,
+      0.9999817609786987
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00068.jpg": {
+    "probability": [
+      0.1443004459142685,
+      0.8556995987892151
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00069.jpg": {
+    "probability": [
+      7.358108632615767e-06,
+      0.9999926090240479
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00070.jpg": {
+    "probability": [
+      8.352653821930289e-05,
+      0.9999164342880249
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00071.jpg": {
+    "probability": [
+      0.8827699422836304,
+      0.11723005771636963
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00072.jpg": {
+    "probability": [
+      0.9912755489349365,
+      0.00872443150728941
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00073.jpg": {
+    "probability": [
+      0.9878385066986084,
+      0.012161494232714176
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Appendix/imgs/cls_00074.jpg": {
+    "probability": [
+      0.9934813976287842,
+      0.006518594920635223
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00000.png": {
+    "probability": [
+      1.0,
+      6.615617081928704e-11
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00001.png": {
+    "probability": [
+      0.9999998807907104,
+      1.0571901043476828e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00002.png": {
+    "probability": [
+      1.0,
+      5.362586819046555e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00003.png": {
+    "probability": [
+      1.0,
+      5.660845125987635e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00004.png": {
+    "probability": [
+      0.9999598264694214,
+      4.01487122871913e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00005.png": {
+    "probability": [
+      1.0,
+      2.291643003832222e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00006.png": {
+    "probability": [
+      0.08080549538135529,
+      0.9191945195198059
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00007.png": {
+    "probability": [
+      0.9999940395355225,
+      5.984916242596228e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00008.png": {
+    "probability": [
+      0.9954907298088074,
+      0.004509252961724997
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00009.png": {
+    "probability": [
+      0.9999995231628418,
+      5.095625965623185e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00010.png": {
+    "probability": [
+      0.9291887283325195,
+      0.07081129401922226
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00011.png": {
+    "probability": [
+      0.9991002082824707,
+      0.0008998334524221718
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00012.png": {
+    "probability": [
+      0.9999672174453735,
+      3.281410317867994e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00013.png": {
+    "probability": [
+      0.9827489256858826,
+      0.017251094803214073
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00014.png": {
+    "probability": [
+      1.0,
+      2.624735984113613e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00015.png": {
+    "probability": [
+      1.0,
+      7.647101701868664e-11
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00016.png": {
+    "probability": [
+      1.0,
+      3.835087625247979e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00017.png": {
+    "probability": [
+      0.9980406165122986,
+      0.0019594551995396614
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00018.png": {
+    "probability": [
+      0.9999861717224121,
+      1.3806053175358102e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00019.png": {
+    "probability": [
+      0.9999938011169434,
+      6.225807737791911e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00020.png": {
+    "probability": [
+      0.9999998807907104,
+      8.969740861175524e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00021.png": {
+    "probability": [
+      0.9999990463256836,
+      9.81644348030386e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00022.png": {
+    "probability": [
+      0.9995948672294617,
+      0.00040515567525289953
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00023.png": {
+    "probability": [
+      0.9999493360519409,
+      5.066422818345018e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00024.png": {
+    "probability": [
+      1.0,
+      2.7634847535318308e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00025.png": {
+    "probability": [
+      0.9962730407714844,
+      0.0037269601598381996
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00026.png": {
+    "probability": [
+      0.9999687671661377,
+      3.125188231933862e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00027.png": {
+    "probability": [
+      0.008940476924180984,
+      0.9910594820976257
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00028.png": {
+    "probability": [
+      1.0,
+      2.2827742300612908e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00029.png": {
+    "probability": [
+      1.0,
+      1.1013127909631493e-10
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00030.png": {
+    "probability": [
+      0.9998947381973267,
+      0.00010519557690713555
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00031.png": {
+    "probability": [
+      1.0,
+      1.4880640719638905e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00032.png": {
+    "probability": [
+      0.9999986886978149,
+      1.2537302609416656e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00033.png": {
+    "probability": [
+      1.0,
+      3.8729183748920093e-10
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00034.png": {
+    "probability": [
+      1.0,
+      5.270716840755085e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00035.png": {
+    "probability": [
+      1.0,
+      8.411531027263663e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00036.png": {
+    "probability": [
+      0.007967841811478138,
+      0.9920321702957153
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00037.png": {
+    "probability": [
+      1.0,
+      1.770014002033804e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00038.png": {
+    "probability": [
+      1.0,
+      1.6034767957862073e-10
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00039.png": {
+    "probability": [
+      0.9999996423721313,
+      3.132920767257019e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00040.png": {
+    "probability": [
+      0.833996593952179,
+      0.16600334644317627
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00041.png": {
+    "probability": [
+      0.9999998807907104,
+      1.0644397718806431e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00042.png": {
+    "probability": [
+      0.9988273978233337,
+      0.0011726024094969034
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00043.png": {
+    "probability": [
+      1.0,
+      2.1035739816710475e-10
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00044.png": {
+    "probability": [
+      0.9999632835388184,
+      3.6658620956586674e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00045.png": {
+    "probability": [
+      0.0069421278312802315,
+      0.9930578470230103
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00046.png": {
+    "probability": [
+      1.0,
+      3.268842752035539e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00047.png": {
+    "probability": [
+      1.0,
+      1.0041471777341715e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00048.png": {
+    "probability": [
+      0.9999994039535522,
+      5.527404596250562e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00049.png": {
+    "probability": [
+      1.0,
+      1.1961600598908717e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00050.png": {
+    "probability": [
+      1.0,
+      7.990949915659407e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00051.png": {
+    "probability": [
+      1.0,
+      1.596777710055619e-10
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00052.png": {
+    "probability": [
+      0.9999933242797852,
+      6.638209015363827e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00053.png": {
+    "probability": [
+      0.9999998807907104,
+      1.7149535835869756e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00054.png": {
+    "probability": [
+      0.9999995231628418,
+      5.084378926767386e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00055.png": {
+    "probability": [
+      0.9849552512168884,
+      0.015044684521853924
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00056.png": {
+    "probability": [
+      1.0,
+      1.6533403335641794e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00057.png": {
+    "probability": [
+      0.9999998807907104,
+      1.1836920066343737e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00058.png": {
+    "probability": [
+      1.0,
+      3.2174295228060146e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00059.png": {
+    "probability": [
+      0.9999369382858276,
+      6.301159737631679e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00060.png": {
+    "probability": [
+      0.9999998807907104,
+      8.087905456477529e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00061.png": {
+    "probability": [
+      0.03215184062719345,
+      0.9678481221199036
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00062.png": {
+    "probability": [
+      0.9654420018196106,
+      0.0345580019056797
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00063.png": {
+    "probability": [
+      1.0,
+      7.235830157270584e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00064.png": {
+    "probability": [
+      0.9070945382118225,
+      0.0929054319858551
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00065.png": {
+    "probability": [
+      0.9712629914283752,
+      0.02873697318136692
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00066.png": {
+    "probability": [
+      0.9989317059516907,
+      0.001068339915946126
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00067.png": {
+    "probability": [
+      0.9999983310699463,
+      1.6512344700458925e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00068.png": {
+    "probability": [
+      1.0,
+      8.914247812130682e-11
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00069.png": {
+    "probability": [
+      0.9757431149482727,
+      0.02425685152411461
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00070.png": {
+    "probability": [
+      0.9999994039535522,
+      5.530125122277241e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00071.png": {
+    "probability": [
+      1.0,
+      5.9879367089732405e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00072.png": {
+    "probability": [
+      1.0,
+      1.1276776179514059e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00073.png": {
+    "probability": [
+      0.9999871253967285,
+      1.282571247429587e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00074.png": {
+    "probability": [
+      0.9998413324356079,
+      0.00015868038462940603
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00075.png": {
+    "probability": [
+      0.9999998807907104,
+      1.6301241601013317e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00076.png": {
+    "probability": [
+      0.999782383441925,
+      0.00021761412790510803
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00077.png": {
+    "probability": [
+      0.999991774559021,
+      8.188532774511259e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00078.png": {
+    "probability": [
+      0.9999998807907104,
+      1.7556226339365821e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00079.png": {
+    "probability": [
+      0.9999256134033203,
+      7.439281034749001e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00080.png": {
+    "probability": [
+      0.9905295968055725,
+      0.009470448829233646
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00081.png": {
+    "probability": [
+      0.9999994039535522,
+      5.47071408618649e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00082.png": {
+    "probability": [
+      1.0,
+      1.1453725745624865e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00083.png": {
+    "probability": [
+      0.9323626160621643,
+      0.0676373541355133
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00084.png": {
+    "probability": [
+      0.9999990463256836,
+      9.929959787768894e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00085.png": {
+    "probability": [
+      1.0,
+      4.8994776985500366e-11
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00086.png": {
+    "probability": [
+      0.9999940395355225,
+      5.971096925350139e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00087.png": {
+    "probability": [
+      0.9999990463256836,
+      1.0096332516695838e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00088.png": {
+    "probability": [
+      0.9999991655349731,
+      8.444229706583428e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00089.png": {
+    "probability": [
+      1.0,
+      8.30040289973022e-12
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00090.png": {
+    "probability": [
+      0.9972419738769531,
+      0.0027580733876675367
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00091.png": {
+    "probability": [
+      0.0004373627598397434,
+      0.999562680721283
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00092.png": {
+    "probability": [
+      0.9999998807907104,
+      1.051791826967019e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00093.png": {
+    "probability": [
+      0.9999955892562866,
+      4.361452738521621e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00094.png": {
+    "probability": [
+      0.9447758197784424,
+      0.055224187672138214
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00095.png": {
+    "probability": [
+      0.9999912977218628,
+      8.697603334439918e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00096.png": {
+    "probability": [
+      7.19041821639621e-08,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00097.png": {
+    "probability": [
+      0.9999995231628418,
+      5.070771749160485e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00098.png": {
+    "probability": [
+      0.6813823580741882,
+      0.31861764192581177
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00099.png": {
+    "probability": [
+      5.0375751925457735e-06,
+      0.9999949932098389
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00100.png": {
+    "probability": [
+      0.0012138137826696038,
+      0.9987861514091492
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00101.png": {
+    "probability": [
+      0.0011653390247374773,
+      0.9988346695899963
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00102.png": {
+    "probability": [
+      0.9999995231628418,
+      4.816465661861002e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00103.png": {
+    "probability": [
+      1.139279461881415e-07,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00104.png": {
+    "probability": [
+      0.9971771240234375,
+      0.00282289762981236
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00105.png": {
+    "probability": [
+      0.9880737662315369,
+      0.011926221661269665
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00106.png": {
+    "probability": [
+      0.035792894661426544,
+      0.9642071723937988
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00107.png": {
+    "probability": [
+      1.0,
+      2.7479059028223674e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00108.png": {
+    "probability": [
+      1.3857306839781813e-06,
+      0.9999985694885254
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00109.png": {
+    "probability": [
+      0.9999587535858154,
+      4.1253879317082465e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00110.png": {
+    "probability": [
+      0.9950072765350342,
+      0.004992729518562555
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00111.png": {
+    "probability": [
+      8.213098226406146e-06,
+      0.999991774559021
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00112.png": {
+    "probability": [
+      0.5586689114570618,
+      0.44133105874061584
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00113.png": {
+    "probability": [
+      1.6122114629979478e-06,
+      0.9999983310699463
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00114.png": {
+    "probability": [
+      0.002604984911158681,
+      0.9973950386047363
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00115.png": {
+    "probability": [
+      9.004157618619502e-06,
+      0.9999909400939941
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00116.png": {
+    "probability": [
+      1.933753810590133e-05,
+      0.9999806880950928
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00117.png": {
+    "probability": [
+      1.1640453521977179e-05,
+      0.999988317489624
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00118.png": {
+    "probability": [
+      0.017584772780537605,
+      0.9824152588844299
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00119.png": {
+    "probability": [
+      0.0025163230020552874,
+      0.9974836707115173
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00120.png": {
+    "probability": [
+      1.971813981072046e-05,
+      0.9999803304672241
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00121.png": {
+    "probability": [
+      1.0,
+      1.4889526944728004e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00122.png": {
+    "probability": [
+      0.9999972581863403,
+      2.7444236820883816e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00123.png": {
+    "probability": [
+      0.9996470212936401,
+      0.0003530020185280591
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00124.png": {
+    "probability": [
+      1.0,
+      4.6271459552826855e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00125.png": {
+    "probability": [
+      0.8958001136779785,
+      0.10419987887144089
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00126.png": {
+    "probability": [
+      0.533635139465332,
+      0.46636486053466797
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00127.png": {
+    "probability": [
+      0.0029237931594252586,
+      0.9970762729644775
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00128.png": {
+    "probability": [
+      0.9021812677383423,
+      0.09781874716281891
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00129.png": {
+    "probability": [
+      0.9999841451644897,
+      1.587545921211131e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00130.png": {
+    "probability": [
+      6.699021781741976e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00131.png": {
+    "probability": [
+      0.9999963045120239,
+      3.7386425901786424e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00132.png": {
+    "probability": [
+      6.571484334472188e-08,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00133.png": {
+    "probability": [
+      1.0,
+      8.989553990090826e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00134.png": {
+    "probability": [
+      0.8216665387153625,
+      0.17833344638347626
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00135.png": {
+    "probability": [
+      0.41796019673347473,
+      0.5820398330688477
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00136.png": {
+    "probability": [
+      2.6543793829603146e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00137.png": {
+    "probability": [
+      0.993998646736145,
+      0.006001308094710112
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00138.png": {
+    "probability": [
+      0.9997596144676208,
+      0.00024042019504122436
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00139.png": {
+    "probability": [
+      2.361083716095891e-06,
+      0.999997615814209
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00140.png": {
+    "probability": [
+      0.9943646192550659,
+      0.00563544686883688
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00141.png": {
+    "probability": [
+      0.7069515585899353,
+      0.2930484116077423
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00142.png": {
+    "probability": [
+      0.9993221759796143,
+      0.0006778353708796203
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00143.png": {
+    "probability": [
+      0.9991833567619324,
+      0.0008166548213921487
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00144.png": {
+    "probability": [
+      6.952169506746486e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00145.png": {
+    "probability": [
+      0.00109803956001997,
+      0.9989019632339478
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00146.png": {
+    "probability": [
+      0.9999699592590332,
+      2.9991113478899933e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00147.png": {
+    "probability": [
+      0.696796715259552,
+      0.3032033145427704
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00148.png": {
+    "probability": [
+      0.12631294131278992,
+      0.8736870288848877
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00149.png": {
+    "probability": [
+      2.7561165438783064e-07,
+      0.9999997615814209
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00150.png": {
+    "probability": [
+      0.9999984502792358,
+      1.6049923488026252e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00151.png": {
+    "probability": [
+      0.05655485391616821,
+      0.9434452056884766
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00152.png": {
+    "probability": [
+      0.9999998807907104,
+      8.580531130064628e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00153.png": {
+    "probability": [
+      0.8555660843849182,
+      0.14443397521972656
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00154.png": {
+    "probability": [
+      0.999998927116394,
+      1.0294304502167506e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00155.png": {
+    "probability": [
+      0.025661280378699303,
+      0.974338710308075
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00156.png": {
+    "probability": [
+      0.01527633611112833,
+      0.984723687171936
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00157.png": {
+    "probability": [
+      8.469982276437804e-05,
+      0.9999152421951294
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00158.png": {
+    "probability": [
+      0.9997991919517517,
+      0.00020086106087546796
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00159.png": {
+    "probability": [
+      0.9971924424171448,
+      0.002807559445500374
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00160.png": {
+    "probability": [
+      0.9930427074432373,
+      0.006957309320569038
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00161.png": {
+    "probability": [
+      0.9053224325180054,
+      0.09467761963605881
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00162.png": {
+    "probability": [
+      0.9999889135360718,
+      1.1123654985567555e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00163.png": {
+    "probability": [
+      0.04055000841617584,
+      0.9594500660896301
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00164.png": {
+    "probability": [
+      0.996781587600708,
+      0.0032184510491788387
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00165.png": {
+    "probability": [
+      0.9999774694442749,
+      2.2531216018251143e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00166.png": {
+    "probability": [
+      0.0004504650423768908,
+      0.9995495676994324
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00167.png": {
+    "probability": [
+      0.9999498128890991,
+      5.021837932872586e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00168.png": {
+    "probability": [
+      0.5458669662475586,
+      0.4541330635547638
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00169.png": {
+    "probability": [
+      0.9171327352523804,
+      0.08286720514297485
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00170.png": {
+    "probability": [
+      0.9811826348304749,
+      0.018817365169525146
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00171.png": {
+    "probability": [
+      0.9999998807907104,
+      1.4792300362387323e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00172.png": {
+    "probability": [
+      1.0,
+      3.799409675764309e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00173.png": {
+    "probability": [
+      0.23059390485286713,
+      0.7694060802459717
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00174.png": {
+    "probability": [
+      0.1728079468011856,
+      0.8271920084953308
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Breast/imgs/cls_00175.png": {
+    "probability": [
+      0.972850501537323,
+      0.027149464935064316
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Breast_luminal/imgs/cls_00000.png": {
+    "probability": [
+      0.006247001234441996,
+      0.047344330698251724,
+      0.9181341528892517,
+      0.028274500742554665
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00001.png": {
+    "probability": [
+      0.013564725406467915,
+      0.17708788812160492,
+      0.7243379354476929,
+      0.08500953018665314
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00002.png": {
+    "probability": [
+      0.38342809677124023,
+      3.0831647563900333e-06,
+      0.6164102554321289,
+      0.00015855085803195834
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00003.png": {
+    "probability": [
+      0.47265681624412537,
+      0.00018336577340960503,
+      0.2548938989639282,
+      0.2722659409046173
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00004.png": {
+    "probability": [
+      0.0039981575682759285,
+      1.5649941360607045e-06,
+      0.9960002303123474,
+      3.381075197594896e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00005.png": {
+    "probability": [
+      0.0018202255014330149,
+      4.7664649116541113e-08,
+      0.9981797933578491,
+      3.235127096767876e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00006.png": {
+    "probability": [
+      2.089109784719767e-06,
+      3.6057099350728095e-05,
+      0.9999618530273438,
+      7.552206637839731e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00007.png": {
+    "probability": [
+      1.9369352788345395e-09,
+      2.624094861403137e-07,
+      0.9999997615814209,
+      7.681837943529501e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00008.png": {
+    "probability": [
+      5.649986860589706e-07,
+      0.0004932269221171737,
+      0.9994506239891052,
+      5.558797420235351e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00009.png": {
+    "probability": [
+      1.7810165564569047e-09,
+      0.0003179801278747618,
+      0.9996819496154785,
+      3.474369236755592e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00010.png": {
+    "probability": [
+      7.241257844725624e-05,
+      5.682365099346498e-06,
+      0.9999219179153442,
+      3.1313762693940816e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00011.png": {
+    "probability": [
+      0.00013517463230527937,
+      7.079280806010502e-08,
+      0.9998646974563599,
+      6.301436152392204e-13
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00012.png": {
+    "probability": [
+      0.00028902236954309046,
+      0.0008194205001927912,
+      0.9988899827003479,
+      1.6640409512547194e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00013.png": {
+    "probability": [
+      0.9456584453582764,
+      4.886042461293982e-06,
+      0.054334212094545364,
+      2.4471617052768124e-06
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00014.png": {
+    "probability": [
+      0.6326034665107727,
+      0.00014948473835829645,
+      0.05157209187746048,
+      0.31567493081092834
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00015.png": {
+    "probability": [
+      5.6919248891063035e-05,
+      3.9047026803018525e-06,
+      0.9999390840530396,
+      7.130206114425164e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00016.png": {
+    "probability": [
+      1.7867134260995954e-07,
+      8.408932785641809e-07,
+      0.9999990463256836,
+      3.2498117974455454e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00017.png": {
+    "probability": [
+      8.757529576541856e-05,
+      8.596139764449617e-07,
+      0.0043883612379431725,
+      0.99552321434021
+    ],
+    "prediction": 3,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00018.png": {
+    "probability": [
+      3.042334128622315e-06,
+      0.0513419471681118,
+      0.9486546516418457,
+      2.917557537784887e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00019.png": {
+    "probability": [
+      2.102843609463889e-05,
+      0.31507617235183716,
+      0.6849018335342407,
+      9.159597880170622e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00020.png": {
+    "probability": [
+      0.02330988645553589,
+      7.803040716680698e-06,
+      0.9766745567321777,
+      7.834029020159505e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00021.png": {
+    "probability": [
+      0.002323224674910307,
+      5.975750809739111e-06,
+      0.9976660013198853,
+      4.7978928705560975e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00022.png": {
+    "probability": [
+      5.009117558074649e-06,
+      0.8434905409812927,
+      0.15640631318092346,
+      9.811637573875487e-05
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00023.png": {
+    "probability": [
+      0.0019083783263340592,
+      0.01762966252863407,
+      0.9790279269218445,
+      0.0014340176712721586
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00024.png": {
+    "probability": [
+      0.00100765994284302,
+      3.067255602218211e-05,
+      0.0352153480052948,
+      0.9637463092803955
+    ],
+    "prediction": 3,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00025.png": {
+    "probability": [
+      0.0001344680058537051,
+      0.004099521320313215,
+      0.9956875443458557,
+      7.839082536520436e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00026.png": {
+    "probability": [
+      0.9191433787345886,
+      0.00034977542236447334,
+      0.08035995066165924,
+      0.0001469202688895166
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00027.png": {
+    "probability": [
+      0.261890709400177,
+      0.1261507123708725,
+      0.6049808859825134,
+      0.006977732293307781
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00028.png": {
+    "probability": [
+      4.7218546228577907e-07,
+      0.0012794153299182653,
+      0.9987201690673828,
+      1.8512733568343265e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00029.png": {
+    "probability": [
+      7.687360630370677e-05,
+      0.7678077816963196,
+      0.23211528360843658,
+      1.3411002441898745e-07
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00030.png": {
+    "probability": [
+      4.0835104300640523e-05,
+      6.74051116220653e-05,
+      0.9998912811279297,
+      4.4565186385625566e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00031.png": {
+    "probability": [
+      3.278089479863411e-07,
+      2.6470668217370985e-06,
+      0.9999970197677612,
+      1.1212106798552668e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00032.png": {
+    "probability": [
+      0.0002136513649020344,
+      0.002250872552394867,
+      0.9975351095199585,
+      2.6313057333027245e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00033.png": {
+    "probability": [
+      0.000927114044316113,
+      0.00044731624075211585,
+      0.9986255168914795,
+      2.4680395505072283e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00034.png": {
+    "probability": [
+      0.0005671443650498986,
+      8.826249541016296e-05,
+      0.9993442893028259,
+      2.7706647642844473e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00035.png": {
+    "probability": [
+      0.00013492490688804537,
+      2.2788790374761447e-06,
+      0.999862790107727,
+      3.0107003112789243e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00036.png": {
+    "probability": [
+      0.960857093334198,
+      0.00011082761193392798,
+      0.008635109290480614,
+      0.030397044494748116
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00037.png": {
+    "probability": [
+      0.9999735355377197,
+      2.965284906508714e-08,
+      1.1403049938962795e-05,
+      1.5003914086264558e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00038.png": {
+    "probability": [
+      0.0011488170130178332,
+      0.0009501904714852571,
+      0.9978183507919312,
+      8.26816467451863e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00039.png": {
+    "probability": [
+      0.0002608371141832322,
+      2.2657070076093078e-05,
+      0.9997159838676453,
+      4.365048766885593e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00040.png": {
+    "probability": [
+      4.501748207985656e-06,
+      5.27941738255322e-05,
+      0.9999417066574097,
+      1.0046012448583497e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00041.png": {
+    "probability": [
+      9.205502465192694e-06,
+      4.161690594628453e-05,
+      0.9999490976333618,
+      5.1457178074088006e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00042.png": {
+    "probability": [
+      2.5823839067129484e-08,
+      6.12571682268026e-08,
+      0.9999998807907104,
+      1.67456770672203e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00043.png": {
+    "probability": [
+      5.992669827037389e-08,
+      5.218008936935803e-06,
+      0.9999946355819702,
+      8.859999844901267e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00044.png": {
+    "probability": [
+      0.012447874993085861,
+      0.9703715443611145,
+      0.017045961692929268,
+      0.00013456710439641029
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00045.png": {
+    "probability": [
+      3.278024450992234e-05,
+      0.9980868101119995,
+      0.0018797086086124182,
+      7.201951461865974e-07
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00046.png": {
+    "probability": [
+      1.4890594002281432e-07,
+      0.02470947429537773,
+      0.9752903580665588,
+      2.167509727257766e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00047.png": {
+    "probability": [
+      5.655059354126024e-08,
+      0.27359625697135925,
+      0.7264036536216736,
+      9.366747377725915e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00048.png": {
+    "probability": [
+      0.8594683408737183,
+      0.0019152509048581123,
+      0.13839051127433777,
+      0.00022590499429497868
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00049.png": {
+    "probability": [
+      0.13221557438373566,
+      0.0034666680730879307,
+      0.8572193384170532,
+      0.0070984321646392345
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00050.png": {
+    "probability": [
+      0.0003534942225087434,
+      8.42564062963902e-08,
+      0.9996460676193237,
+      3.556459660103428e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00051.png": {
+    "probability": [
+      0.023560257628560066,
+      1.6230175106102251e-06,
+      0.9753130674362183,
+      0.0011250803945586085
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00052.png": {
+    "probability": [
+      5.594508536987952e-11,
+      1.151191213466518e-06,
+      0.9999988079071045,
+      1.2011134309375393e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00053.png": {
+    "probability": [
+      7.546608671304966e-09,
+      1.6836136040865313e-08,
+      1.0,
+      1.3587601876974276e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00054.png": {
+    "probability": [
+      0.9534198045730591,
+      1.760200234457443e-06,
+      0.04648718982934952,
+      9.126584336627275e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00055.png": {
+    "probability": [
+      0.9553261399269104,
+      1.2807104212697595e-06,
+      0.044644832611083984,
+      2.772695734165609e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00056.png": {
+    "probability": [
+      2.139984633942049e-09,
+      5.497374111484987e-09,
+      1.0,
+      1.501363269817979e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00057.png": {
+    "probability": [
+      2.851524849578624e-10,
+      2.377929178010163e-07,
+      0.9999997615814209,
+      3.4188565312121e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00058.png": {
+    "probability": [
+      0.9996954202651978,
+      1.5115035239432473e-05,
+      0.0002895081997849047,
+      1.1158959090096232e-08
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00059.png": {
+    "probability": [
+      0.9995334148406982,
+      7.797092257533222e-05,
+      0.0003776572411879897,
+      1.1016419193765614e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00060.png": {
+    "probability": [
+      2.0705829228973016e-07,
+      7.473983032468823e-07,
+      0.9999990463256836,
+      1.4740375586796972e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00061.png": {
+    "probability": [
+      2.968439105632825e-10,
+      1.8956185954266402e-08,
+      1.0,
+      1.553676133060622e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00062.png": {
+    "probability": [
+      0.999769389629364,
+      2.138682475560927e-06,
+      0.00021664572705049068,
+      1.1802937478933018e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00063.png": {
+    "probability": [
+      0.9986771941184998,
+      2.315159974841663e-07,
+      2.650949318194762e-05,
+      0.0012959486339241266
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00064.png": {
+    "probability": [
+      0.34938323497772217,
+      7.761468441458419e-05,
+      0.6505391597747803,
+      4.208657955473427e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00065.png": {
+    "probability": [
+      0.16122785210609436,
+      8.594574296694191e-07,
+      0.8387712240219116,
+      9.205594064809475e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00066.png": {
+    "probability": [
+      0.00016048815450631082,
+      0.008777155540883541,
+      0.9910622835159302,
+      1.4545561555223685e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00067.png": {
+    "probability": [
+      0.030225669965147972,
+      0.005762691609561443,
+      0.8089054226875305,
+      0.15510617196559906
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00068.png": {
+    "probability": [
+      0.0007365919882431626,
+      0.00015881482977420092,
+      0.9991045594215393,
+      1.0475746659022178e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00069.png": {
+    "probability": [
+      2.244203711754267e-09,
+      2.2384677222930804e-08,
+      1.0,
+      1.0030760673029188e-14
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00070.png": {
+    "probability": [
+      0.0016158883227035403,
+      0.020542124286293983,
+      0.9773272275924683,
+      0.0005146531038917601
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00071.png": {
+    "probability": [
+      2.9698187518079067e-06,
+      2.1571335309999995e-05,
+      0.9966174960136414,
+      0.003357979701831937
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00072.png": {
+    "probability": [
+      1.8502719285606872e-06,
+      0.00034545024391263723,
+      0.9989069700241089,
+      0.0007456810562871397
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00073.png": {
+    "probability": [
+      2.178750764869619e-05,
+      0.000101136312878225,
+      0.9998769760131836,
+      1.0324750121526449e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00074.png": {
+    "probability": [
+      5.419818080554251e-06,
+      0.0001900243223644793,
+      0.9997901320457458,
+      1.4520322110911366e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00075.png": {
+    "probability": [
+      0.008597690612077713,
+      0.08381002396345139,
+      0.7451929450035095,
+      0.1623993068933487
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00076.png": {
+    "probability": [
+      0.0017005762783810496,
+      0.005536527372896671,
+      0.9924881458282471,
+      0.00027484161546453834
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00077.png": {
+    "probability": [
+      0.004158656578511,
+      0.004882173612713814,
+      0.9906533360481262,
+      0.0003058331785723567
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00078.png": {
+    "probability": [
+      5.9351586969569325e-05,
+      0.9204081296920776,
+      0.07946310192346573,
+      6.950413808226585e-05
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00079.png": {
+    "probability": [
+      0.00533524714410305,
+      0.00021588400704786181,
+      0.9944420456886292,
+      6.810725153627573e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00080.png": {
+    "probability": [
+      0.9748605489730835,
+      0.0006059668376110494,
+      0.018320636823773384,
+      0.00621277978643775
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00081.png": {
+    "probability": [
+      0.9948269724845886,
+      4.015111699118279e-05,
+      0.005128222052007914,
+      4.701351372204954e-06
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00082.png": {
+    "probability": [
+      0.00047346556675620377,
+      0.00030005088774487376,
+      0.9992263317108154,
+      1.17642379393601e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00083.png": {
+    "probability": [
+      0.0006051738746464252,
+      7.854279715502344e-07,
+      0.9993939399719238,
+      1.468556803940757e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00084.png": {
+    "probability": [
+      1.4122217180556618e-05,
+      2.551871602918254e-06,
+      0.9999833106994629,
+      7.16825354629691e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00085.png": {
+    "probability": [
+      1.445093766960781e-05,
+      2.750410021690186e-05,
+      0.9999288320541382,
+      2.922986459452659e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00086.png": {
+    "probability": [
+      2.4435237264697207e-06,
+      5.16110158059746e-05,
+      0.9999457597732544,
+      2.719669964790228e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00087.png": {
+    "probability": [
+      1.5773226778037497e-06,
+      1.887436337710824e-05,
+      0.9999796152114868,
+      1.2680567706979673e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00088.png": {
+    "probability": [
+      0.07651429623365402,
+      0.00015740693197585642,
+      0.8973593711853027,
+      0.02596886269748211
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00089.png": {
+    "probability": [
+      0.05428580939769745,
+      0.001076642656698823,
+      0.5222044587135315,
+      0.42243313789367676
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00090.png": {
+    "probability": [
+      2.4249324770408975e-10,
+      2.494055024726549e-07,
+      0.9999997615814209,
+      2.236196827709591e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00091.png": {
+    "probability": [
+      7.777922661489356e-08,
+      6.541000766446814e-05,
+      0.999934196472168,
+      2.2817938827301987e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00092.png": {
+    "probability": [
+      3.03363066223028e-07,
+      1.232041935139705e-08,
+      0.9999996423721313,
+      1.4913052346840483e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00093.png": {
+    "probability": [
+      1.963584184139222e-09,
+      3.693998232301432e-11,
+      1.0,
+      1.4737050216761215e-14
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00094.png": {
+    "probability": [
+      2.654037471565285e-13,
+      2.663309260242386e-06,
+      0.9999973773956299,
+      6.064825833380916e-13
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00095.png": {
+    "probability": [
+      9.740694473237e-09,
+      1.7794496670830995e-05,
+      0.9999822378158569,
+      1.5377258577586872e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00096.png": {
+    "probability": [
+      0.004922490566968918,
+      0.001970246434211731,
+      0.9924094676971436,
+      0.0006977570010349154
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00097.png": {
+    "probability": [
+      3.3360042834829073e-06,
+      1.09583415905945e-05,
+      0.9999856948852539,
+      3.856346353359186e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00098.png": {
+    "probability": [
+      0.046147145330905914,
+      1.1499985703267157e-05,
+      0.9538413286209106,
+      1.4183377139431741e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00099.png": {
+    "probability": [
+      0.0006185928941704333,
+      2.707186013140017e-06,
+      0.9993776679039001,
+      1.1030854238924803e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00100.png": {
+    "probability": [
+      3.648172423709184e-05,
+      0.00021504471078515053,
+      0.9997476935386658,
+      8.341493185071158e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00101.png": {
+    "probability": [
+      3.2296920693397624e-09,
+      9.167945245280862e-05,
+      0.9998258948326111,
+      8.246356446761638e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00102.png": {
+    "probability": [
+      0.0006197039037942886,
+      1.1023861645753641e-07,
+      0.9993801116943359,
+      3.218104183133619e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00103.png": {
+    "probability": [
+      0.03796130791306496,
+      8.897877137314936e-07,
+      0.9620378017425537,
+      1.893054069057598e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00104.png": {
+    "probability": [
+      0.02119002491235733,
+      2.5730665583978407e-05,
+      0.9787841439247131,
+      2.406422794365426e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00105.png": {
+    "probability": [
+      0.02951657958328724,
+      3.1118775041250046e-06,
+      0.9704802632331848,
+      1.0801601280086004e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00106.png": {
+    "probability": [
+      0.549944281578064,
+      0.0069533828645944595,
+      0.42592480778694153,
+      0.017177511006593704
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00107.png": {
+    "probability": [
+      2.291069358761888e-05,
+      4.399778481456451e-05,
+      0.9999330043792725,
+      5.487496679279502e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00108.png": {
+    "probability": [
+      0.0006760293035767972,
+      0.0002481481060385704,
+      0.9986850619316101,
+      0.00039082352304831147
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00109.png": {
+    "probability": [
+      0.014385219663381577,
+      0.00017509590543340892,
+      0.9852932095527649,
+      0.00014655616541858763
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00110.png": {
+    "probability": [
+      4.595503014570568e-06,
+      1.1257469623160432e-06,
+      0.9999939203262329,
+      3.4994752695638454e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00111.png": {
+    "probability": [
+      0.13572369515895844,
+      0.002013210440054536,
+      0.8612481951713562,
+      0.00101487897336483
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00112.png": {
+    "probability": [
+      4.5140634341578334e-08,
+      3.105274970494065e-07,
+      0.9999996423721313,
+      4.6287432220459834e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00113.png": {
+    "probability": [
+      4.0780790300232184e-08,
+      1.913467301273286e-10,
+      1.0,
+      2.7082435144314132e-14
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00114.png": {
+    "probability": [
+      6.79083633943478e-13,
+      1.5710433842741622e-08,
+      1.0,
+      3.266084971920158e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00115.png": {
+    "probability": [
+      5.120874557729138e-11,
+      4.6144364773681446e-07,
+      0.9999995231628418,
+      5.747684550527765e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00116.png": {
+    "probability": [
+      6.766264631918872e-11,
+      0.00018124899361282587,
+      0.999818742275238,
+      3.4459887388038624e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00117.png": {
+    "probability": [
+      7.63032486587184e-14,
+      1.3413157375907758e-06,
+      0.9999986886978149,
+      9.512464149707966e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00118.png": {
+    "probability": [
+      0.000196964101633057,
+      0.003571516601368785,
+      0.996229350566864,
+      2.0998013496864587e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00119.png": {
+    "probability": [
+      0.0005112728686071932,
+      0.0018468049820512533,
+      0.9974526762962341,
+      0.0001892516593215987
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00120.png": {
+    "probability": [
+      0.0013006922090426087,
+      0.00016299560957122594,
+      0.9985363483428955,
+      2.1339536360187594e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00121.png": {
+    "probability": [
+      1.358116037408763e-06,
+      0.46863409876823425,
+      0.5313643217086792,
+      2.317556067055193e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00122.png": {
+    "probability": [
+      0.08064921945333481,
+      0.0010654375655576587,
+      0.9179537296295166,
+      0.00033161891042254865
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00123.png": {
+    "probability": [
+      2.0204032225024093e-08,
+      3.0802330002188683e-06,
+      0.9999969005584717,
+      1.604121990794738e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00124.png": {
+    "probability": [
+      3.1907993047752825e-07,
+      0.000238364256802015,
+      0.9997583031654358,
+      3.033085476999986e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00125.png": {
+    "probability": [
+      1.7216398973118885e-08,
+      5.830373538628919e-06,
+      0.999988317489624,
+      5.879599939362379e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00126.png": {
+    "probability": [
+      0.007754117250442505,
+      0.00026777019957080483,
+      0.9919638633728027,
+      1.429967232979834e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00127.png": {
+    "probability": [
+      0.8975006341934204,
+      4.722266021417454e-05,
+      0.10245133936405182,
+      8.197788474717527e-07
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00128.png": {
+    "probability": [
+      9.293512448493857e-08,
+      0.00010649625619407743,
+      0.999893307685852,
+      2.3588521358419712e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00129.png": {
+    "probability": [
+      2.401843346433452e-07,
+      0.0001824385253712535,
+      0.9998171925544739,
+      1.2792250458915078e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00130.png": {
+    "probability": [
+      0.950037956237793,
+      9.282652172259986e-06,
+      0.04803389683365822,
+      0.0019188154255971313
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00131.png": {
+    "probability": [
+      0.0006390211055986583,
+      0.0014341569039970636,
+      0.9979017972946167,
+      2.4946568373707123e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00132.png": {
+    "probability": [
+      0.0020695836283266544,
+      0.002006947062909603,
+      0.9959076642990112,
+      1.58554994413862e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00133.png": {
+    "probability": [
+      9.409453696207493e-07,
+      0.00025926652597263455,
+      0.9997398257255554,
+      5.138369174595425e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00134.png": {
+    "probability": [
+      5.718718239222653e-05,
+      4.2920173655147664e-06,
+      0.9999384880065918,
+      8.738603590741079e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00135.png": {
+    "probability": [
+      0.13121278584003448,
+      0.0003149829863104969,
+      0.8684714436531067,
+      7.778091912769014e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00136.png": {
+    "probability": [
+      0.017353283241391182,
+      0.00018698062922339886,
+      0.9824588298797607,
+      9.307206596531614e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00137.png": {
+    "probability": [
+      4.1781650139682824e-08,
+      3.906470738002099e-06,
+      0.9999960660934448,
+      1.6381811462906626e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00138.png": {
+    "probability": [
+      0.0985855758190155,
+      0.0003685814153868705,
+      0.8876834511756897,
+      0.013362318277359009
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00139.png": {
+    "probability": [
+      0.0009297213982790709,
+      0.03470071032643318,
+      0.9627289772033691,
+      0.0016406404320150614
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00140.png": {
+    "probability": [
+      0.10557062178850174,
+      0.0005379574140533805,
+      0.8938578367233276,
+      3.3615026040934026e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00141.png": {
+    "probability": [
+      0.008698869496583939,
+      2.9094439014443196e-05,
+      0.9912720322608948,
+      6.379863748406933e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00142.png": {
+    "probability": [
+      0.009041404351592064,
+      1.97407844098052e-05,
+      0.9869509339332581,
+      0.003987955395132303
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00143.png": {
+    "probability": [
+      0.0028451604302972555,
+      0.0007241375278681517,
+      0.29624679684638977,
+      0.7001838684082031
+    ],
+    "prediction": 3,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00144.png": {
+    "probability": [
+      0.9998160004615784,
+      9.896986563617816e-10,
+      1.730089570628479e-05,
+      0.00016678613610565662
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00145.png": {
+    "probability": [
+      0.9237239956855774,
+      7.041555818432244e-07,
+      0.07618408650159836,
+      9.122666961047798e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00146.png": {
+    "probability": [
+      0.6803588271141052,
+      7.641097909072414e-06,
+      0.18942347168922424,
+      0.1302100569009781
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00147.png": {
+    "probability": [
+      0.9978557229042053,
+      2.685755760012398e-07,
+      0.002143995137885213,
+      5.308037565043833e-09
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00148.png": {
+    "probability": [
+      8.780726784607396e-05,
+      7.560782705695601e-06,
+      0.9999046325683594,
+      4.141389009504337e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00149.png": {
+    "probability": [
+      2.8293690775171854e-05,
+      0.041731566190719604,
+      0.9582228064537048,
+      1.7350086636724882e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00150.png": {
+    "probability": [
+      0.27351340651512146,
+      0.0004328929353505373,
+      0.7210360169410706,
+      0.005017617717385292
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00151.png": {
+    "probability": [
+      0.004100110847502947,
+      4.1623821743996814e-05,
+      0.9958011507987976,
+      5.712920392397791e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00152.png": {
+    "probability": [
+      6.8687868406414054e-06,
+      0.0031573784071952105,
+      0.9968350529670715,
+      7.386648235296889e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00153.png": {
+    "probability": [
+      0.0009543343330733478,
+      0.1409333497285843,
+      0.858019232749939,
+      9.312288602814078e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00154.png": {
+    "probability": [
+      0.0012828357284888625,
+      0.00010897206084337085,
+      0.9986078143119812,
+      3.7365268212852243e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00155.png": {
+    "probability": [
+      0.005196586716920137,
+      0.004010271746665239,
+      0.9905349612236023,
+      0.00025808627833612263
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00156.png": {
+    "probability": [
+      0.019491080194711685,
+      7.03300997884071e-07,
+      0.9805082678794861,
+      8.274283480602662e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00157.png": {
+    "probability": [
+      0.548782229423523,
+      1.916965253201397e-08,
+      0.45121774077415466,
+      1.820563078069881e-08
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00158.png": {
+    "probability": [
+      0.0180373378098011,
+      1.787103201422724e-06,
+      0.981873095035553,
+      8.771153079578653e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00159.png": {
+    "probability": [
+      5.292700734571554e-06,
+      1.5396776689158287e-06,
+      0.9998353719711304,
+      0.00015779394016135484
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00160.png": {
+    "probability": [
+      0.0009441176080144942,
+      0.00039766100235283375,
+      0.998658299446106,
+      4.4157570933123225e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00161.png": {
+    "probability": [
+      0.0007502934895455837,
+      0.0012279525399208069,
+      0.9980214834213257,
+      3.3290780265815556e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00162.png": {
+    "probability": [
+      0.00503553869202733,
+      0.0003423436137381941,
+      0.9946126937866211,
+      9.430790669284761e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00163.png": {
+    "probability": [
+      0.0005690584657713771,
+      9.74078261606337e-07,
+      0.9994296431541443,
+      3.717513550327567e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00164.png": {
+    "probability": [
+      0.010640827938914299,
+      8.436524694843683e-06,
+      0.9893506169319153,
+      2.6534475949802072e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00165.png": {
+    "probability": [
+      1.1399242794141173e-06,
+      2.074955773423426e-06,
+      0.9999967813491821,
+      1.0791442406343776e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00166.png": {
+    "probability": [
+      0.00016913007129915059,
+      0.07484874129295349,
+      0.9248908162117004,
+      9.132162085734308e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00167.png": {
+    "probability": [
+      0.03173789754509926,
+      0.0018446441972628236,
+      0.9663872122764587,
+      3.0293544114101678e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00168.png": {
+    "probability": [
+      2.7629667442852224e-07,
+      1.664962638869838e-07,
+      0.9999996423721313,
+      1.489120285413925e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00169.png": {
+    "probability": [
+      0.13888803124427795,
+      6.087522592679306e-07,
+      0.8611114025115967,
+      8.381483007635637e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00170.png": {
+    "probability": [
+      0.9934878349304199,
+      2.4949292765086284e-07,
+      0.006511889398097992,
+      1.55075147167949e-10
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00171.png": {
+    "probability": [
+      0.00012338788656052202,
+      0.003342995885759592,
+      0.9965097308158875,
+      2.3874619728303514e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00172.png": {
+    "probability": [
+      0.00781768187880516,
+      0.0002632350369822234,
+      0.990039050579071,
+      0.00188001140486449
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00173.png": {
+    "probability": [
+      0.026693245396018028,
+      0.0002894465287681669,
+      0.968492329120636,
+      0.004524943418800831
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00174.png": {
+    "probability": [
+      0.9976159334182739,
+      1.6016348070024833e-07,
+      0.0023820644710212946,
+      1.8711666598392185e-06
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00175.png": {
+    "probability": [
+      1.0828176577604154e-08,
+      7.953271108362969e-08,
+      0.9999998807907104,
+      4.338973269568669e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00176.png": {
+    "probability": [
+      3.1307962444770965e-07,
+      0.0001326012279605493,
+      0.009140881709754467,
+      0.990726113319397
+    ],
+    "prediction": 3,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00177.png": {
+    "probability": [
+      2.292781755386386e-05,
+      0.0005632024258375168,
+      0.9994138479232788,
+      9.618442220471479e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00178.png": {
+    "probability": [
+      9.094415872823447e-06,
+      0.00024070033396128565,
+      0.9997501969337463,
+      2.148831779180682e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00179.png": {
+    "probability": [
+      1.0671955124053056e-06,
+      9.843442057899665e-06,
+      0.9999890327453613,
+      3.744520782333893e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00180.png": {
+    "probability": [
+      1.4386249858944211e-05,
+      8.384542161365971e-05,
+      0.9998998641967773,
+      1.8471545217835228e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00181.png": {
+    "probability": [
+      0.00040343316504731774,
+      0.006805273238569498,
+      0.9927418231964111,
+      4.9423037125961855e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00182.png": {
+    "probability": [
+      2.4036837658059085e-06,
+      0.01024356298148632,
+      0.9897540211677551,
+      7.492402254172248e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00183.png": {
+    "probability": [
+      1.5677800169200395e-09,
+      5.618558134301566e-06,
+      0.9999943971633911,
+      3.978595231046711e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00184.png": {
+    "probability": [
+      1.7086276216105034e-07,
+      0.00013136652705725282,
+      0.9998549222946167,
+      1.3566438610723708e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00185.png": {
+    "probability": [
+      0.011278561316430569,
+      7.727382580924314e-06,
+      0.9887136816978455,
+      1.456151732526223e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00186.png": {
+    "probability": [
+      1.1323583748890087e-05,
+      7.584014383610338e-05,
+      0.9999126195907593,
+      1.6677115866059466e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00187.png": {
+    "probability": [
+      0.9898404479026794,
+      2.5201590688084252e-05,
+      0.010040081106126308,
+      9.421677532372996e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00188.png": {
+    "probability": [
+      0.29432326555252075,
+      0.0080276969820261,
+      0.626792311668396,
+      0.07085670530796051
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00189.png": {
+    "probability": [
+      0.2760155498981476,
+      0.0029321755282580853,
+      0.7210520505905151,
+      1.7804887875172426e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00190.png": {
+    "probability": [
+      0.368727445602417,
+      0.08453244715929031,
+      0.5440464615821838,
+      0.002693675924092531
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00191.png": {
+    "probability": [
+      0.0026386198587715626,
+      8.167790838342626e-06,
+      0.9973530769348145,
+      1.811375938132187e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00192.png": {
+    "probability": [
+      0.6872973442077637,
+      5.293308049658663e-07,
+      0.31270208954811096,
+      6.076101044527604e-08
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00193.png": {
+    "probability": [
+      0.6614166498184204,
+      0.00014667228970211,
+      0.33842793107032776,
+      8.767490726313554e-06
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00194.png": {
+    "probability": [
+      0.02118130400776863,
+      0.009288180619478226,
+      0.9695302248001099,
+      3.270848765168921e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00195.png": {
+    "probability": [
+      1.9881339540006593e-05,
+      0.0016427428927272558,
+      0.998067319393158,
+      0.00027013864018954337
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00196.png": {
+    "probability": [
+      0.0001562107354402542,
+      1.1938808484046604e-06,
+      0.9997983574867249,
+      4.422527854330838e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00197.png": {
+    "probability": [
+      0.00015421846183016896,
+      0.00019056825840380043,
+      0.99965500831604,
+      2.0045847293204133e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00198.png": {
+    "probability": [
+      3.3764848922146484e-05,
+      1.1360039025021251e-05,
+      0.9999549388885498,
+      1.2194552034827666e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00199.png": {
+    "probability": [
+      0.853924036026001,
+      3.5415348975220695e-05,
+      0.14603906869888306,
+      1.5730181530670961e-06
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00200.png": {
+    "probability": [
+      0.008799034170806408,
+      0.00023731362307444215,
+      0.990962564945221,
+      1.1191036719537806e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00201.png": {
+    "probability": [
+      0.0004765644553117454,
+      1.8703191244640038e-06,
+      0.9995214939117432,
+      1.648603809023541e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00202.png": {
+    "probability": [
+      0.03331216424703598,
+      2.3976875240805384e-07,
+      0.9666876196861267,
+      1.751650380299452e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00203.png": {
+    "probability": [
+      4.350601011537947e-05,
+      1.8820945115294307e-05,
+      0.9999376535415649,
+      1.7568126953193541e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00204.png": {
+    "probability": [
+      1.2528630577435251e-05,
+      3.675376376577333e-07,
+      0.9999871253967285,
+      1.5393353909251561e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00205.png": {
+    "probability": [
+      0.01469836663454771,
+      2.230128120572772e-05,
+      0.9852793216705322,
+      1.7438186006302203e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00206.png": {
+    "probability": [
+      0.005328483879566193,
+      0.00020979199325665832,
+      0.9941091537475586,
+      0.0003526607761159539
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00207.png": {
+    "probability": [
+      0.9969135522842407,
+      3.4088679967680946e-07,
+      0.0016468425747007132,
+      0.0014392565935850143
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00208.png": {
+    "probability": [
+      0.992660403251648,
+      1.1764731766561454e-07,
+      0.007324938662350178,
+      1.4501317309623118e-05
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00209.png": {
+    "probability": [
+      4.986645194549055e-07,
+      4.034495759697165e-06,
+      0.9999954700469971,
+      2.833837053906052e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00210.png": {
+    "probability": [
+      1.971707348502605e-07,
+      2.1507469583070815e-08,
+      0.9999997615814209,
+      6.488365888405317e-14
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00211.png": {
+    "probability": [
+      2.7249941467744065e-06,
+      0.003030830528587103,
+      0.9964388608932495,
+      0.0005276610027067363
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00212.png": {
+    "probability": [
+      0.00021659006597474217,
+      0.01599809341132641,
+      0.9806813597679138,
+      0.0031039079185575247
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00213.png": {
+    "probability": [
+      0.0038175443187355995,
+      0.014702730812132359,
+      0.9812712073326111,
+      0.00020852606394328177
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00214.png": {
+    "probability": [
+      3.266322164563462e-05,
+      0.0041529289446771145,
+      0.9954936504364014,
+      0.0003207408881280571
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00215.png": {
+    "probability": [
+      0.003430111100897193,
+      3.190307040767948e-07,
+      0.9965695142745972,
+      3.3728539960975468e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00216.png": {
+    "probability": [
+      0.0005991480429656804,
+      3.96758679244158e-07,
+      0.9994004964828491,
+      3.4737702298004436e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00217.png": {
+    "probability": [
+      4.48621676696348e-06,
+      4.326305315771606e-06,
+      0.9999886751174927,
+      2.442097866151016e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00218.png": {
+    "probability": [
+      0.29406994581222534,
+      2.0411815057741478e-05,
+      0.32730260491371155,
+      0.3786070644855499
+    ],
+    "prediction": 3,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00219.png": {
+    "probability": [
+      0.985557496547699,
+      4.4212831085133075e-07,
+      0.01444204244762659,
+      2.1734722910338178e-09
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00220.png": {
+    "probability": [
+      0.004414441529661417,
+      0.03590717911720276,
+      0.9596754908561707,
+      2.9247837574075675e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00221.png": {
+    "probability": [
+      0.9974871873855591,
+      7.542276989624952e-07,
+      0.000572862452827394,
+      0.001939161098562181
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00222.png": {
+    "probability": [
+      0.710665225982666,
+      0.0007392761763185263,
+      0.28703054785728455,
+      0.00156494474504143
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00223.png": {
+    "probability": [
+      9.839939529854291e-09,
+      3.164116060361266e-05,
+      0.999968409538269,
+      2.3253657333022204e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00224.png": {
+    "probability": [
+      1.973558255485841e-06,
+      1.3134495020494796e-05,
+      0.999984860420227,
+      8.528982853306388e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00225.png": {
+    "probability": [
+      0.00025146870757453144,
+      1.8410242773825303e-05,
+      0.9997299313545227,
+      1.3970768009130552e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00226.png": {
+    "probability": [
+      4.56446684893308e-07,
+      2.8533006570796715e-06,
+      0.9999966621398926,
+      1.5099423933406797e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00227.png": {
+    "probability": [
+      3.6208564324624604e-07,
+      3.704607465238041e-08,
+      0.9999996423721313,
+      2.463103852823334e-11
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00228.png": {
+    "probability": [
+      0.018909918144345284,
+      0.001231866655871272,
+      0.8492960929870605,
+      0.13056209683418274
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00229.png": {
+    "probability": [
+      0.948294997215271,
+      0.005117199383676052,
+      0.04137609526515007,
+      0.005211654584854841
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00230.png": {
+    "probability": [
+      0.001044734613969922,
+      6.173243605189782e-07,
+      0.9989546537399292,
+      3.0274435403043753e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00231.png": {
+    "probability": [
+      0.00016177834186237305,
+      1.0020947229349986e-05,
+      0.9998282194137573,
+      9.13564779381204e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00232.png": {
+    "probability": [
+      1.5145123199999944e-07,
+      0.024073339998722076,
+      0.6421138644218445,
+      0.3338125944137573
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00233.png": {
+    "probability": [
+      3.974482388002798e-05,
+      0.045678671449422836,
+      0.6712433695793152,
+      0.2830381989479065
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00234.png": {
+    "probability": [
+      0.9186352491378784,
+      2.6242453259328613e-06,
+      0.08136212825775146,
+      2.795230491514644e-09
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00235.png": {
+    "probability": [
+      0.0008830470032989979,
+      0.0005362272495403886,
+      0.9985657334327698,
+      1.5022996194602456e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00236.png": {
+    "probability": [
+      3.2797668660794477e-12,
+      3.43288020232535e-09,
+      1.0,
+      6.430786892580587e-12
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00237.png": {
+    "probability": [
+      1.4718797501700465e-05,
+      0.02452411875128746,
+      0.9734811782836914,
+      0.001979964319616556
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00238.png": {
+    "probability": [
+      2.83849249171908e-06,
+      0.6852677464485168,
+      0.31358739733695984,
+      0.0011419951915740967
+    ],
+    "prediction": 1,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00239.png": {
+    "probability": [
+      1.8205355445388705e-05,
+      4.44458203574527e-09,
+      0.9999817609786987,
+      4.85707551673582e-17
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00240.png": {
+    "probability": [
+      4.034043498551965e-12,
+      1.510976517238305e-07,
+      0.9999998807907104,
+      3.1182361223798473e-16
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00241.png": {
+    "probability": [
+      2.7617736222951272e-11,
+      1.1337578875725285e-08,
+      1.0,
+      4.306740240041934e-13
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00242.png": {
+    "probability": [
+      6.392077267491914e-08,
+      0.0005462578847073019,
+      0.999453604221344,
+      3.5068306591945486e-10
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00243.png": {
+    "probability": [
+      6.433264206862077e-05,
+      1.2843217973568244e-06,
+      0.9999343156814575,
+      2.098984097642642e-09
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00244.png": {
+    "probability": [
+      0.0002559992717579007,
+      3.243794708396308e-07,
+      0.999743640422821,
+      3.5174458901110484e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00245.png": {
+    "probability": [
+      0.0004640139522962272,
+      0.040362242609262466,
+      0.9591280817985535,
+      4.570132659864612e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00246.png": {
+    "probability": [
+      8.227282705774996e-06,
+      0.00019499793415889144,
+      0.9997968077659607,
+      2.0254386612350572e-08
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00247.png": {
+    "probability": [
+      0.00011965470184804872,
+      0.00012563454220071435,
+      0.9997268319129944,
+      2.7869904442923144e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00248.png": {
+    "probability": [
+      0.00019292488286737353,
+      3.7250674722599797e-06,
+      0.9997851252555847,
+      1.8227485270472243e-05
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00249.png": {
+    "probability": [
+      1.6126567061292008e-05,
+      0.023107558488845825,
+      0.9763593077659607,
+      0.0005169069627299905
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00250.png": {
+    "probability": [
+      2.108617309204419e-06,
+      0.31823861598968506,
+      0.6793034076690674,
+      0.0024558466393500566
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00251.png": {
+    "probability": [
+      0.621893584728241,
+      8.44085752760293e-06,
+      0.3765609860420227,
+      0.0015369782922789454
+    ],
+    "prediction": 0,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00252.png": {
+    "probability": [
+      0.0029735711868852377,
+      0.013394099660217762,
+      0.9836312532424927,
+      1.1509916930663167e-06
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00253.png": {
+    "probability": [
+      0.00011602661106735468,
+      0.00020191488147247583,
+      0.999681830406189,
+      1.5081555204687902e-07
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00254.png": {
+    "probability": [
+      0.006289679557085037,
+      0.005956678185611963,
+      0.9652041792869568,
+      0.022549385204911232
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Breast_luminal/imgs/cls_00255.png": {
+    "probability": [
+      0.1665450483560562,
+      0.007394162937998772,
+      0.8082180023193359,
+      0.017842771485447884
+    ],
+    "prediction": 2,
+    "num_classes": 4
+  },
+  "classification/Liver/imgs/cls_00000.jpg": {
+    "probability": [
+      0.9559925198554993,
+      0.04400741308927536
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00001.jpg": {
+    "probability": [
+      7.320006378819244e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00002.jpg": {
+    "probability": [
+      0.999997615814209,
+      2.4371872768824687e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00003.jpg": {
+    "probability": [
+      5.829134579471429e-07,
+      0.9999994039535522
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00004.jpg": {
+    "probability": [
+      0.0010250238701701164,
+      0.9989750385284424
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00005.jpg": {
+    "probability": [
+      0.1086750477552414,
+      0.8913248777389526
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00006.jpg": {
+    "probability": [
+      4.575137602103041e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00007.jpg": {
+    "probability": [
+      0.23288947343826294,
+      0.7671105265617371
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00008.jpg": {
+    "probability": [
+      0.0006003704620525241,
+      0.9993996620178223
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00009.jpg": {
+    "probability": [
+      0.003776283236220479,
+      0.9962236881256104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00010.jpg": {
+    "probability": [
+      0.7718060612678528,
+      0.22819393873214722
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00011.jpg": {
+    "probability": [
+      0.9999923706054688,
+      7.578455097245751e-06
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00012.jpg": {
+    "probability": [
+      9.194767335429788e-05,
+      0.9999080896377563
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00013.jpg": {
+    "probability": [
+      1.0,
+      1.114202330398939e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00014.jpg": {
+    "probability": [
+      1.0,
+      4.6516131391172166e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00015.jpg": {
+    "probability": [
+      0.9999785423278809,
+      2.145902362826746e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00016.jpg": {
+    "probability": [
+      1.0,
+      1.290247908514175e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00017.jpg": {
+    "probability": [
+      1.0,
+      1.4542668402839354e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00018.jpg": {
+    "probability": [
+      6.322239176625999e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00019.jpg": {
+    "probability": [
+      0.017975887283682823,
+      0.9820241332054138
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00020.jpg": {
+    "probability": [
+      0.999903678894043,
+      9.634705202188343e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00021.jpg": {
+    "probability": [
+      9.759638487594202e-05,
+      0.9999023675918579
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00022.jpg": {
+    "probability": [
+      1.0,
+      2.933226106449638e-08
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00023.jpg": {
+    "probability": [
+      0.9999997615814209,
+      1.7939318297521822e-07
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00024.jpg": {
+    "probability": [
+      0.9997933506965637,
+      0.00020665347983594984
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00025.jpg": {
+    "probability": [
+      0.9999806880950928,
+      1.9303486624266952e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00026.jpg": {
+    "probability": [
+      0.05480387806892395,
+      0.9451960921287537
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00027.jpg": {
+    "probability": [
+      0.06128754839301109,
+      0.938712477684021
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00028.jpg": {
+    "probability": [
+      0.012098390609025955,
+      0.9879015684127808
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00029.jpg": {
+    "probability": [
+      0.18932026624679565,
+      0.8106797337532043
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00030.jpg": {
+    "probability": [
+      0.999713122844696,
+      0.0002868420269805938
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00031.jpg": {
+    "probability": [
+      0.7945622205734253,
+      0.20543783903121948
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00032.jpg": {
+    "probability": [
+      0.0063997781835496426,
+      0.9936002492904663
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00033.jpg": {
+    "probability": [
+      1.5203125940388418e-06,
+      0.9999984502792358
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00034.jpg": {
+    "probability": [
+      0.9999712705612183,
+      2.8677208320004866e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00035.jpg": {
+    "probability": [
+      0.5816779732704163,
+      0.41832202672958374
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00036.jpg": {
+    "probability": [
+      0.671512246131897,
+      0.3284877836704254
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00037.jpg": {
+    "probability": [
+      1.0,
+      4.1076169132736595e-09
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00038.jpg": {
+    "probability": [
+      0.9981091022491455,
+      0.0018908358179032803
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00039.jpg": {
+    "probability": [
+      0.9993459582328796,
+      0.0006540383328683674
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00040.jpg": {
+    "probability": [
+      0.7279224395751953,
+      0.2720775604248047
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00041.jpg": {
+    "probability": [
+      6.631643234555895e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00042.jpg": {
+    "probability": [
+      0.9907825589179993,
+      0.009217444807291031
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00043.jpg": {
+    "probability": [
+      0.3094002306461334,
+      0.6905997395515442
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00044.jpg": {
+    "probability": [
+      0.4406368136405945,
+      0.5593631863594055
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00045.jpg": {
+    "probability": [
+      1.308131380994837e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00046.jpg": {
+    "probability": [
+      1.707818952922935e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00047.jpg": {
+    "probability": [
+      0.9999706745147705,
+      2.9306256692507304e-05
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00048.jpg": {
+    "probability": [
+      0.9967206120491028,
+      0.003279393073171377
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00049.jpg": {
+    "probability": [
+      1.790507485566195e-05,
+      0.9999821186065674
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00050.jpg": {
+    "probability": [
+      0.0018788967281579971,
+      0.9981210827827454
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00051.jpg": {
+    "probability": [
+      2.2095166408303557e-12,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00052.jpg": {
+    "probability": [
+      9.283566753878758e-13,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00053.jpg": {
+    "probability": [
+      0.8669620752334595,
+      0.13303792476654053
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00054.jpg": {
+    "probability": [
+      3.0445148624380636e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00055.jpg": {
+    "probability": [
+      4.2766554543050006e-05,
+      0.9999572038650513
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00056.jpg": {
+    "probability": [
+      1.7548741482187324e-07,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00057.jpg": {
+    "probability": [
+      0.00039526517502963543,
+      0.9996047616004944
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00058.jpg": {
+    "probability": [
+      1.1986111658757181e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00059.jpg": {
+    "probability": [
+      2.6596408631007762e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00060.jpg": {
+    "probability": [
+      2.4979353654974723e-11,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00061.jpg": {
+    "probability": [
+      2.2704038826759643e-07,
+      0.9999997615814209
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00062.jpg": {
+    "probability": [
+      8.424508024518218e-08,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00063.jpg": {
+    "probability": [
+      5.166846226041522e-13,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00064.jpg": {
+    "probability": [
+      1.413190773291717e-07,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00065.jpg": {
+    "probability": [
+      1.3759743566765792e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00066.jpg": {
+    "probability": [
+      8.596826361895182e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00067.jpg": {
+    "probability": [
+      0.1787162721157074,
+      0.8212836980819702
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00068.jpg": {
+    "probability": [
+      5.231479693890151e-10,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00069.jpg": {
+    "probability": [
+      0.020341813564300537,
+      0.9796581268310547
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00070.jpg": {
+    "probability": [
+      9.348106289053248e-08,
+      0.9999998807907104
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00071.jpg": {
+    "probability": [
+      1.519765469026879e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00072.jpg": {
+    "probability": [
+      0.000247568532358855,
+      0.9997524619102478
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00073.jpg": {
+    "probability": [
+      1.3311107771585284e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00074.jpg": {
+    "probability": [
+      0.4075110852718353,
+      0.5924889445304871
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00075.jpg": {
+    "probability": [
+      3.1691892218077555e-05,
+      0.9999682903289795
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00076.jpg": {
+    "probability": [
+      0.992638111114502,
+      0.007361942902207375
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00077.jpg": {
+    "probability": [
+      2.6823837256066815e-15,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00078.jpg": {
+    "probability": [
+      4.6351665616839455e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00079.jpg": {
+    "probability": [
+      0.00020023004617542028,
+      0.9997997879981995
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00080.jpg": {
+    "probability": [
+      0.9454416632652283,
+      0.05455833673477173
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00081.jpg": {
+    "probability": [
+      1.4924804725424679e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00082.jpg": {
+    "probability": [
+      6.776000191166531e-06,
+      0.9999932050704956
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00083.jpg": {
+    "probability": [
+      3.6322260754673152e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00084.jpg": {
+    "probability": [
+      0.9991023540496826,
+      0.0008976540993899107
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00085.jpg": {
+    "probability": [
+      1.4000532199234025e-14,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00086.jpg": {
+    "probability": [
+      0.9452843070030212,
+      0.05471568927168846
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00087.jpg": {
+    "probability": [
+      0.6104030609130859,
+      0.38959693908691406
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00088.jpg": {
+    "probability": [
+      0.987421989440918,
+      0.012578054331243038
+    ],
+    "prediction": 0,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00089.jpg": {
+    "probability": [
+      1.1751365214252019e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00090.jpg": {
+    "probability": [
+      1.4098432075115852e-06,
+      0.9999985694885254
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00091.jpg": {
+    "probability": [
+      8.113552212307695e-07,
+      0.9999991655349731
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00092.jpg": {
+    "probability": [
+      5.666957349603763e-06,
+      0.9999942779541016
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00093.jpg": {
+    "probability": [
+      1.233801147186575e-12,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00094.jpg": {
+    "probability": [
+      5.155879521066831e-13,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00095.jpg": {
+    "probability": [
+      5.51231806866781e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00096.jpg": {
+    "probability": [
+      0.0047194440849125385,
+      0.9952805638313293
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00097.jpg": {
+    "probability": [
+      0.0022050649859011173,
+      0.9977949857711792
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00098.jpg": {
+    "probability": [
+      2.3796503656470236e-10,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00099.jpg": {
+    "probability": [
+      0.0001988711446756497,
+      0.9998010993003845
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00100.jpg": {
+    "probability": [
+      1.3719876346129922e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00101.jpg": {
+    "probability": [
+      1.9421683816744917e-07,
+      0.9999997615814209
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00102.jpg": {
+    "probability": [
+      9.603068974683993e-06,
+      0.9999903440475464
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00103.jpg": {
+    "probability": [
+      0.019151750952005386,
+      0.9808483123779297
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00104.jpg": {
+    "probability": [
+      2.088739137207085e-08,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00105.jpg": {
+    "probability": [
+      4.144019793983489e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00106.jpg": {
+    "probability": [
+      0.01657785102725029,
+      0.9834222197532654
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00107.jpg": {
+    "probability": [
+      0.001405103481374681,
+      0.9985949397087097
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00108.jpg": {
+    "probability": [
+      2.7012210176979856e-11,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00109.jpg": {
+    "probability": [
+      0.011330114677548409,
+      0.9886698722839355
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00110.jpg": {
+    "probability": [
+      2.6754209958568254e-10,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00111.jpg": {
+    "probability": [
+      3.088895458858154e-11,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00112.jpg": {
+    "probability": [
+      0.0006242840318009257,
+      0.9993757605552673
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00113.jpg": {
+    "probability": [
+      0.003397854045033455,
+      0.9966021776199341
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00114.jpg": {
+    "probability": [
+      5.6162414693972096e-05,
+      0.9999438524246216
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00115.jpg": {
+    "probability": [
+      2.4588544533798995e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00116.jpg": {
+    "probability": [
+      4.1835139796830845e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00117.jpg": {
+    "probability": [
+      1.969146179447989e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00118.jpg": {
+    "probability": [
+      9.417270518952137e-09,
+      1.0
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00119.jpg": {
+    "probability": [
+      0.014428168535232544,
+      0.9855718612670898
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  },
+  "classification/Liver/imgs/cls_00120.jpg": {
+    "probability": [
+      1.819017415982671e-05,
+      0.9999817609786987
+    ],
+    "prediction": 1,
+    "num_classes": 2
+  }
+}

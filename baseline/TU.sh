@@ -107,31 +107,31 @@ CUDA_VISIBLE_DEVICES=0
 
 
 # ######## test TU v2 tta ########
+torchrun \
+  --nproc_per_node=1 \
+  --master_port=21345 \
+  omni_test_TU_tta_45-1.py \
+  --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
+  --output_dir test_out/test_44-2-3_572_0.8393 \
+  --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44-2-3/best_model_572_0.8393.pth \
+  --batch_size 1 \
+  --img_size 224 \
+  --is_saveout \
+  --prompt \
+  --use_tta \
+
+# ######## test TU tta V45-1-2 ########
 # torchrun \
 #   --nproc_per_node=1 \
 #   --master_port=21345 \
-#   omni_test_TU_tta_45-1-2.py \
+#   omni_test_TU_tta_45-1-3.py \
 #   --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
-#   --output_dir test_out/test_45-1-2 \
+#   --output_dir test_out/test_45-1-3 \
 #   --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44-2-3/best_model_367_0.8287.pth \
 #   --batch_size 1 \
 #   --img_size 224 \
 #   --is_saveout \
 #   --prompt \
 #   --use_tta \
-
-# ######## test TU tta V45-1-2 ########
-torchrun \
-  --nproc_per_node=1 \
-  --master_port=21345 \
-  omni_test_TU_tta_45-1-3.py \
-  --root_path /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/data \
-  --output_dir test_out/test_45-1-3 \
-  --resume /cpfs01/projects-HDD/cfff-906dc71fafda_HDD/gbw_21307130160/challenge-main/baseline/exp_out/trail_debug_44-2-3/best_model_367_0.8287.pth \
-  --batch_size 1 \
-  --img_size 224 \
-  --is_saveout \
-  --prompt \
-  --use_tta \
-  --ms_scales_thyroid 1.0 \
-  --ms_scales_default 1.0 \
+#   --ms_scales_thyroid 1.0 \
+#   --ms_scales_default 1.0 \
